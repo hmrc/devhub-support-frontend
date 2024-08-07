@@ -1,7 +1,7 @@
 
 # devhub-support-frontend
 
-This is a placeholder README.md for a new repository
+This is the frontend component of developer hub that provides the support pages
 
 ### License
 
