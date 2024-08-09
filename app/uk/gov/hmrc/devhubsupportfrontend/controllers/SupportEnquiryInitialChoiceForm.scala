@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,26 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.HmrcStandardPageParams
+package uk.gov.hmrc.devhubsupportfrontend.controllers
 
-@this(
-  appConfig: AppConfig,
-  hmrcStandardPage: HmrcStandardPage
-)
+import play.api.data.Form
+import play.api.data.Forms._
 
-@(pageTitle: Option[String] = None)(contentBlock: Html)(implicit request: Request[Any], messages: Messages)
+import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData._
 
-@hmrcStandardPage(
-  HmrcStandardPageParams(
-    pageTitle = pageTitle,
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
+final case class SupportEnquiryInitialChoiceForm(initialChoice: String)
+
+object SupportEnquiryInitialChoiceForm extends FormValidation {
+
+  val form: Form[SupportEnquiryInitialChoiceForm] = Form(
+    mapping(
+      "initialChoice" -> oneOf(FindingAnApi.id, UsingAnApi.id, SigningIn.id, SettingUpApplication.id, NoneOfTheAbove.id)
+    )(SupportEnquiryInitialChoiceForm.apply)(SupportEnquiryInitialChoiceForm.unapply)
   )
-)(contentBlock)
-
-@{
-    //$COVERAGE-OFF$
 }
