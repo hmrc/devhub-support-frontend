@@ -21,6 +21,24 @@ lazy val microservice = Project("devhub-support-frontend", file("."))
   )
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
+    .settings(
+      routesImport ++= Seq(
+        "uk.gov.hmrc.devhubsupportfrontend.controllers.models._",
+        "uk.gov.hmrc.apiplatform.modules.common.domain.models._",
+    )
+  )
+  .settings(
+    TwirlKeys.templateImports ++= Seq(
+      "uk.gov.hmrc.hmrcfrontend.views.html.components._",
+      "uk.gov.hmrc.hmrcfrontend.views.html.helpers._",
+      "uk.gov.hmrc.apiplatform.modules.common.domain.models._",
+      "uk.gov.hmrc.devhubsupportfrontend.config.AppConfig",
+      "uk.gov.hmrc.devhubsupportfrontend.controllers",
+      "uk.gov.hmrc.devhubsupportfrontend.views.html._",
+      "uk.gov.hmrc.devhubsupportfrontend.views.html.include._",
+      "uk.gov.hmrc.devhubsupportfrontend.views.html.templates._",
+    )
+  )
 
 lazy val it = project
   .enablePlugins(PlayScala)

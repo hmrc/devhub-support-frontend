@@ -16,22 +16,16 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import play.api.data.Form
+import play.api.data.Forms._
 
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+final case class ChooseAPrivateApiForm(chosenApiName: String)
 
-import uk.gov.hmrc.devhubsupportfrontend.views.html.HelloWorldPage
+object ChooseAPrivateApiForm extends FormValidation {
 
-@Singleton
-class HelloWorldController @Inject() (
-    mcc: MessagesControllerComponents,
-    helloWorldPage: HelloWorldPage
-  ) extends FrontendController(mcc) {
-
-  val helloWorld: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(helloWorldPage()))
-  }
-
+  val form: Form[ChooseAPrivateApiForm] = Form(
+    mapping(
+      "apiName" -> oneOf(SupportData.ChooseBusinessRates.id, SupportData.ChooseCDS.id)
+    )(ChooseAPrivateApiForm.apply)(ChooseAPrivateApiForm.unapply)
+  )
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.devhubsupportfrontend.config
+package uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors
 
-import com.google.inject.AbstractModule
+import play.api.libs.json._
 
-class Module extends AbstractModule {
 
-  override def configure(): Unit = {
-    bind(classOf[AppConfig]).asEagerSingleton()
-  }
+case class HorizonTicketRef(ref: String)
+
+case object HorizonTicketRef {
+  implicit val reader: Reads[HorizonTicketRef] = (__ \ "data" \ "ref").read[String].map(HorizonTicketRef(_))
 }
