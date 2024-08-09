@@ -32,6 +32,7 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
 import uk.gov.hmrc.devhubsupportfrontend.services.SupportService
 import uk.gov.hmrc.devhubsupportfrontend.views.html.support.ApplyForPrivateApiAccessView
 import uk.gov.hmrc.devhubsupportfrontend.views.html.support.ChooseAPrivateApiView
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 
 @Singleton
 class ApplyForPrivateApiAccessController @Inject() (
@@ -39,6 +40,7 @@ class ApplyForPrivateApiAccessController @Inject() (
     supportService: SupportService,
     val cookieSigner: CookieSigner,
     val errorHandler: ErrorHandler,
+    val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     applyForPrivateApiAccessView: ApplyForPrivateApiAccessView,
     chooseAPrivateApiView: ChooseAPrivateApiView
   )(implicit val ec: ExecutionContext,

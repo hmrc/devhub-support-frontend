@@ -19,6 +19,10 @@ lazy val microservice = Project("devhub-support-frontend", file("."))
     scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s",
     pipelineStages := Seq(gzip),
   )
+  .settings(
+    Test / unmanagedSourceDirectories += baseDirectory.value / "test-utils",
+    Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-eT")
+  )
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
     .settings(

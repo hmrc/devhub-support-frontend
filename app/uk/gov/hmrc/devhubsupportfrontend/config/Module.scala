@@ -17,10 +17,21 @@
 package uk.gov.hmrc.devhubsupportfrontend.config
 
 import com.google.inject.AbstractModule
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ConnectorMetrics
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ConnectorMetricsImpl
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApmConnector
+import java.time.Clock
 
 class Module extends AbstractModule {
 
   override def configure(): Unit = {
-    bind(classOf[AppConfig]).asEagerSingleton()
+    bind(classOf[AppConfig]).asEagerSingleton
+
+    bind(classOf[ConnectorMetrics]).to(classOf[ConnectorMetricsImpl])
+
+    bind(classOf[ApmConnector.Config])
+      .toProvider(classOf[LiveApmConnectorConfigProvider])
+
+    bind(classOf[Clock]).toInstance(Clock.systemUTC())
   }
 }

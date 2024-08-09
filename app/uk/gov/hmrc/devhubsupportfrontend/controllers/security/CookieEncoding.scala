@@ -37,6 +37,18 @@ trait CookieEncoding {
 
   val cookieSigner: CookieSigner
 
+  def createUserCookie(sessionId: UserSessionId): Cookie = {
+    Cookie(
+      cookieName,
+      encodeCookie(sessionId.toString()),
+      cookieMaxAge,
+      cookiePathOption,
+      cookieDomainOption,
+      cookieSecureOption,
+      cookieHttpOnlyOption
+    )
+  }
+
   def createSupportCookie(sessionId: SupportSessionId): Cookie = {
     Cookie(
       cookieName,

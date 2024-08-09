@@ -20,9 +20,11 @@ import javax.inject.{Inject, Singleton}
 
 import play.api.{ConfigLoader, Configuration}
 import java.time.Duration
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class AppConfig @Inject() (config: Configuration) {
+class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config) {
+
   val welshLanguageSupportEnabled: Boolean            = getConfigDefaulted("features.welsh-language-support", false)
 
   val title                                           = "HMRC Developer Hub"
@@ -56,32 +58,12 @@ class AppConfig @Inject() (config: Configuration) {
   val deskproHorizonApplicationId: String             = config.get[String]("deskpro-horizon.application-id")
   val deskproHorizonTeamMemberEmail: String           = config.get[String]("deskpro-horizon.team-member-email")
   
-  def getString(key: String) =
-    config.getOptional[String](key).getOrElse(throwConfigNotFoundError(key))
-    
-  private def throwConfigNotFoundError(key: String) =
-    throw new RuntimeException(s"Could not find config key '$key'")
-
-  private val rootServices = "microservice.services"
-
-  private lazy val defaultProtocol: String =
-    config
-      .getOptional[String](s"$rootServices.protocol")
-      .getOrElse("http")
-
   private def buildUrl(key: String) = {
     (getConfigDefaulted(s"$key.protocol", ""), getConfigDefaulted(s"$key.host", "")) match {
       case (p, h) if !p.isEmpty && !h.isEmpty => Some(s"$p://$h")
       case (p, h) if p.isEmpty                => Some(s"https://$h")
       case _                                  => None
     }
-  }
-  
-  private def baseUrl(serviceName: String) = {
-    val protocol = config.getOptional[String](s"$serviceName.protocol").getOrElse(defaultProtocol)
-    val host     = config.get[String](s"$serviceName.host")
-    val port     = config.get[String](s"$serviceName.port")
-    s"$protocol://$host:$port"
   }
 
   private def getConfigDefaulted[A](key: String, default: => A)(implicit loader: ConfigLoader[A]): A = config.getOptional[A](key)(loader).getOrElse(default)
