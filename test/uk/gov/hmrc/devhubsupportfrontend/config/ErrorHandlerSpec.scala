@@ -40,7 +40,7 @@ class ErrorHandlerSpec extends AnyWordSpec
 
   "standardErrorTemplate" should {
     "render HTML" in {
-      val html = handler.standardErrorTemplate("title", "heading", "message")(fakeRequest).futureValue
+      val html = handler.standardErrorTemplate("title", "heading", "message")(fakeRequest)
       html.contentType shouldBe "text/html"
     }
   }
