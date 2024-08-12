@@ -20,6 +20,7 @@ import java.security.MessageDigest
 
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Cookie, RequestHeader}
+import uk.gov.hmrc.apiplatform.modules.tpd.core.domain.models.SessionId
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSessionId
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
@@ -28,16 +29,19 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
 trait CookieEncoding {
   implicit val appConfig: AppConfig
 
+  private[security] lazy val cookieName                         = "PLAY2AUTH_SESS_ID"
   private[security] lazy val cookieSecureOption: Boolean        = appConfig.securedCookie
   private[security] lazy val cookieHttpOnlyOption: Boolean      = true
   private[security] lazy val cookieDomainOption: Option[String] = None
   private[security] lazy val cookiePathOption: String           = "/"
-  private[security] lazy val cookieName                         = "SUPPORT_SESS_ID"
-  private[security] lazy val cookieMaxAge                       = Some(3600) // Hardcoded to 1 Hour
+  private[security] lazy val cookieMaxAge                       = Some(86400) // Hardcoded to 24 Hours until we fix the timeout dialog.
+
+  private[security] lazy val supportCookieName   = "SUPPORT_SESS_ID"
+  private[security] lazy val supportCookieMaxAge = Some(3600) // Hardcoded to 1 Hour
 
   val cookieSigner: CookieSigner
 
-  def createUserCookie(sessionId: UserSessionId): Cookie = {
+  def createUserCookie(sessionId: SessionId): Cookie = {
     Cookie(
       cookieName,
       encodeCookie(sessionId.toString()),
@@ -51,9 +55,9 @@ trait CookieEncoding {
 
   def createSupportCookie(sessionId: SupportSessionId): Cookie = {
     Cookie(
-      cookieName,
+      supportCookieName,
       encodeCookie(sessionId.toString()),
-      cookieMaxAge,
+      supportCookieMaxAge,
       cookiePathOption,
       cookieDomainOption,
       cookieSecureOption,

@@ -19,7 +19,9 @@ package uk.gov.hmrc.devhubsupportfrontend.domain.models
 import java.{util => ju}
 import scala.util.control.Exception._
 
-case class SupportSessionId(value: ju.UUID) {
+import uk.gov.hmrc.apiplatform.modules.tpd.core.domain.models.SessionId
+
+case class SupportSessionId(value: ju.UUID) extends SessionId {
   override def toString(): String = value.toString
 }
 

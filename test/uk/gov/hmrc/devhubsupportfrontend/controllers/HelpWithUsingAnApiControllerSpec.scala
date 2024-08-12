@@ -87,6 +87,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
       redirectLocation(result).value shouldBe "/devhub-support/new-support/api/private-api"
     }
   }
+
   "HelpWithUsingAnApiController" when {
     "using the delta functions" should {
       "work for chooseMakingCall" in {
