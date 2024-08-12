@@ -22,16 +22,21 @@ import com.google.inject.AbstractModule
 
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApmConnector, ConnectorMetrics, ConnectorMetricsImpl}
 
-class Module extends AbstractModule {
+import play.api.{Configuration, Environment}
+import play.api.inject.{Binding, Module}
 
-  override def configure(): Unit = {
-    bind(classOf[AppConfig]).asEagerSingleton
+import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApmConnector, ConnectorMetrics, ConnectorMetricsImpl}
 
-    bind(classOf[ConnectorMetrics]).to(classOf[ConnectorMetricsImpl])
+class ConfigModule extends Module {
 
-    bind(classOf[ApmConnector.Config])
-      .toProvider(classOf[LiveApmConnectorConfigProvider])
+  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = Seq(
+    bind[AppConfig].toSelf.eagerly(),
 
-    bind(classOf[Clock]).toInstance(Clock.systemUTC())
-  }
+    bind[ConnectorMetrics].to[ConnectorMetricsImpl],
+
+    bind[ApmConnector.Config]
+      .toProvider[LiveApmConnectorConfigProvider],
+
+    bind[Clock].toInstance(Clock.systemUTC())
+  )
 }
