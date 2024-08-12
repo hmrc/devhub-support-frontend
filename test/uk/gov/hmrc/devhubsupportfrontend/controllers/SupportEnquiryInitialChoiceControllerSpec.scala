@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.devhubsupportfrontend.controllers.support
+package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -26,7 +26,6 @@ import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinitionData
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
-import uk.gov.hmrc.devhubsupportfrontend.controllers.{BaseControllerSpec, SupportData, SupportEnquiryInitialChoiceController}
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.service.SupportServiceMockModule
