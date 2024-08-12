@@ -17,17 +17,18 @@
 package uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors
 
 import scala.util.Properties
+
 import play.api.libs.json._
 
 case class DeskproHorizonTicketPerson(
-  name: String,
-  email: String
-)
+    name: String,
+    email: String
+  )
 
 case class DeskproHorizonTicketMessage(
-  message: String,
-  format: String = "html"
-)
+    message: String,
+    format: String = "html"
+  )
 
 object DeskproHorizonTicketMessage {
   def fromRaw(message: String): DeskproHorizonTicketMessage = DeskproHorizonTicketMessage(message.replaceAll(Properties.lineSeparator, "<br>"))

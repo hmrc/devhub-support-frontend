@@ -17,17 +17,10 @@
 package uk.gov.hmrc.devhubsupportfrontend.service
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress.StringSyntax
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
-import uk.gov.hmrc.devhubsupportfrontend.connectors.DeskproHorizonConnector
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors.DeskproHorizonTicketPerson
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors.DeskproHorizonTicket
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors.DeskproHorizonTicketMessage
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors.HorizonTicketRef
+import uk.gov.hmrc.devhubsupportfrontend.connectors.DeskproHorizonConnector
 
 @Singleton
 class DeskproHorizonService @Inject() (

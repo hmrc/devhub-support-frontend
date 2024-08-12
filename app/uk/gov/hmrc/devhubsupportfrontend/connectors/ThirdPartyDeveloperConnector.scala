@@ -20,26 +20,24 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.Logging
+import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.{UserSession, UserSessionId}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HttpClient, SessionId => _, _}
 import uk.gov.hmrc.play.http.metrics.common.API
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
-import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSessionId
 
 @Singleton
 class ThirdPartyDeveloperConnector @Inject() (
-  http: HttpClient,
-  config: AppConfig,
-  metrics: ConnectorMetrics
-)(
-  implicit val ec: ExecutionContext
-) extends CommonResponseHandlers with Logging {
+    http: HttpClient,
+    config: AppConfig,
+    metrics: ConnectorMetrics
+  )(implicit val ec: ExecutionContext
+  ) extends CommonResponseHandlers with Logging {
 
   lazy val serviceBaseUrl: String = config.thirdPartyDeveloperUrl
 
-  val api: API                    = API("third-party-developer")
+  val api: API = API("third-party-developer")
 
   def fetchSession(sessionId: UserSessionId)(implicit hc: HeaderCarrier): Future[Option[UserSession]] = metrics.record(api) {
     http.GET[Option[UserSession]](s"$serviceBaseUrl/session/$sessionId")

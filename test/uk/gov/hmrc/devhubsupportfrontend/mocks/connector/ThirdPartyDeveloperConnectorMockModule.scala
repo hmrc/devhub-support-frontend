@@ -20,23 +20,30 @@ import scala.concurrent.Future.successful
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.data.SampleUserSession
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.UserIdTracker
 
-trait ThirdPartyDeveloperConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar with SampleUserSession with UserBuilder with UserIdTracker {
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 
-  trait AbstractTPDConnectorMock {
+trait ThirdPartyDeveloperConnectorMockModule
+    extends MockitoSugar
+    with ArgumentMatchersSugar
+    with SampleUserSession
+    with UserBuilder
+    with UserIdTracker {
+
+  trait AbstractThirdPartyDeveloperConnectorConnectorMock {
     def aMock: ThirdPartyDeveloperConnector
 
     object FetchSession {
+
       def succeeds() =
         when(aMock.fetchSession(eqTo(sessionId))(*)).thenReturn(successful(Some(userSession)))
     }
   }
 
-  object TPDConnectorMock extends AbstractTPDConnectorMock {
+  object ThirdPartyDeveloperConnectorConnectorMock extends AbstractThirdPartyDeveloperConnectorConnectorMock {
     val aMock = mock[ThirdPartyDeveloperConnector]
   }
 }

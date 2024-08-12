@@ -17,11 +17,11 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import play.api.mvc.{AnyContent, MessagesControllerComponents}
-
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
+
 import uk.gov.hmrc.devhubsupportfrontend.controllers._
-import uk.gov.hmrc.devhubsupportfrontend.security.SupportCookie
 import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
+import uk.gov.hmrc.devhubsupportfrontend.security.SupportCookie
 
 abstract class AbstractController(
     mcc: MessagesControllerComponents

@@ -24,12 +24,10 @@ import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
-import uk.gov.hmrc.devhubsupportfrontend.services._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.SupportPageDetailView
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.SupportPageConfirmationView
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
+import uk.gov.hmrc.devhubsupportfrontend.services._
+import uk.gov.hmrc.devhubsupportfrontend.views.html.support.{SupportPageConfirmationView, SupportPageDetailView}
 
 @Singleton
 class SupportDetailsController @Inject() (

@@ -19,20 +19,17 @@ package uk.gov.hmrc.devhubsupportfrontend.services
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import uk.gov.hmrc.http.HeaderCarrier
-
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.services.{ApplicationLogger, EitherTHelper}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-import uk.gov.hmrc.devhubsupportfrontend.domain.models._
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors.{DeskproHorizonTicket, DeskproHorizonTicketMessage, DeskproHorizonTicketPerson}
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
+import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApmConnector, DeskproHorizonConnector}
 import uk.gov.hmrc.devhubsupportfrontend.controllers._
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApmConnector
-import uk.gov.hmrc.devhubsupportfrontend.connectors.DeskproHorizonConnector
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors.{DeskproHorizonTicket, DeskproHorizonTicketMessage, DeskproHorizonTicketPerson}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, _}
 import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
-import uk.gov.hmrc.http.UpstreamErrorResponse
 
 @Singleton
 class SupportService @Inject() (
@@ -155,8 +152,8 @@ class SupportService @Inject() (
 
   private def submitTicket(supportFlow: SupportFlow, ticket: DeskproHorizonTicket)(implicit hc: HeaderCarrier): Future[SupportFlow] = {
     for {
-      ticketResult  <- deskproConnector.createTicket(ticket)
-      flow          <- flowRepository.saveFlow(supportFlow.copy(referenceNumber = Some(ticketResult.ref), emailAddress = Some(ticket.person.email)))
+      ticketResult <- deskproConnector.createTicket(ticket)
+      flow         <- flowRepository.saveFlow(supportFlow.copy(referenceNumber = Some(ticketResult.ref), emailAddress = Some(ticket.person.email)))
     } yield flow
   }
 }

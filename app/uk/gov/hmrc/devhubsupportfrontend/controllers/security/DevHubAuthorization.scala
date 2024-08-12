@@ -19,14 +19,14 @@ package uk.gov.hmrc.devhubsupportfrontend.security
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.mvc._
+import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.{UserSession, UserSessionId}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
 
-import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.{UserSession, UserSessionId}
-import uk.gov.hmrc.devhubsupportfrontend.controllers.BaseController
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
+import uk.gov.hmrc.devhubsupportfrontend.controllers.BaseController
+import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
 
 trait DevHubAuthorization extends FrontendHeaderCarrierProvider with CookieEncoding {
   self: BaseController =>

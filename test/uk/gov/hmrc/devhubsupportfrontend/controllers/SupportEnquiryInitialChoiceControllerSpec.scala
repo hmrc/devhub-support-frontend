@@ -19,23 +19,20 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers.support
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import org.jsoup.Jsoup
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.SupportEnquiryInitialChoiceView
 
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinitionData
+import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
+
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
-import uk.gov.hmrc.devhubsupportfrontend.controllers.BaseControllerSpec
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
+import uk.gov.hmrc.devhubsupportfrontend.controllers.{BaseControllerSpec, SupportData, SupportEnquiryInitialChoiceController}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
+import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.service.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
-import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
-import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportEnquiryInitialChoiceController
-import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
-import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
+import uk.gov.hmrc.devhubsupportfrontend.views.html.support.SupportEnquiryInitialChoiceView
 
 class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
@@ -53,12 +50,12 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
       mcc,
       cookieSigner,
       mock[ErrorHandler],
-      TPDConnectorMock.aMock,
+      ThirdPartyDeveloperConnectorConnectorMock.aMock,
       SupportServiceMock.aMock,
       supportEnquiryInitialChoiceView
     )
 
-    TPDConnectorMock.FetchSession.succeeds()
+    ThirdPartyDeveloperConnectorConnectorMock.FetchSession.succeeds()
 
     SupportServiceMock.FetchAllPublicApis.succeeds(List(ApiDefinitionData.apiDefinition))
 

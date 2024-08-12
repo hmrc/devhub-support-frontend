@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.config
 
-import com.google.inject.AbstractModule
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ConnectorMetrics
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ConnectorMetricsImpl
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApmConnector
 import java.time.Clock
+
+import com.google.inject.AbstractModule
+
+import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApmConnector, ConnectorMetrics, ConnectorMetricsImpl}
 
 class Module extends AbstractModule {
 

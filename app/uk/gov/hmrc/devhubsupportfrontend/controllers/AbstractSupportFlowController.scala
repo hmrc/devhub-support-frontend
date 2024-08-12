@@ -22,14 +22,13 @@ import scala.concurrent.Future.successful
 import play.api.data.Form
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import play.twirl.api.HtmlFormat
-
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
+
 import uk.gov.hmrc.devhubsupportfrontend.controllers._
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
+import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.security.SupportCookie
 import uk.gov.hmrc.devhubsupportfrontend.services.SupportService
-import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
 
 abstract class AbstractSupportFlowController[F, E](
     mcc: MessagesControllerComponents,

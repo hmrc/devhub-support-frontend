@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.controllers.models
 
-import play.api.data.Forms._
 import play.api.data.Form
+import play.api.data.Forms._
 
 case class SignOutSurveyForm(rating: Option[Int], improvementSuggestions: String, name: String, email: String, isJavascript: Boolean)
 

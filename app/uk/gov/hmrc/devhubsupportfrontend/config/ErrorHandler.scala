@@ -34,5 +34,3 @@ class ErrorHandler @Inject() (
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]): Html =
     errorTemplate(pageTitle, heading, message)
 }
-
-

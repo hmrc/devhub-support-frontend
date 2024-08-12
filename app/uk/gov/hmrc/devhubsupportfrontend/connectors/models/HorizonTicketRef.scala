@@ -18,7 +18,6 @@ package uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors
 
 import play.api.libs.json._
 
-
 case class HorizonTicketRef(ref: String)
 
 case object HorizonTicketRef {

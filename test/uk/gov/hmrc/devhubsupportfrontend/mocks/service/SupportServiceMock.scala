@@ -21,9 +21,9 @@ import scala.concurrent.Future.successful
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
+
 import uk.gov.hmrc.devhubsupportfrontend.controllers.{ApplyForPrivateApiAccessForm, SupportData, SupportDetailsForm}
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.services.SupportService
 
 trait SupportServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {

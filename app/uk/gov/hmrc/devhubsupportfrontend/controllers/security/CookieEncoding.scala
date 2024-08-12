@@ -20,10 +20,10 @@ import java.security.MessageDigest
 
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Cookie, RequestHeader}
-
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
-import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSessionId
+
+import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
 
 trait CookieEncoding {
   implicit val appConfig: AppConfig
@@ -32,8 +32,8 @@ trait CookieEncoding {
   private[security] lazy val cookieHttpOnlyOption: Boolean      = true
   private[security] lazy val cookieDomainOption: Option[String] = None
   private[security] lazy val cookiePathOption: String           = "/"
-  private[security] lazy val cookieName   = "SUPPORT_SESS_ID"
-  private[security] lazy val cookieMaxAge = Some(3600) // Hardcoded to 1 Hour
+  private[security] lazy val cookieName                         = "SUPPORT_SESS_ID"
+  private[security] lazy val cookieMaxAge                       = Some(3600) // Hardcoded to 1 Hour
 
   val cookieSigner: CookieSigner
 
@@ -67,7 +67,7 @@ trait CookieEncoding {
 
   def extractSupportSessionIdFromCookie(request: RequestHeader): Option[SupportSessionId] = decodeCookie(request, cookieName).flatMap(SupportSessionId.apply)
 
-  def extractUserSessionIdFromCookie(request: RequestHeader): Option[UserSessionId]       = decodeCookie(request, cookieName).flatMap(UserSessionId.apply)
+  def extractUserSessionIdFromCookie(request: RequestHeader): Option[UserSessionId] = decodeCookie(request, cookieName).flatMap(UserSessionId.apply)
 
   private def decodeCookie(request: RequestHeader, theCookieName: String): Option[String] = {
     for {

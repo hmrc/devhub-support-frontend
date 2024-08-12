@@ -16,48 +16,48 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.config
 
+import java.time.Duration
 import javax.inject.{Inject, Singleton}
 
 import play.api.{ConfigLoader, Configuration}
-import java.time.Duration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
 class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config) {
 
-  val welshLanguageSupportEnabled: Boolean            = getConfigDefaulted("features.welsh-language-support", false)
+  val welshLanguageSupportEnabled: Boolean = getConfigDefaulted("features.welsh-language-support", false)
 
-  val title                                           = "HMRC Developer Hub"
+  val title = "HMRC Developer Hub"
 
-  val platformFrontendHost: String                    = getConfigDefaulted("platform.frontend.host", "http://localhost:9695")
+  val platformFrontendHost: String = getConfigDefaulted("platform.frontend.host", "http://localhost:9695")
 
-  val thirdPartyDeveloperUrl: String                  = baseUrl("third-party-developer")
+  val thirdPartyDeveloperUrl: String = baseUrl("third-party-developer")
 
-  val thirdPartyDeveloperFrontendUrl: String          = buildUrl("platform.internal.frontend").getOrElse(baseUrl("third-party-developer-frontend"))
-  val keepAliveUrl: String                            = s"$thirdPartyDeveloperFrontendUrl/developer/keep-alive"
-  val logOutUrl: String                               = s"$thirdPartyDeveloperFrontendUrl/developer/logout"
-  val logInUrl: String                                = s"$thirdPartyDeveloperFrontendUrl/developer/login"
+  val thirdPartyDeveloperFrontendUrl: String = buildUrl("platform.internal.frontend").getOrElse(baseUrl("third-party-developer-frontend"))
+  val keepAliveUrl: String                   = s"$thirdPartyDeveloperFrontendUrl/developer/keep-alive"
+  val logOutUrl: String                      = s"$thirdPartyDeveloperFrontendUrl/developer/logout"
+  val logInUrl: String                       = s"$thirdPartyDeveloperFrontendUrl/developer/login"
 
-  val apiDocumentationFrontendUrl: String             = buildUrl("platform.internal.frontend").getOrElse(baseUrl("api-documentation-frontend"))
-  
-  lazy val reportProblemHost: String                  = config.underlying.getString("urls.report-a-problem.baseUrl") + config.underlying.getString("urls.report-a-problem.problem")
+  val apiDocumentationFrontendUrl: String = buildUrl("platform.internal.frontend").getOrElse(baseUrl("api-documentation-frontend"))
 
-  val securedCookie: Boolean                          = getConfigDefaulted("cookie.secure", true)
+  lazy val reportProblemHost: String = config.underlying.getString("urls.report-a-problem.baseUrl") + config.underlying.getString("urls.report-a-problem.problem")
 
-  val sessionTimeout: Duration                        = config.underlying.getDuration("sessiontimeout.timeout")
-  val sessionCountdown: Duration                      = config.underlying.getDuration("sessiontimeout.countdown")
+  val securedCookie: Boolean = getConfigDefaulted("cookie.secure", true)
 
-  val supportSessionTimeout: Duration                 = config.underlying.getDuration("supportsession.timeout")
+  val sessionTimeout: Duration   = config.underlying.getDuration("sessiontimeout.timeout")
+  val sessionCountdown: Duration = config.underlying.getDuration("sessiontimeout.countdown")
 
-  val deskproHorizonUrl: String                       = config.get[String]("deskpro-horizon.uri")
-  val deskproHorizonApiKey: String                    = config.getOptional[String]("deskpro-horizon.api-key").map(key => s"key $key").getOrElse("")
-  val deskproHorizonBrand: Int                        = config.get[Int]("deskpro-horizon.brand")
-  val deskproHorizonApiName: String                   = config.get[String]("deskpro-horizon.api-name")
-  val deskproHorizonSupportReason: String             = config.get[String]("deskpro-horizon.support-reason")
-  val deskproHorizonOrganisation: String              = config.get[String]("deskpro-horizon.organisation")
-  val deskproHorizonApplicationId: String             = config.get[String]("deskpro-horizon.application-id")
-  val deskproHorizonTeamMemberEmail: String           = config.get[String]("deskpro-horizon.team-member-email")
-  
+  val supportSessionTimeout: Duration = config.underlying.getDuration("supportsession.timeout")
+
+  val deskproHorizonUrl: String             = config.get[String]("deskpro-horizon.uri")
+  val deskproHorizonApiKey: String          = config.getOptional[String]("deskpro-horizon.api-key").map(key => s"key $key").getOrElse("")
+  val deskproHorizonBrand: Int              = config.get[Int]("deskpro-horizon.brand")
+  val deskproHorizonApiName: String         = config.get[String]("deskpro-horizon.api-name")
+  val deskproHorizonSupportReason: String   = config.get[String]("deskpro-horizon.support-reason")
+  val deskproHorizonOrganisation: String    = config.get[String]("deskpro-horizon.organisation")
+  val deskproHorizonApplicationId: String   = config.get[String]("deskpro-horizon.application-id")
+  val deskproHorizonTeamMemberEmail: String = config.get[String]("deskpro-horizon.team-member-email")
+
   private def buildUrl(key: String) = {
     (getConfigDefaulted(s"$key.protocol", ""), getConfigDefaulted(s"$key.host", "")) match {
       case (p, h) if !p.isEmpty && !h.isEmpty => Some(s"$p://$h")

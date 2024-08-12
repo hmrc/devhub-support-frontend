@@ -20,17 +20,16 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.http.HeaderNames.AUTHORIZATION
-import play.api.http.Status.{UNAUTHORIZED}
+import play.api.http.Status.UNAUTHORIZED
 import play.api.libs.json.Json
+import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.http.metrics.common.API
 
-import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors._
-import uk.gov.hmrc.http.UpstreamErrorResponse
 
 class DeskproHorizonConnector @Inject() (http: HttpClientV2, config: AppConfig, metrics: ConnectorMetrics)(implicit val ec: ExecutionContext)
     extends CommonResponseHandlers with ApplicationLogger {
@@ -43,25 +42,26 @@ class DeskproHorizonConnector @Inject() (http: HttpClientV2, config: AppConfig, 
       .withProxy
       .withBody(Json.toJson(deskproHorizonTicket))
       .setHeader(AUTHORIZATION -> config.deskproHorizonApiKey)
-      .execute[Either[UpstreamErrorResponse,HorizonTicketRef]]
-      .map { result => (result match {
-        case Right(response) => {
-          logger.info(s"Deskpro horizon ticket '${deskproHorizonTicket.subject}' created successfully")
-          response
-        }
-        
-        case Left(err @ UpstreamErrorResponse(msg, UNAUTHORIZED, _, _)) =>
-          logger.error(s"Deskpro horizon ticket creation failed due to unauthorized error for: ${deskproHorizonTicket.subject}")
-          logger.error(msg)
-          throw(err)
+      .execute[Either[UpstreamErrorResponse, HorizonTicketRef]]
+      .map { result =>
+        (result match {
+          case Right(response) => {
+            logger.info(s"Deskpro horizon ticket '${deskproHorizonTicket.subject}' created successfully")
+            response
+          }
 
-        case Left(err @ UpstreamErrorResponse(msg, _, _, _)) =>
-        // TODO: ************************* FIX THE LOG MESSAGE
-          logger.error(s"Deskpro horizon ticket creation failed due to ??? for: ${deskproHorizonTicket.subject}")
-          logger.error(msg)
-          throw(err)
-      })
-    }
+          case Left(err @ UpstreamErrorResponse(msg, UNAUTHORIZED, _, _)) =>
+            logger.error(s"Deskpro horizon ticket creation failed due to unauthorized error for: ${deskproHorizonTicket.subject}")
+            logger.error(msg)
+            throw (err)
+
+          case Left(err @ UpstreamErrorResponse(msg, _, _, _)) =>
+            // TODO: ************************* FIX THE LOG MESSAGE
+            logger.error(s"Deskpro horizon ticket creation failed due to ??? for: ${deskproHorizonTicket.subject}")
+            logger.error(msg)
+            throw (err)
+        })
+      }
   }
 
   override def toString = "DeskproHorizonConnector()"

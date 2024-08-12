@@ -17,6 +17,7 @@
 package uk.gov.hmrc.devhubsupportfrontend.domain.models.views
 
 import play.api.libs.json._
+
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 
 case class NavLink(label: String, href: String, truncate: Boolean = false, openInNewWindow: Boolean = false, isSensitive: Boolean = false)
@@ -42,7 +43,7 @@ case object UserNavLinks {
   def apply(appConfig: AppConfig, userFullName: Option[String], isRegistering: Boolean = false) =
     (userFullName, isRegistering) match {
       case (_, true)       => Seq.empty
-      case (Some(name), _) => loggedInNavLinks(appConfig,name)
+      case (Some(name), _) => loggedInNavLinks(appConfig, name)
       case (_, _)          => loggedOutNavLinks(appConfig)
     }
 

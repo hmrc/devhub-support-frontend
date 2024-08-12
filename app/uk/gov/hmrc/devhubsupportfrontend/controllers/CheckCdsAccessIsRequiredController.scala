@@ -26,14 +26,12 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import play.twirl.api.HtmlFormat
 
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
-import uk.gov.hmrc.devhubsupportfrontend.services.SupportService
-import uk.gov.hmrc.devhubsupportfrontend.domain.models._
-import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
-import uk.gov.hmrc.devhubsupportfrontend.security.SupportCookie
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.ChooseAPrivateApiView
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.CheckCdsAccessIsRequiredView
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.CdsAccessIsNotRequiredView
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
+import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
+import uk.gov.hmrc.devhubsupportfrontend.domain.models._
+import uk.gov.hmrc.devhubsupportfrontend.security.SupportCookie
+import uk.gov.hmrc.devhubsupportfrontend.services.SupportService
+import uk.gov.hmrc.devhubsupportfrontend.views.html.support.{CdsAccessIsNotRequiredView, CheckCdsAccessIsRequiredView, ChooseAPrivateApiView}
 
 @Singleton
 class CheckCdsAccessIsRequiredController @Inject() (

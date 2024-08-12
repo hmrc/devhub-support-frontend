@@ -19,10 +19,10 @@ package uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors
 import play.api.libs.json._
 import play.api.mvc.Request
 import play.mvc.Http.HeaderNames.REFERER
-import uk.gov.hmrc.http.HeaderCarrier
-
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress.StringSyntax
+import uk.gov.hmrc.http.HeaderCarrier
+
 import uk.gov.hmrc.devhubsupportfrontend.controllers.models.SignOutSurveyForm
 
 case class Feedback(
