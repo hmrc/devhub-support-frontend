@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.devhubsupportfrontend.controllers.support
+package uk.gov.hmrc.thirdpartydeveloperfrontend.controllers.support
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -26,54 +26,59 @@ import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
-import uk.gov.hmrc.devhubsupportfrontend.controllers.{ApplyForPrivateApiAccessController, BaseControllerSpec, SupportData}
+import uk.gov.hmrc.devhubsupportfrontend.controllers.{BaseControllerSpec, ChooseAPrivateApiController, SupportData}
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.service.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.{ApplyForPrivateApiAccessView, ChooseAPrivateApiView}
+import uk.gov.hmrc.devhubsupportfrontend.views.html.support.{CheckCdsAccessIsRequiredView, ChooseAPrivateApiView}
 
-class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
+class ChooseAPrivateApiControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
   trait Setup extends SupportServiceMockModule with ThirdPartyDeveloperConnectorMockModule with UserBuilder with LocalUserIdTracker {
-    val applyForPrivateApiAccessView = app.injector.instanceOf[ApplyForPrivateApiAccessView]
+    val checkCdsAccessIsRequiredView = app.injector.instanceOf[CheckCdsAccessIsRequiredView]
     val chooseAPrivateApiView        = app.injector.instanceOf[ChooseAPrivateApiView]
 
     lazy val request = FakeRequest()
       .withSupport(underTest, cookieSigner)(supportSessionId)
       .withUser(underTest, cookieSigner)(sessionId)
 
-    val underTest = new ApplyForPrivateApiAccessController(
+    val underTest = new ChooseAPrivateApiController(
       mcc,
-      SupportServiceMock.aMock,
       cookieSigner,
       mock[ErrorHandler],
       ThirdPartyDeveloperConnectorMock.aMock,
-      applyForPrivateApiAccessView,
-      chooseAPrivateApiView
+      SupportServiceMock.aMock,
+      chooseAPrivateApiView,
+      checkCdsAccessIsRequiredView
     )
 
     val supportSessionId = SupportSessionId.random
-    val basicFlow        = SupportFlow(supportSessionId, SupportData.PrivateApiDocumentation.id)
-    val appropriateFlow  = basicFlow.copy(privateApi = Some("xxx"))
+    val basicFlow        = SupportFlow(supportSessionId, "?")
+    val appropriateFlow  = basicFlow.copy(entrySelection = SupportData.UsingAnApi.id, subSelection = Some(SupportData.PrivateApiDocumentation.id))
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
 
     def shouldBeRedirectedToPreviousPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/api/private-api"
+      redirectLocation(result).value shouldBe "/devhub-support/new-support/api/choose-api"
     }
 
-    def shouldBeRedirectedToConfirmationPage(result: Future[Result]) = {
+    def shouldBeRedirectedToApplyPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/confirmation"
+      redirectLocation(result).value shouldBe "/devhub-support/new-support/api/private-api/apply"
+    }
+
+    def shouldBeRedirectedToConfirmCdsPage(result: Future[Result]) = {
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).value shouldBe "/devhub-support/new-support/api/private-api/cds-check"
     }
   }
 
-  "ApplyForPrivateApiAccessController" when {
-    "invoke page" should {
-      "render the page when flow has private api present" in new Setup {
+  "ChooseAPrivateApiController" when {
+    "invoke chooseAPrivateApiPage" should {
+      "render the page when flow is correct" in new Setup {
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
 
         val result = addToken(underTest.page())(request)
@@ -81,8 +86,8 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
         status(result) shouldBe OK
       }
 
-      "render the previous page when flow has no private api present" in new Setup {
-        SupportServiceMock.GetSupportFlow.succeeds(basicFlow.copy(privateApi = None))
+      "render the previous page when flow is wrong" in new Setup {
+        SupportServiceMock.GetSupportFlow.succeeds(basicFlow.copy(entrySelection = SupportData.UsingAnApi.id))
 
         val result = addToken(underTest.page())(request)
 
@@ -90,7 +95,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
       }
 
       "render the previous page when there is no flow" in new Setup {
-        SupportServiceMock.GetSupportFlow.succeeds(basicFlow.copy(privateApi = None))
+        SupportServiceMock.GetSupportFlow.succeeds(basicFlow)
 
         val result = addToken(underTest.page())(request)
 
@@ -98,27 +103,34 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
       }
     }
 
-    "invoke submit" should {
-      "submit new valid request from form" in new Setup {
+    "invoke submitChoiceOfPrivateApi" should {
+      "submit new valid request from form for business rates choice" in new Setup {
         val formRequest = request.withFormUrlEncodedBody(
-          "fullName"      -> "Bob",
-          "emailAddress"  -> "bob@example.com",
-          "organisation"  -> "org",
-          "applicationId" -> "123456"
+          "apiName" -> SupportData.ChooseBusinessRates.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
-        SupportServiceMock.SubmitTicket.succeeds()
+        SupportServiceMock.UpdateWithDelta.succeeds()
 
         val result = addToken(underTest.submit())(formRequest)
 
-        shouldBeRedirectedToConfirmationPage(result)
+        shouldBeRedirectedToApplyPage(result)
+      }
+
+      "submit new valid request from form for CDS choice" in new Setup {
+        val formRequest = request.withFormUrlEncodedBody(
+          "apiName" -> SupportData.ChooseCDS.id
+        )
+        SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
+        SupportServiceMock.UpdateWithDelta.succeeds()
+
+        val result = addToken(underTest.submit())(formRequest)
+
+        shouldBeRedirectedToConfirmCdsPage(result)
       }
 
       "submit invalid request returns BAD_REQUEST" in new Setup {
         val formRequest = request.withFormUrlEncodedBody(
-          "fullName"      -> "Bob",
-          "emailAddress"  -> "bob@example.com",
-          "applicationId" -> "123456"
+          "bobbins" -> SupportData.ChooseBusinessRates.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
 
@@ -129,10 +141,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
 
       "submit valid request but no session" in new Setup {
         val formRequest = request.withFormUrlEncodedBody(
-          "fullName"      -> "Bob",
-          "emailAddress"  -> "bob@example.com",
-          "organisation"  -> "org",
-          "applicationId" -> "123456"
+          "apiName" -> SupportData.ChooseCDS.id
         )
         SupportServiceMock.GetSupportFlow.succeeds()
 

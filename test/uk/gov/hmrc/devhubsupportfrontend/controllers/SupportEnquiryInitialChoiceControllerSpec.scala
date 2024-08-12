@@ -50,12 +50,12 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
       mcc,
       cookieSigner,
       mock[ErrorHandler],
-      ThirdPartyDeveloperConnectorConnectorMock.aMock,
+      ThirdPartyDeveloperConnectorMock.aMock,
       SupportServiceMock.aMock,
       supportEnquiryInitialChoiceView
     )
 
-    ThirdPartyDeveloperConnectorConnectorMock.FetchSession.succeeds()
+    ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
 
     SupportServiceMock.FetchAllPublicApis.succeeds(List(ApiDefinitionData.apiDefinition))
 

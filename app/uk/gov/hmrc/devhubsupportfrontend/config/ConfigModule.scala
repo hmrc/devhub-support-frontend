@@ -18,12 +18,8 @@ package uk.gov.hmrc.devhubsupportfrontend.config
 
 import java.time.Clock
 
-import com.google.inject.AbstractModule
-
-import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApmConnector, ConnectorMetrics, ConnectorMetricsImpl}
-
-import play.api.{Configuration, Environment}
 import play.api.inject.{Binding, Module}
+import play.api.{Configuration, Environment}
 
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApmConnector, ConnectorMetrics, ConnectorMetricsImpl}
 
@@ -31,12 +27,9 @@ class ConfigModule extends Module {
 
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = Seq(
     bind[AppConfig].toSelf.eagerly(),
-
     bind[ConnectorMetrics].to[ConnectorMetricsImpl],
-
     bind[ApmConnector.Config]
       .toProvider[LiveApmConnectorConfigProvider],
-
     bind[Clock].toInstance(Clock.systemUTC())
   )
 }

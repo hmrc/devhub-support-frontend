@@ -33,7 +33,7 @@ trait ThirdPartyDeveloperConnectorMockModule
     with UserBuilder
     with UserIdTracker {
 
-  trait AbstractThirdPartyDeveloperConnectorConnectorMock {
+  trait AbstractThirdPartyDeveloperConnectorMock {
     def aMock: ThirdPartyDeveloperConnector
 
     object FetchSession {
@@ -43,7 +43,7 @@ trait ThirdPartyDeveloperConnectorMockModule
     }
   }
 
-  object ThirdPartyDeveloperConnectorConnectorMock extends AbstractThirdPartyDeveloperConnectorConnectorMock {
+  object ThirdPartyDeveloperConnectorMock extends AbstractThirdPartyDeveloperConnectorMock {
     val aMock = mock[ThirdPartyDeveloperConnector]
   }
 }
