@@ -14,7 +14,7 @@ $hmrc-assets-path: "/developer/assets/lib/hmrc-frontend/hmrc/";
 @import "lib/hmrc-frontend/hmrc/all";
 
 // // Ad-hoc fixes
-// @import "ad-hoc";
+@import "ad-hoc";
 // @import "character-count";
 // @import "slider";
 

@@ -49,6 +49,7 @@ class SupportEnquiryInitialChoiceController @Inject() (
     def handleValidForm(form: SupportEnquiryInitialChoiceForm): Future[Result] = {
       val sessionId = extractSupportSessionIdFromCookie(request).getOrElse(SupportSessionId.random)
       supportService.createFlow(sessionId, form.initialChoice)
+
       form.initialChoice match {
         case SupportData.UsingAnApi.id           => Future.successful(withSupportCookie(Redirect(routes.HelpWithUsingAnApiController.page()), sessionId))
         case SupportData.SigningIn.id            => Future.successful(withSupportCookie(Redirect(routes.HelpWithSigningInController.page()), sessionId))

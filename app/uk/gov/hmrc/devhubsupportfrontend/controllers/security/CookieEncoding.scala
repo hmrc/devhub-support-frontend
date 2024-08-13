@@ -69,7 +69,7 @@ trait CookieEncoding {
     cookieSigner.sign(token) + token
   }
 
-  def extractSupportSessionIdFromCookie(request: RequestHeader): Option[SupportSessionId] = decodeCookie(request, cookieName).flatMap(SupportSessionId.apply)
+  def extractSupportSessionIdFromCookie(request: RequestHeader): Option[SupportSessionId] = decodeCookie(request, supportCookieName).flatMap(SupportSessionId.apply)
 
   def extractUserSessionIdFromCookie(request: RequestHeader): Option[UserSessionId] = decodeCookie(request, cookieName).flatMap(UserSessionId.apply)
 

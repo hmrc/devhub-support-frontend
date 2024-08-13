@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.views.helper
 
+import uk.gov.hmrc.devhubsupportfrontend.controllers.models.FieldNameKey
+
 object GlobalSection {
-
   import uk.gov.hmrc.devhubsupportfrontend.controllers.FormKeys._
-  import uk.gov.hmrc.devhubsupportfrontend.controllers.FieldNameKey
 
+  // HTML anchor
   private def a(rawErrorMessageKeyOrMessageText: String)(found: FieldNameKey => String, notFound: () => String) = {
     globalKeys.find(_.value == rawErrorMessageKeyOrMessageText).fold(
       notFound()
