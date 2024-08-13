@@ -28,7 +28,7 @@ import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
 import uk.gov.hmrc.devhubsupportfrontend.controllers.BaseControllerSpec
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
-import uk.gov.hmrc.devhubsupportfrontend.mocks.service.SupportServiceMockModule
+import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithSupportSession._

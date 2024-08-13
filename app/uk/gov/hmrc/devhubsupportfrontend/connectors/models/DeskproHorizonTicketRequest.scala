@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors
+package uk.gov.hmrc.devhubsupportfrontend.connectors.models
 
 import scala.util.Properties
 
@@ -34,7 +34,7 @@ object DeskproHorizonTicketMessage {
   def fromRaw(message: String): DeskproHorizonTicketMessage = DeskproHorizonTicketMessage(message.replaceAll(Properties.lineSeparator, "<br>"))
 }
 
-case class DeskproHorizonTicket(
+case class DeskproHorizonTicketRequest(
     person: DeskproHorizonTicketPerson,
     subject: String,
     message: DeskproHorizonTicketMessage,
@@ -42,9 +42,8 @@ case class DeskproHorizonTicket(
     fields: Map[String, String] = Map.empty
   )
 
-object DeskproHorizonTicket extends FieldTransformer {
+object DeskproHorizonTicketRequest {
   implicit val ticketPersonFormat: OFormat[DeskproHorizonTicketPerson]   = Json.format[DeskproHorizonTicketPerson]
   implicit val ticketMessageFormat: OFormat[DeskproHorizonTicketMessage] = Json.format[DeskproHorizonTicketMessage]
-  implicit val ticketFormat: OFormat[DeskproHorizonTicket]               = Json.format[DeskproHorizonTicket]
-
+  implicit val ticketFormat: OFormat[DeskproHorizonTicketRequest]        = Json.format[DeskproHorizonTicketRequest]
 }

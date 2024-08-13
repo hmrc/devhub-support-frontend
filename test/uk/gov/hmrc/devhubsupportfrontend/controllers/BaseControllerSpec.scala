@@ -28,7 +28,7 @@ import play.api.libs.crypto.CookieSigner
 import play.api.mvc.MessagesControllerComponents
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-import uk.gov.hmrc.devhubsupportfrontend.mocks.service.ErrorHandlerMock
+import uk.gov.hmrc.devhubsupportfrontend.mocks.services.ErrorHandlerMock
 import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec
 
 class BaseControllerSpec

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.devhubsupportfrontend.mocks.service
+package uk.gov.hmrc.devhubsupportfrontend.mocks.services
 
 import scala.concurrent.Future.successful
 

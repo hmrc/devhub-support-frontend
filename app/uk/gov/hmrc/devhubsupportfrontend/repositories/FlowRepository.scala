@@ -32,18 +32,18 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 
-object SupportFlowRepository {
+object FlowRepository {
   import play.api.libs.json._
   implicit val dateFormat: Format[Instant]            = MongoJavatimeFormats.instantFormat
   implicit val formatSupportFlow: Format[SupportFlow] = Json.format[SupportFlow]
 }
 
 @Singleton
-class SupportFlowRepository @Inject() (mongo: MongoComponent, appConfig: AppConfig)(implicit val ec: ExecutionContext)
+class FlowRepository @Inject() (mongo: MongoComponent, appConfig: AppConfig)(implicit val ec: ExecutionContext)
     extends PlayMongoRepository[SupportFlow](
       collectionName = "flows",
       mongoComponent = mongo,
-      domainFormat = SupportFlowRepository.formatSupportFlow,
+      domainFormat = FlowRepository.formatSupportFlow,
       indexes = Seq(
         IndexModel(
           ascending("sessionId"),
@@ -60,7 +60,7 @@ class SupportFlowRepository @Inject() (mongo: MongoComponent, appConfig: AppConf
       )
     ) {
 
-  def saveFlow[A <: SupportFlow](flow: A): Future[A] = {
+  def saveFlow(flow: SupportFlow): Future[SupportFlow] = {
     val query = equal("sessionId", flow.sessionId.toString)
 
     collection.find(query).headOption() flatMap {

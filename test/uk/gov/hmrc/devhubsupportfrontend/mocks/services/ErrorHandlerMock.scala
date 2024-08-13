@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors
+package uk.gov.hmrc.devhubsupportfrontend.mocks.services
 
-import play.api.libs.json._
+import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-case class HorizonTicketRef(ref: String)
+import play.twirl.api.Html
 
-case object HorizonTicketRef {
-  implicit val reader: Reads[HorizonTicketRef] = (__ \ "data" \ "ref").read[String].map(HorizonTicketRef(_))
+import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
+
+trait ErrorHandlerMock extends MockitoSugar with ArgumentMatchersSugar {
+  val mockErrorHandler = mock[ErrorHandler]
+  when(mockErrorHandler.notFoundTemplate(*)).thenReturn(Html(""))
+  when(mockErrorHandler.badRequestTemplate(*)).thenReturn(Html(""))
 }

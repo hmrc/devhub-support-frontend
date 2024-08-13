@@ -25,17 +25,17 @@ import uk.gov.hmrc.apiplatform.modules.common.services.{ApplicationLogger, Eithe
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
+import uk.gov.hmrc.devhubsupportfrontend.connectors.models.{DeskproHorizonTicketMessage, DeskproHorizonTicketPerson, DeskproHorizonTicketRequest}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApmConnector, DeskproHorizonConnector}
 import uk.gov.hmrc.devhubsupportfrontend.controllers._
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors.{DeskproHorizonTicket, DeskproHorizonTicketMessage, DeskproHorizonTicketPerson}
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, _}
-import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
+import uk.gov.hmrc.devhubsupportfrontend.repositories.FlowRepository
 
 @Singleton
 class SupportService @Inject() (
     val apmConnector: ApmConnector,
     deskproConnector: DeskproHorizonConnector,
-    flowRepository: SupportFlowRepository,
+    flowRepository: FlowRepository,
     config: AppConfig
   )(implicit val ec: ExecutionContext
   ) extends ApplicationLogger {
@@ -119,7 +119,7 @@ class SupportService @Inject() (
     )
   }
 
-  private def buildTicket(supportFlow: SupportFlow, fullName: String, emailAddress: String, messageContents: String): DeskproHorizonTicket = {
+  private def buildTicket(supportFlow: SupportFlow, fullName: String, emailAddress: String, messageContents: String): DeskproHorizonTicketRequest = {
     // Entry point is currently the value of the text on the radio button but may not always be so.
     def deriveSupportReason(): String = {
       (supportFlow.entrySelection, supportFlow.subSelection) match {
@@ -139,7 +139,7 @@ class SupportService @Inject() (
       }
     }
 
-    DeskproHorizonTicket(
+    DeskproHorizonTicketRequest(
       person = DeskproHorizonTicketPerson(fullName, emailAddress),
       subject = "HMRC Developer Hub: Support Enquiry",
       message = DeskproHorizonTicketMessage.fromRaw(messageContents),
@@ -150,7 +150,7 @@ class SupportService @Inject() (
     )
   }
 
-  private def submitTicket(supportFlow: SupportFlow, ticket: DeskproHorizonTicket)(implicit hc: HeaderCarrier): Future[SupportFlow] = {
+  private def submitTicket(supportFlow: SupportFlow, ticket: DeskproHorizonTicketRequest)(implicit hc: HeaderCarrier): Future[SupportFlow] = {
     for {
       ticketResult <- deskproConnector.createTicket(ticket)
       flow         <- flowRepository.saveFlow(supportFlow.copy(referenceNumber = Some(ticketResult.ref), emailAddress = Some(ticket.person.email)))

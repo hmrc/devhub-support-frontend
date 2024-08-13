@@ -29,7 +29,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.http.metrics.common.API
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.connectors._
+import uk.gov.hmrc.devhubsupportfrontend.connectors.models._
 
 class DeskproHorizonConnector @Inject() (http: HttpClientV2, config: AppConfig, metrics: ConnectorMetrics)(implicit val ec: ExecutionContext)
     extends CommonResponseHandlers with ApplicationLogger {
@@ -37,12 +37,12 @@ class DeskproHorizonConnector @Inject() (http: HttpClientV2, config: AppConfig, 
   lazy val serviceBaseUrl: String = config.deskproHorizonUrl
   val api                         = API("deskpro-horizon")
 
-  def createTicket(deskproHorizonTicket: DeskproHorizonTicket)(implicit hc: HeaderCarrier): Future[HorizonTicketRef] = metrics.record(api) {
+  def createTicket(deskproHorizonTicket: DeskproHorizonTicketRequest)(implicit hc: HeaderCarrier): Future[DeskproHorizonTicketResponse] = metrics.record(api) {
     http.post(url"${requestUrl("/api/v2/tickets")}")
       .withProxy
       .withBody(Json.toJson(deskproHorizonTicket))
       .setHeader(AUTHORIZATION -> config.deskproHorizonApiKey)
-      .execute[Either[UpstreamErrorResponse, HorizonTicketRef]]
+      .execute[Either[UpstreamErrorResponse, DeskproHorizonTicketResponse]]
       .map { result =>
         (result match {
           case Right(response) => {
