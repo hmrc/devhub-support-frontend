@@ -32,8 +32,8 @@ class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config)
   val platformFrontendHost: String = getConfigDefaulted("platform.frontend.host", "http://localhost:9695")
 
   val thirdPartyDeveloperUrl: String = baseUrl("third-party-developer")
-
-  val thirdPartyDeveloperFrontendUrl: String = buildUrl("platform.internal.frontend").getOrElse(baseUrl("third-party-developer-frontend"))
+  val thirdPartyDeveloperFrontendUrl: String = baseUrl("third-party-developer-frontend")
+  
   val keepAliveUrl: String                   = s"$thirdPartyDeveloperFrontendUrl/developer/keep-alive"
   val logOutUrl: String                      = s"$thirdPartyDeveloperFrontendUrl/developer/logout"
   val logInUrl: String                       = s"$thirdPartyDeveloperFrontendUrl/developer/login"
