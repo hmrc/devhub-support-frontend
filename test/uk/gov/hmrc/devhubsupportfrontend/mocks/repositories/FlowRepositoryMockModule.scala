@@ -36,13 +36,7 @@ trait FlowRepositoryMockModule extends MockitoSugar with ArgumentMatchersSugar {
     object FetchBySessionId {
       def thenReturn(flow: SupportFlow) = when(aMock.fetchBySessionId(*)).thenReturn(successful(Some(flow)))
 
-      def thenReturn(sessionId: SupportSessionId)(flow: SupportFlow) =
-        when(aMock.fetchBySessionId(eqTo(sessionId))).thenReturn(successful(Some(flow)))
-
       def thenReturnNothing = when(aMock.fetchBySessionId(*)).thenReturn(successful(None))
-
-      def thenReturnNothing(sessionId: SupportSessionId) =
-        when(aMock.fetchBySessionId(eqTo(sessionId))).thenReturn(successful(None))
 
       def verifyCalledWith(sessionId: SupportSessionId) = verify.fetchBySessionId(eqTo(sessionId))
     }
@@ -53,11 +47,6 @@ trait FlowRepositoryMockModule extends MockitoSugar with ArgumentMatchersSugar {
       def verifyCalledWith(flow: SupportFlow) = verify.saveFlow(eqTo(flow))
     }
 
-    object DeleteBySessionId {
-      def thenReturnSuccess(sessionId: SupportSessionId) = when(aMock.deleteBySessionId(eqTo(sessionId))).thenReturn(successful(true))
-
-      def verifyCalledWith(sessionId: SupportSessionId) = verify.deleteBySessionId(eqTo(sessionId))
-    }
   }
 
   object FlowRepositoryMock extends BaseFlowRepositoryMock {

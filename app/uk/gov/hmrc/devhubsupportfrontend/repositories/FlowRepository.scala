@@ -82,17 +82,11 @@ class FlowRepository @Inject() (mongo: MongoComponent, appConfig: AppConfig)(imp
     }
   }
 
-  def deleteBySessionId(sessionId: SupportSessionId): Future[Boolean] = {
-    collection.deleteOne(equal("sessionId", sessionId.toString))
-      .toFuture()
-      .map(_.wasAcknowledged())
-  }
-
   def fetchBySessionId(sessionId: SupportSessionId): Future[Option[SupportFlow]] = {
     collection.find(equal("sessionId", sessionId.toString)).headOption()
   }
 
-  def updateLastUpdated(sessionId: SupportSessionId): Future[Unit] = {
+  private def updateLastUpdated(sessionId: SupportSessionId): Future[Unit] = {
     collection.updateMany(
       filter = equal("sessionId", sessionId.toString),
       update = Updates.currentDate("lastUpdated"),
