@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import play.twirl.api.HtmlFormat
+
 @import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.HmrcStandardPageParams
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
@@ -25,6 +27,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.TwoThirdsMainContent
 @import uk.gov.hmrc.govukfrontend.views.html.components.FixedWidthPageLayout
 @import uk.gov.hmrc.govukfrontend.views.html.components.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
 
 @this(
   appConfig: AppConfig,
@@ -40,35 +43,7 @@
   fixedWidthPageLayout: FixedWidthPageLayout
 )
 
-@(params: HmrcStandardPageParams)(contentBlock: Html)(implicit request: Request[Any], messages: Messages)
-@import params._
-
-@headerBlock = {
-  @hmrcHeader(Header(
-    homepageUrl = messages("header.govuk.url"),
-    serviceName = serviceName,
-    navigation = Some(navigation),
-    serviceUrl = "/api-documentation",
-    signOutHref = None,
-    language = if(messages.lang.code == "cy") Cy else En,
-    assetsPath = uk.gov.hmrc.hmrcfrontend.controllers.routes.Assets.at("govuk/images").url,
-    displayHmrcBanner = false,
-    containerClasses = "govuk-width-container",
-    additionalBannersBlock = Some(feedbackBannerBlock)
-  ))
-}
-
-@beforeContent = {
-  @if(isWelshTranslationAvailable) {
-      @hmrcLanguageSelectHelper()
-  }
-  @backLink.map { link =>
-    @govukBackLink(link)
-  }
-  @exitThisPage.map { exit =>
-      @govukExitThisPage(exit)
-  }
-}
+@(pageTitle: Option[String], backLink: BackLink = BackLink())(contentBlock: Html)(implicit request: Request[Any], messages: Messages)
 
 @navigation = @{
   Seq(
@@ -80,19 +55,46 @@
 }
 
 @feedbackBannerBlock = {
+  <div id="feedback-banner" class="govuk-phase-banner">
+    <p id="feedback-title" class="govuk-phase-banner__content">
+      <span class="govuk-phase-banner__text">
+        Your <a class="govuk-link" href="@{appConfig.feedbackSurveyUrl}" target="_blank">feedback (opens in new tab)</a> will help us to improve this service.
+      </span>
+    </p>
+  </div>
+}
+
+@additionalBannersBlock = {
   <div class="govuk-width-container">
-    <div id="feedback-banner" class="govuk-phase-banner">
-      <p id="feedback-title" class="govuk-phase-banner__content">
-        <span class="govuk-phase-banner__text">
-          Your <a class="govuk-link" href="@{appConfig.feedbackSurveyUrl}" target="_blank">feedback (opens in new tab)</a> will help us to improve this service.
-        </span>
-      </p>
+    @feedbackBannerBlock
+    <div class="before-content-banner">
+      @govukBackLink(backLink)
     </div>
   </div>
 }
 
+@headerBlock = {
+  @hmrcHeader(Header(
+    homepageUrl = messages("header.govuk.url"),
+    serviceName = Some(appConfig.serviceName),
+    navigation = Some(navigation),
+    serviceUrl = "/api-documentation",
+    signOutHref = None,
+    language = if(messages.lang.code == "cy") Cy else En,
+    assetsPath = uk.gov.hmrc.hmrcfrontend.controllers.routes.Assets.at("govuk/images").url,
+    displayHmrcBanner = false,
+    containerClasses = "govuk-width-container",
+    additionalBannersBlock = Some(additionalBannersBlock)
+  ))
+}
+
+
 @mainContentBlock = {
-  @contentBlock
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      @contentBlock
+    </div>
+  </div>
   <br />
   <br />
   <a href="@{appConfig.reportProblemHost}/contact/problem_reports_nonjs?newTab=false&service=third-party-developer?referrerUrl=@{helper.urlEncode(request.uri)}" class="govuk-link govuk-link--no-visited-state">
@@ -118,12 +120,12 @@
 
 @govukLayout(
     pageTitle = pageTitle,
-    headBlock = Some(hmrcHead(headBlock = templateOverrides.additionalHeadBlock)),
+    headBlock = Some(hmrcHead()),
     headerBlock = Some(headerBlock),
-    scriptsBlock = Some(hmrcScripts(scriptsBlock = templateOverrides.additionalScriptsBlock)),
+    scriptsBlock = Some(hmrcScripts()),
     beforeContentBlock = None,
     footerBlock = Some(footerBlock),
     mainContentLayout = None,
     assetPath = None,
-    pageLayout = templateOverrides.pageLayout orElse Some(fixedWidthPageLayout(_))
+    pageLayout = Some(fixedWidthPageLayout(_))
 )(mainContentBlock)

@@ -27,7 +27,7 @@ class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config)
 
   val welshLanguageSupportEnabled: Boolean = getConfigDefaulted("features.welsh-language-support", false)
 
-  val title = "HMRC Developer Hub"
+  val serviceName = "HMRC Developer Hub"
 
   val feedbackSurveyUrl = getString("feedbackBanner.generic.surveyUrl")
 
@@ -35,12 +35,11 @@ class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config)
 
   val thirdPartyDeveloperUrl: String         = baseUrl("third-party-developer")
   val thirdPartyDeveloperFrontendUrl: String = baseUrl("third-party-developer-frontend")
+  val apiDocumentationFrontendUrl: String    = baseUrl("api-documentation-frontend")
 
   val keepAliveUrl: String = s"$thirdPartyDeveloperFrontendUrl/developer/keep-alive"
   val logOutUrl: String    = s"$thirdPartyDeveloperFrontendUrl/developer/logout"
   val logInUrl: String     = s"$thirdPartyDeveloperFrontendUrl/developer/login"
-
-  val apiDocumentationFrontendUrl: String = buildUrl("platform.internal.frontend").getOrElse(baseUrl("api-documentation-frontend"))
 
   lazy val reportProblemHost: String = config.underlying.getString("urls.report-a-problem.baseUrl") + config.underlying.getString("urls.report-a-problem.problem")
 
@@ -59,14 +58,6 @@ class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config)
   val deskproHorizonOrganisation: String    = config.get[String]("deskpro-horizon.organisation")
   val deskproHorizonApplicationId: String   = config.get[String]("deskpro-horizon.application-id")
   val deskproHorizonTeamMemberEmail: String = config.get[String]("deskpro-horizon.team-member-email")
-
-  private def buildUrl(key: String) = {
-    (getConfigDefaulted(s"$key.protocol", ""), getConfigDefaulted(s"$key.host", "")) match {
-      case (p, h) if !p.isEmpty && !h.isEmpty => Some(s"$p://$h")
-      case (p, h) if p.isEmpty                => Some(s"https://$h")
-      case _                                  => None
-    }
-  }
 
   private def getConfigDefaulted[A](key: String, default: => A)(implicit loader: ConfigLoader[A]): A = config.getOptional[A](key)(loader).getOrElse(default)
 }

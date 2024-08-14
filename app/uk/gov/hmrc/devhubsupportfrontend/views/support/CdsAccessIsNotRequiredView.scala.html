@@ -20,9 +20,10 @@
 @import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.BackButtonToUrl
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
 
 @this(
-  devMain: DevMain,
+  layout: Layout,
   govukRadios: GovukRadios,
   govukButton : GovukButton,
   govukInput : GovukInput,
@@ -31,11 +32,9 @@
 
 @(loggedIn: Option[UserSession], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
 
-@devMain(
-  title = "You don't need access to this documentation",
-  userFullName = loggedIn.map(_.developer.displayedName),
-  developerSession = None,
-  back = BackButtonToUrl(backUri)
+@layout(
+  pageTitle = Some("You don't need access to this documentation"),
+  backLink = BackLink(backUri)
 ) {
   <h1 class="govuk-heading-l">You don't need access to this documentation</h1>
   <p class="govuk-body">You don't need access to the Custom Declarations API documentation to use third-party customs software.</p>

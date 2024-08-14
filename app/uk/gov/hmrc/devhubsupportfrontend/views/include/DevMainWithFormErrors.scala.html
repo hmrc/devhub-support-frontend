@@ -73,7 +73,7 @@
 
 @govUkWrapper(
   title = pageHeading,
-  navTitle = Some(appConfig.title),
+  navTitle = Some(appConfig.serviceName),
   navTitleLink = Some(Call("GET", s"${appConfig.apiDocumentationFrontendUrl}/api-documentation")),
   headerNavLinks = headerNavLinks(
     StaticNavLinks(appConfig.apiDocumentationFrontendUrl, appConfig.thirdPartyDeveloperFrontendUrl),
