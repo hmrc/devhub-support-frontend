@@ -28,6 +28,8 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{Format, OFormat}
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 import uk.gov.hmrc.mongo.play.json.Codecs
@@ -49,6 +51,13 @@ class FlowRepositoryISpec extends AnyWordSpec
   private val anotherEntrySelection = "another"
 
   private val flowRepository = app.injector.instanceOf[FlowRepository]
+
+  override implicit lazy val app: Application =
+    new GuiceApplicationBuilder()
+      .configure(
+        "mongodb.uri" -> s"mongodb://127.0.0.1:27017/test-${this.getClass.getSimpleName}"
+      )
+      .build()
 
   override protected def beforeEach(): Unit = {
     await(flowRepository.collection.drop().toFuture())
