@@ -28,6 +28,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.FixedWidthPageLayout
 @import uk.gov.hmrc.govukfrontend.views.html.components.Text
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
+@import uk.gov.hmrc.devhubsupportfrontend.domain.models.views._
 
 @this(
   appConfig: AppConfig,
@@ -43,7 +44,11 @@
   fixedWidthPageLayout: FixedWidthPageLayout
 )
 
-@(pageTitle: Option[String], backLink: BackLink = BackLink())(contentBlock: Html)(implicit request: Request[Any], messages: Messages)
+@(
+  pageTitle: Option[String],
+  backLink: Option[BackLink] = None,
+  crumbs: Seq[Crumb] = Seq.empty
+)(contentBlock: Html)(implicit request: Request[Any], messages: Messages)
 
 @navigation = @{
   Seq(
@@ -64,11 +69,16 @@
   </div>
 }
 
+@makeMeABackLink = {
+  @backLink.fold({})(govukBackLink(_))
+}
+
 @additionalBannersBlock = {
   <div class="govuk-width-container">
     @feedbackBannerBlock
     <div class="before-content-banner">
-      @govukBackLink(backLink)
+      @breadcrumbs(crumbs: _*)
+      @makeMeABackLink
     </div>
   </div>
 }

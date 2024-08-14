@@ -22,21 +22,16 @@
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
 
 @this(
-  devMain: DevMainWithFormErrors,
+  layout: Layout,
   govukRadios: GovukRadios,
   govukButton : GovukButton
 )
 
 @(loggedIn: Option[UserSession], form: Form[SupportEnquiryInitialChoiceForm])(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
 
-@devMain(
-  form,
-  title = "What do you need help with?",
-  userFullName = loggedIn.map(_.developer.displayedName),
-  crumbs = Seq(
-    Crumb.home
-  ),
-  developerSession = None
+@layout(
+  pageTitle = Some("What do you need help with?"),
+  crumbs = Seq(Crumb.home)
 ) {
   @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.SupportEnquiryInitialChoiceController.submit()) {
     @helper.CSRF.formField
