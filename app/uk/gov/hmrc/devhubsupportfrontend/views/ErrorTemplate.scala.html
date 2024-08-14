@@ -15,18 +15,19 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.Text
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.HmrcStandardPageParams
 
 @this(appConfig: AppConfig, layout: Layout)
 
 @(pageTitle: String, heading: String, message: String)(implicit request: Request[Any], messages: Messages)
 
 @layout(
-    pageTitle = Some(appConfig.title)
+    HmrcStandardPageParams(
+        serviceName = Some(appConfig.title),
+        pageTitle = Some(pageTitle),
+        isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
+    )
 ) {
     <h1 class="govuk-heading-xl">@{Text(heading).asHtml}</h1>
     <p class="govuk-body">@{Text(message).asHtml}</p>
-}
-
-@{
-    //$COVERAGE-OFF$
 }
