@@ -28,9 +28,10 @@
 @import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
 
 @this(
-  devMain: DevMainWithFormErrors,
+  layout: Layout,
   govukButton : GovukButton,
   govukInput : GovukInput,
   govukCharacterCount : GovukCharacterCount
@@ -99,12 +100,10 @@
     <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Complete this short form to ask a question</h1>
 }
 
-@devMain(
-  form,
-  title = "Which best describes what you need help with?",
-  userFullName = loggedIn.map(_.developer.displayedName),
-  developerSession = None,
-    back = BackButtonWithJavaScript,
+@layout(
+  pageTitle = Some("Which best describes what you need help with?"),
+  backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
+  form = Some(form)
 ) {
   <span class="govuk-caption-l">Developer Hub support</span>
 
