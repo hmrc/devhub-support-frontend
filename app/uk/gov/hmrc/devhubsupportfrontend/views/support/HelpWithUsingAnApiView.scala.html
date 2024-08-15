@@ -23,9 +23,10 @@
 @import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
 
 @this(
-  devMain: DevMainWithFormErrors,
+  layout: Layout,
   govukRadios: GovukRadios,
   govukButton : GovukButton,
   govukInput : GovukInput,
@@ -60,12 +61,10 @@
   )
 }
 
-@devMain(
-  form,
-  title = "Which best describes what you need help with?",
-  userFullName = loggedIn.map(_.developer.displayedName),
-  developerSession = None,
-  back = BackButtonToUrl(backUri)
+@layout(
+  pageTitle = Some("Which best describes what you need help with?"),
+  backLink = Some(BackLink(backUri)),
+  form = Some(form)
 ) {
   @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.HelpWithUsingAnApiController.submit()) {
     @helper.CSRF.formField

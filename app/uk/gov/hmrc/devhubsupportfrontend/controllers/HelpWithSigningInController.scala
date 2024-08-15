@@ -67,7 +67,7 @@ class HelpWithSigningInController @Inject() (
     helpWithSigningInView(
       fullyloggedInDeveloper,
       form,
-      routes.HelpWithSigningInController.page().url
+      routes.SupportEnquiryInitialChoiceController.page().url
     )
 
   def onValidForm(flow: SupportFlow, form: HelpWithSigningInForm)(implicit request: MaybeUserRequest[AnyContent]): Future[Result] = {

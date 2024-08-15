@@ -21,9 +21,10 @@
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
 
 @this(
-  devMain: DevMain,
+  layout: Layout,
   govukRadios: GovukRadios,
   govukButton : GovukButton,
   govukInput : GovukInput,
@@ -32,11 +33,10 @@
 
 @(loggedIn: Option[UserSession], backUri: String, signInUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
 
-@devMain(
-  title = "Adding team members to an application",
-  userFullName = loggedIn.map(_.developer.displayedName),
-  developerSession = None,
-  back = BackButtonToUrl(backUri)
+@layout(
+  pageTitle = Some("Adding team members to an application"),
+  backLink = Some(BackLink(backUri)),
+  form = None
 ) {
   <span class="govuk-caption-l">Developer Hub support</span>
   <h1 class="govuk-heading-l">Adding team members to an application</h1>

@@ -23,9 +23,10 @@
 @import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
 
 @this(
-  devMain: DevMainWithFormErrors,
+  layout: Layout,
   govukRadios: GovukRadios,
   govukButton : GovukButton,
   govukInput : GovukInput,
@@ -34,12 +35,10 @@
 
 @(loggedIn: Option[UserSession], form: Form[ChooseAPrivateApiForm], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
 
-@devMain(
-  form,
-  title = "Which private API documentation do you want to access?",
-  userFullName = loggedIn.map(_.developer.displayedName),
-  developerSession = None,
-  back = BackButtonToUrl(backUri)
+@layout(
+  pageTitle = Some("Which private API documentation do you want to access?"),
+  backLink = Some(BackLink(backUri)),
+  form = Some(form)
 ) {
   @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.ChooseAPrivateApiController.submit()) {
     @helper.CSRF.formField

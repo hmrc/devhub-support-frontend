@@ -59,7 +59,7 @@ class ApplyForPrivateApiAccessController @Inject() (
       fullyloggedInDeveloper,
       flow.privateApi.get,
       form,
-      routes.ChooseAPrivateApiController.page().url
+      routes.CheckCdsAccessIsRequiredController.page().url
     )
   }
 

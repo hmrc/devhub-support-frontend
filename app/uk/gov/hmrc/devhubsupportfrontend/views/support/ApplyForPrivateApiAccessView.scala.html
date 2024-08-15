@@ -23,9 +23,10 @@
 @import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.BackButtonToUrl
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
 
 @this(
-  devMain: DevMainWithFormErrors,
+  layout: Layout,
   govukRadios: GovukRadios,
   govukButton : GovukButton,
   govukInput : GovukInput,
@@ -34,12 +35,10 @@
 
 @(loggedIn: Option[UserSession], chosenApiName: String, form: Form[ApplyForPrivateApiAccessForm], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
 
-@devMain(
-  form,
-  title = "Apply for access to the @{chosenApiName} API",
-  userFullName = loggedIn.map(_.developer.displayedName),
-  developerSession = None,
-  back = BackButtonToUrl(backUri)
+@layout(
+  pageTitle = Some("Apply for access to the @{chosenApiName} API"),
+  backLink = Some(BackLink(backUri)),
+  form = Some(form),
 ) {
   <span class="govuk-caption-l">Developer Hub support</span>
   <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Apply for access to the @{chosenApiName} API</h1>

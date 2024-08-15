@@ -23,9 +23,10 @@
 @import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
 
 @this(
-  devMain: DevMain,
+  layout: Layout,
   govukRadios: GovukRadios,
   govukButton : GovukButton,
   govukInput : GovukInput,
@@ -34,11 +35,9 @@
 
 @(loggedIn: Option[UserSession], backUrl: String, loginUrl: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
 
-@devMain(
-  title = "How to remove access codes for signing in",
-  userFullName = loggedIn.map(_.developer.displayedName),
-  developerSession = None,
-  back = BackButtonToUrl(backUrl)
+@layout(
+  pageTitle = Some("How to remove access codes for signing in"),
+  backLink = Some(BackLink(backUrl))
 ) {
   <span class="govuk-caption-l">Developer Hub support</span>
   <h1 class="govuk-heading-l">How to remove access codes for signing in</h1>
