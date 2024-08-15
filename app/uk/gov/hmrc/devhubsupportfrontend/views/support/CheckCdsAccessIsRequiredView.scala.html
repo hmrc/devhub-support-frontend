@@ -14,15 +14,11 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.Crumb
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+
+@import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.CheckCdsAccessIsRequiredForm
-@import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.BackButtonToUrl
-@import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
-@import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
-@import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
 
 @this(
@@ -33,14 +29,15 @@
   govukSelect : GovukSelect
 )
 
-@(loggedIn: Option[UserSession], form: Form[CheckCdsAccessIsRequiredForm], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[CheckCdsAccessIsRequiredForm], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
 
 @layout(
-  pageTitle = Some("Are you intending to build software to integrate with the Customs Declaration Service(CDS)?"),
+  pageTitle = "Are you intending to build software to integrate with the Customs Declaration Service(CDS)?",
   backLink = Some(BackLink(backUri)),
+  loggedInSession = loggedInSession,
   form = Some(form)
 ) {
-  @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.CheckCdsAccessIsRequiredController.submit()) {
+  @helper.form(action = routes.CheckCdsAccessIsRequiredController.submit()) {
     @helper.CSRF.formField
     <span class="govuk-caption-l">Developer Hub support</span>
     @govukRadios(

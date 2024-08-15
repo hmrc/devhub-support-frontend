@@ -14,12 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.Crumb
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
-@import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.BackButtonToUrl
+
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
-@import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
 
 @this(
@@ -30,11 +27,12 @@
   govukSelect : GovukSelect
 )
 
-@(loggedIn: Option[UserSession], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
 
 @layout(
-  pageTitle = Some("You don't need access to this documentation"),
-  backLink = Some(BackLink(backUri))
+  pageTitle = "You don't need access to this documentation",
+  backLink = Some(BackLink(backUri)),
+  loggedInSession = loggedInSession,
 ) {
   <h1 class="govuk-heading-l">You don't need access to this documentation</h1>
   <p class="govuk-body">You don't need access to the Custom Declarations API documentation to use third-party customs software.</p>

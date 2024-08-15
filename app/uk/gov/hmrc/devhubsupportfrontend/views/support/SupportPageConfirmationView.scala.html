@@ -14,14 +14,10 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.Crumb
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
-@import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportDetailsForm
-@import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.BackButtonWithJavaScript
+
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
 
 @this(
@@ -29,11 +25,12 @@
   govukPanel : GovukPanel
 )
 
-@(loggedIn: Option[UserSession], supportFlow: SupportFlow)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], supportFlow: SupportFlow)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
 
 
 @layout(
-  pageTitle = Some("Your support request has been received")
+  pageTitle = "Your support request has been received",
+  loggedInSession = loggedInSession
 ) {
     @govukPanel(Panel(
         title = Text("Your support request has been received"),

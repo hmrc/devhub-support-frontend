@@ -14,15 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.Crumb
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
-@import uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithSigningInForm
-@import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.BackButtonToUrl
+
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
-@import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
-@import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
 
 @this(
@@ -33,11 +27,12 @@
   govukSelect : GovukSelect
 )
 
-@(loggedIn: Option[UserSession], backUrl: String, loginUrl: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], backUrl: String, loginUrl: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
 
 @layout(
-  pageTitle = Some("How to remove access codes for signing in"),
-  backLink = Some(BackLink(backUrl))
+  pageTitle = "How to remove access codes for signing in",
+  backLink = Some(BackLink(backUrl)),
+  loggedInSession = loggedInSession
 ) {
   <span class="govuk-caption-l">Developer Hub support</span>
   <h1 class="govuk-heading-l">How to remove access codes for signing in</h1>

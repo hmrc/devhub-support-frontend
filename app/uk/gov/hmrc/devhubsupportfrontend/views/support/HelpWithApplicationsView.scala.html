@@ -14,15 +14,12 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.Crumb
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+
+@import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithApplicationsForm
-@import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.BackButtonToUrl
-@import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
-@import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
 
 @this(
@@ -33,14 +30,15 @@
   govukSelect : GovukSelect
 )
 
-@(loggedIn: Option[UserSession], form: Form[HelpWithApplicationsForm], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[HelpWithApplicationsForm], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
 
 @layout(
-  pageTitle = Some("What do you need help with?"),
+  pageTitle = "What do you need help with?",
   backLink = Some(BackLink(backUri)),
+  loggedInSession = loggedInSession,
   form = Some(form)
 ) {
-  @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.HelpWithApplicationsController.submit()) {
+  @helper.form(action = routes.HelpWithApplicationsController.submit()) {
     @helper.CSRF.formField
     <span class="govuk-caption-l">Developer Hub support</span>
     @govukRadios(

@@ -16,11 +16,6 @@
 
 @import play.twirl.api.HtmlFormat
 
-@import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.HmrcStandardPageParams
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardHeader
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardFooter
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukLayout
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukBackLink
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukExitThisPage
@@ -28,15 +23,19 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.FixedWidthPageLayout
 @import uk.gov.hmrc.govukfrontend.views.html.components.Text
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
+
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
+
+@import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
+@import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 @import uk.gov.hmrc.devhubsupportfrontend.domain.models.views._
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.include.{breadcrumbs, errorSummaryForFormErrors}
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.include.{breadcrumbs, errorSummaryForFormErrors, headerNavLinks}
 
 @this(
   appConfig: AppConfig,
   govukLayout: GovukLayout,
   hmrcHeader: HmrcHeader,
   hmrcFooter: HmrcFooter,
-  hmrcHead: HmrcHead,
   hmrcLanguageSelectHelper: HmrcLanguageSelectHelper,
   hmrcScripts: HmrcScripts,
   govukBackLink: GovukBackLink,
@@ -46,21 +45,40 @@
 )
 
 @(
-  pageTitle: Option[String],
+  pageTitle: String,
   backLink: Option[BackLink] = None,
   crumbs: Seq[Crumb] = Seq.empty,
+  loggedInSession: Option[UserSession] = None,
   form: Option[Form[_]] = None,
 )(
   contentBlock: Html
 )(implicit request: Request[Any], messages: Messages)
 
+@headBlock = {
+  <link href='@routes.Assets.versioned("stylesheets/main.css")' media="screen" rel="stylesheet" type="text/css" />
+}
+
 @navigation = @{
-  Seq(
-      NavigationItem(content = Text("Documentation"), href = Some(s"${appConfig.apiDocumentationFrontendUrl}/api-documentation/docs/using-the-hub")),
-      NavigationItem(content = Text("Applications"), href = Some(s"${appConfig.thirdPartyDeveloperFrontendUrl}/developer/applications")),
-      NavigationItem(content = Text("Support"), href = Some("/devhub-support/new-support")),
-      NavigationItem(content = Text("Service Availability"), href = Some("https://api-platform-status.production.tax.service.gov.uk/"))
-  )
+  StaticNavLinks(appConfig.apiDocumentationFrontendUrl, appConfig.thirdPartyDeveloperFrontendUrl)
+    .map(navLink => NavigationItem(
+      content = Text(navLink.label),
+      href = Some(navLink.href),
+      attributes = if (navLink.openInNewWindow) Map("target" -> "_blank") else Map.empty
+    ))
+}
+
+@headerBlock = {
+  @hmrcHeader(Header(
+    homepageUrl = messages("header.govuk.url"),
+    serviceName = Some(appConfig.serviceName),
+    navigation = Some(navigation),
+    serviceUrl = "/api-documentation",
+    signOutHref = None,
+    language = if(messages.lang.code == "cy") Cy else En,
+    assetsPath = uk.gov.hmrc.hmrcfrontend.controllers.routes.Assets.at("govuk/images").url,
+    displayHmrcBanner = false,
+    containerClasses = "govuk-width-container"
+  ))
 }
 
 @feedbackBannerBlock = {
@@ -79,29 +97,21 @@
   } else {}
 }
 
-@additionalBannersBlock = {
-  <div class="govuk-width-container">
-    @feedbackBannerBlock
-    <div class="before-content-banner">
-      @breadcrumbs(crumbs: _*)
-      @buildABackLink(backLink)
-    </div>
+@userBanner = {
+  <div class="subnav-auth">
+    <ul id="proposition-links" class="govuk-list subnav-auth-links">
+      @headerNavLinks(UserNavLinks(appConfig, loggedInSession.map(_.developer.displayedName)))
+    </ul>
   </div>
 }
 
-@headerBlock = {
-  @hmrcHeader(Header(
-    homepageUrl = messages("header.govuk.url"),
-    serviceName = Some(appConfig.serviceName),
-    navigation = Some(navigation),
-    serviceUrl = "/api-documentation",
-    signOutHref = None,
-    language = if(messages.lang.code == "cy") Cy else En,
-    assetsPath = uk.gov.hmrc.hmrcfrontend.controllers.routes.Assets.at("govuk/images").url,
-    displayHmrcBanner = false,
-    containerClasses = "govuk-width-container",
-    additionalBannersBlock = Some(additionalBannersBlock)
-  ))
+@beforeContentBlock = {
+  @feedbackBannerBlock
+  <div class="before-content-banner">
+    @breadcrumbs(crumbs: _*)
+    @buildABackLink(backLink)
+    @userBanner
+  </div>
 }
 
 @errorSummary(form: Option[Form[_]]) = {
@@ -141,11 +151,11 @@
 }
 
 @govukLayout(
-    pageTitle = pageTitle,
-    headBlock = Some(hmrcHead()),
+    pageTitle = Some(pageTitle),
+    headBlock = Some(headBlock),
     headerBlock = Some(headerBlock),
     scriptsBlock = Some(hmrcScripts()),
-    beforeContentBlock = None,
+    beforeContentBlock = Some(beforeContentBlock),
     footerBlock = Some(footerBlock),
     mainContentLayout = None,
     assetPath = None,

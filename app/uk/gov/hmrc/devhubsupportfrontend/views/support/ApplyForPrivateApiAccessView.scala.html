@@ -15,14 +15,9 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
-@import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
-@import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.Crumb
-@import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.ApplyForPrivateApiAccessForm
-@import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.BackButtonToUrl
-@import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
 
 @this(
@@ -33,11 +28,12 @@
   govukSelect : GovukSelect
 )
 
-@(loggedIn: Option[UserSession], chosenApiName: String, form: Form[ApplyForPrivateApiAccessForm], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], chosenApiName: String, form: Form[ApplyForPrivateApiAccessForm], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
 
 @layout(
-  pageTitle = Some("Apply for access to the @{chosenApiName} API"),
+  pageTitle = "Apply for access to the @{chosenApiName} API",
   backLink = Some(BackLink(backUri)),
+  loggedInSession = loggedInSession,
   form = Some(form),
 ) {
   <span class="govuk-caption-l">Developer Hub support</span>
@@ -60,7 +56,7 @@
           content = Text("Full name")
         ),
         classes = "govuk-!-width-full",
-        value = form("fullName").value.orElse(loggedIn.map(_.developer.displayedName)),
+        value = form("fullName").value.orElse(loggedInSession.map(_.developer.displayedName)),
         errorMessage = form.error("fullName").map(e => ErrorMessage(content = Text(messages(e.message))))
       )
     )
@@ -80,7 +76,7 @@
           )
         ),
         classes = "govuk-!-width-full",
-        value = form("emailAddress").value.orElse(loggedIn.map(_.developer.email.text)),
+        value = form("emailAddress").value.orElse(loggedInSession.map(_.developer.email.text)),
         errorMessage = form.error("emailAddress").map(e => ErrorMessage(content = Text(messages(e.message))))
       )
     )
