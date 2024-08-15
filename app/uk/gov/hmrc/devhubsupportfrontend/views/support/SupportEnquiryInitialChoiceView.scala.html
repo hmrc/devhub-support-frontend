@@ -20,6 +20,7 @@
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportEnquiryInitialChoiceForm
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
 
 @this(
   layout: Layout,
@@ -31,7 +32,8 @@
 
 @layout(
   pageTitle = Some("What do you need help with?"),
-  crumbs = Seq(Crumb.home)
+  crumbs = Seq(Crumb.home),
+  form = Some(form)
 ) {
   @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.SupportEnquiryInitialChoiceController.submit()) {
     @helper.CSRF.formField

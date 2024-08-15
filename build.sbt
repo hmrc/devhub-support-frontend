@@ -55,9 +55,9 @@ lazy val microservice = Project("devhub-support-frontend", file("."))
       "uk.gov.hmrc.apiplatform.modules.common.domain.models._",
       "uk.gov.hmrc.devhubsupportfrontend.config.AppConfig",
       "uk.gov.hmrc.devhubsupportfrontend.controllers",
-      "uk.gov.hmrc.devhubsupportfrontend.views.html._",
-      "uk.gov.hmrc.devhubsupportfrontend.views.html.include._",
-      "uk.gov.hmrc.devhubsupportfrontend.views.html.templates._",
+      // "uk.gov.hmrc.devhubsupportfrontend.views.html._",
+      // "uk.gov.hmrc.devhubsupportfrontend.views.html.include._",
+      // "uk.gov.hmrc.devhubsupportfrontend.views.html.templates._",
     )
   )
   .settings(

@@ -29,6 +29,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.Text
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
 @import uk.gov.hmrc.devhubsupportfrontend.domain.models.views._
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.include.{breadcrumbs, errorSummaryForFormErrors}
 
 @this(
   appConfig: AppConfig,
@@ -47,8 +48,11 @@
 @(
   pageTitle: Option[String],
   backLink: Option[BackLink] = None,
-  crumbs: Seq[Crumb] = Seq.empty
-)(contentBlock: Html)(implicit request: Request[Any], messages: Messages)
+  crumbs: Seq[Crumb] = Seq.empty,
+  form: Option[Form[_]] = None,
+)(
+  contentBlock: Html
+)(implicit request: Request[Any], messages: Messages)
 
 @navigation = @{
   Seq(
@@ -69,7 +73,7 @@
   </div>
 }
 
-@makeMeABackLink = {
+@buildABackLink = {
   @backLink.fold({})(govukBackLink(_))
 }
 
@@ -78,7 +82,7 @@
     @feedbackBannerBlock
     <div class="before-content-banner">
       @breadcrumbs(crumbs: _*)
-      @makeMeABackLink
+      @buildABackLink
     </div>
   </div>
 }
@@ -98,11 +102,17 @@
   ))
 }
 
+@errorSummary(form: Option[Form[_]]) = {
+  @if(form.isDefined) {
+    @errorSummaryForFormErrors(form.get.errors)
+  } else {}
+}
 
 @mainContentBlock = {
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      @contentBlock
+      @errorSummary(form)
+      @contentBlock 
     </div>
   </div>
   <br />
