@@ -22,7 +22,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
 import uk.gov.hmrc.apiplatform.modules.common.domain.models._
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.play.http.metrics.common.API
 
 object ApmConnector {
@@ -30,7 +31,7 @@ object ApmConnector {
 }
 
 @Singleton
-class ApmConnector @Inject() (http: HttpClient, config: ApmConnector.Config, metrics: ConnectorMetrics)(implicit ec: ExecutionContext)
+class ApmConnector @Inject() (http: HttpClientV2, config: ApmConnector.Config, metrics: ConnectorMetrics)(implicit ec: ExecutionContext)
     extends CommonResponseHandlers {
 
   val api = API("api-platform-microservice")
@@ -38,6 +39,8 @@ class ApmConnector @Inject() (http: HttpClient, config: ApmConnector.Config, met
   def fetchApiDefinitionsVisibleToUser(userId: Option[UserId])(implicit hc: HeaderCarrier): Future[List[ApiDefinition]] = {
     val queryParams: Seq[(String, String)] = userId.fold(Seq.empty[(String, String)])(id => Seq("developerId" -> id.toString()))
 
-    http.GET[List[ApiDefinition]](s"${config.serviceBaseUrl}/combined-api-definitions", queryParams)
+    http
+      .get(url"${config.serviceBaseUrl}/combined-api-definitions?$queryParams")
+      .execute[List[ApiDefinition]]
   }
 }
