@@ -15,6 +15,7 @@
  *@
 
 @import play.twirl.api.HtmlFormat
+@import views.html.helper.CSPNonce
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukLayout
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukBackLink
@@ -25,6 +26,7 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
 
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcTrackingConsentSnippet
 
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
@@ -41,7 +43,8 @@
   govukBackLink: GovukBackLink,
   govukExitThisPage: GovukExitThisPage,
   defaultMainContent: TwoThirdsMainContent,
-  fixedWidthPageLayout: FixedWidthPageLayout
+  fixedWidthPageLayout: FixedWidthPageLayout,
+  hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet
 )
 
 @(
@@ -56,6 +59,7 @@
 
 @headBlock = {
   <link href='@routes.Assets.versioned("stylesheets/main.css")' media="screen" rel="stylesheet" type="text/css" />
+  @hmrcTrackingConsentSnippet()
 }
 
 @navigation = @{
