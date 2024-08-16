@@ -44,6 +44,7 @@
   govukExitThisPage: GovukExitThisPage,
   defaultMainContent: TwoThirdsMainContent,
   fixedWidthPageLayout: FixedWidthPageLayout,
+  hmrcTimeoutDialog: HmrcTimeoutDialog,
   hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet
 )
 
@@ -57,9 +58,22 @@
   contentBlock: Html
 )(implicit request: Request[Any], messages: Messages)
 
+@timeoutBlock = {
+  @hmrcTimeoutDialog(
+    TimeoutDialog(
+      timeout = Some(appConfig.sessionTimeout.getSeconds().toInt),
+      countdown = Some(appConfig.sessionCountdown.getSeconds().toInt),
+      keepAliveUrl = Some(appConfig.keepAliveUrl),
+      signOutUrl = Some(appConfig.logOutUrl),
+      language = Some("en")
+    )
+  ) 
+}
+
 @headBlock = {
   <link href='@routes.Assets.versioned("stylesheets/main.css")' media="screen" rel="stylesheet" type="text/css" />
   @hmrcTrackingConsentSnippet()
+  @timeoutBlock
 }
 
 @navigation = @{
