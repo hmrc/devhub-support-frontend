@@ -28,8 +28,8 @@ import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
+import uk.gov.hmrc.devhubsupportfrontend.controllers.security.SupportCookie
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
-import uk.gov.hmrc.devhubsupportfrontend.security.SupportCookie
 import uk.gov.hmrc.devhubsupportfrontend.services.SupportService
 import uk.gov.hmrc.devhubsupportfrontend.views.html.support.HelpWithUsingAnApiView
 

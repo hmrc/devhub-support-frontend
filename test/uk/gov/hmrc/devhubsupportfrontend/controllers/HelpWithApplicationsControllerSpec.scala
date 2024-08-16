@@ -33,7 +33,7 @@ import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
 import uk.gov.hmrc.devhubsupportfrontend.views.html.support.{GivingTeamMemberAccessView, HelpWithApplicationsView}
 
-class HelpWithApplicationControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
+class HelpWithApplicationsControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
   trait Setup extends SupportServiceMockModule with ThirdPartyDeveloperConnectorMockModule with UserBuilder with LocalUserIdTracker {
     val helpWithApplicationsView    = app.injector.instanceOf[HelpWithApplicationsView]

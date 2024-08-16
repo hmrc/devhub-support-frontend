@@ -31,13 +31,12 @@ import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperCon
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.{CheckCdsAccessIsRequiredView, ChooseAPrivateApiView}
+import uk.gov.hmrc.devhubsupportfrontend.views.html.support.ChooseAPrivateApiView
 
 class ChooseAPrivateApiControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
   trait Setup extends SupportServiceMockModule with ThirdPartyDeveloperConnectorMockModule with UserBuilder with LocalUserIdTracker {
-    val checkCdsAccessIsRequiredView = app.injector.instanceOf[CheckCdsAccessIsRequiredView]
-    val chooseAPrivateApiView        = app.injector.instanceOf[ChooseAPrivateApiView]
+    val chooseAPrivateApiView = app.injector.instanceOf[ChooseAPrivateApiView]
 
     lazy val request = FakeRequest()
       .withSupport(underTest, cookieSigner)(supportSessionId)
@@ -49,8 +48,7 @@ class ChooseAPrivateApiControllerSpec extends BaseControllerSpec with WithCSRFAd
       mock[ErrorHandler],
       ThirdPartyDeveloperConnectorMock.aMock,
       SupportServiceMock.aMock,
-      chooseAPrivateApiView,
-      checkCdsAccessIsRequiredView
+      chooseAPrivateApiView
     )
 
     val supportSessionId = SupportSessionId.random

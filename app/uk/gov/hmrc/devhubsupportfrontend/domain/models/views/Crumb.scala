@@ -25,16 +25,4 @@ object Crumb {
   def home(implicit appConfig: AppConfig) =
     Crumb("Home", s"${appConfig.apiDocumentationFrontendUrl}/api-documentation", Some("data-breadcrumb-home"))
 
-  // val viewAllApplications =
-  //   Crumb("Applications", s"${routes.ManageApplications.manageApps()}", Some("data-breadcrumb-manage-app"))
-
-  // val securityPreferences =
-  //   Crumb(
-  //     "Security preferences",
-  //     s"${uk.gov.hmrc.apiplatform.modules.mfa.controllers.profile.routes.MfaController.securityPreferences()}",
-  //     Some("data-breadcrumb-security-preferences")
-  //   )
-
-  // val signIn =
-  //   Crumb("Sign in", s"${routes.UserLoginAccount.login()}", Some("data-breadcrumb-sign-in"))
 }

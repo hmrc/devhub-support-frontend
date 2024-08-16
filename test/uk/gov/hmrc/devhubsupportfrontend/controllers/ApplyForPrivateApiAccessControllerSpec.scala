@@ -31,13 +31,12 @@ import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperCon
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.{ApplyForPrivateApiAccessView, ChooseAPrivateApiView}
+import uk.gov.hmrc.devhubsupportfrontend.views.html.support.ApplyForPrivateApiAccessView
 
 class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
   trait Setup extends SupportServiceMockModule with ThirdPartyDeveloperConnectorMockModule with UserBuilder with LocalUserIdTracker {
     val applyForPrivateApiAccessView = app.injector.instanceOf[ApplyForPrivateApiAccessView]
-    val chooseAPrivateApiView        = app.injector.instanceOf[ChooseAPrivateApiView]
 
     lazy val request = FakeRequest()
       .withSupport(underTest, cookieSigner)(supportSessionId)
@@ -49,8 +48,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
       cookieSigner,
       mock[ErrorHandler],
       ThirdPartyDeveloperConnectorMock.aMock,
-      applyForPrivateApiAccessView,
-      chooseAPrivateApiView
+      applyForPrivateApiAccessView
     )
 
     val supportSessionId = SupportSessionId.random

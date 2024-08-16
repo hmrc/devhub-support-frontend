@@ -20,8 +20,8 @@ import play.api.libs.crypto.CookieSigner
 import play.api.test.FakeRequest
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSessionId
 
+import uk.gov.hmrc.devhubsupportfrontend.controllers.security.CookieEncoding
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
-import uk.gov.hmrc.devhubsupportfrontend.security.CookieEncoding
 
 object WithLoggedInSession {
 

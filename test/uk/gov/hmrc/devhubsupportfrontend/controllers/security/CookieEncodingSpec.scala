@@ -28,7 +28,6 @@ import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSessionId
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ConnectorMetrics, NoopConnectorMetrics}
-import uk.gov.hmrc.devhubsupportfrontend.security.CookieEncoding
 import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec
 
 class CookieEncodingSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {

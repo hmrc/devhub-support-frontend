@@ -23,7 +23,7 @@ import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
-import uk.gov.hmrc.devhubsupportfrontend.security.DevHubAuthorization
+import uk.gov.hmrc.devhubsupportfrontend.controllers.security.DevHubAuthorization
 
 abstract class BaseController(mcc: MessagesControllerComponents) extends FrontendController(mcc) with DevHubAuthorization with WithUnsafeDefaultFormBinding {
   val errorHandler: ErrorHandler

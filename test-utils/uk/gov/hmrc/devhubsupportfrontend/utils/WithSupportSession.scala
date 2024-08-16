@@ -19,8 +19,8 @@ package uk.gov.hmrc.devhubsupportfrontend.utils
 import play.api.libs.crypto.CookieSigner
 import play.api.test.FakeRequest
 
+import uk.gov.hmrc.devhubsupportfrontend.controllers.security.CookieEncoding
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
-import uk.gov.hmrc.devhubsupportfrontend.security.CookieEncoding
 
 object WithSupportSession {
 

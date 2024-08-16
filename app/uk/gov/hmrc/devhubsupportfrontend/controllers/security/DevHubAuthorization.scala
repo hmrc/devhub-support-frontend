@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.devhubsupportfrontend.security
+package uk.gov.hmrc.devhubsupportfrontend.controllers.security
 
 import scala.concurrent.{ExecutionContext, Future}
 

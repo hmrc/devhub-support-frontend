@@ -28,10 +28,10 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
+import uk.gov.hmrc.devhubsupportfrontend.controllers.security.SupportCookie
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
-import uk.gov.hmrc.devhubsupportfrontend.security.SupportCookie
 import uk.gov.hmrc.devhubsupportfrontend.services.SupportService
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.{ApplyForPrivateApiAccessView, ChooseAPrivateApiView}
+import uk.gov.hmrc.devhubsupportfrontend.views.html.support.ApplyForPrivateApiAccessView
 
 @Singleton
 class ApplyForPrivateApiAccessController @Inject() (
@@ -40,8 +40,7 @@ class ApplyForPrivateApiAccessController @Inject() (
     val cookieSigner: CookieSigner,
     val errorHandler: ErrorHandler,
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
-    applyForPrivateApiAccessView: ApplyForPrivateApiAccessView,
-    chooseAPrivateApiView: ChooseAPrivateApiView
+    applyForPrivateApiAccessView: ApplyForPrivateApiAccessView
   )(implicit val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractSupportFlowController[ApplyForPrivateApiAccessForm, Unit](mcc, supportService) with SupportCookie {
