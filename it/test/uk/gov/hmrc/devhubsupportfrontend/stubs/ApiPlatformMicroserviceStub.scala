@@ -24,25 +24,28 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 
 object ApiPlatformMicroserviceStub {
 
-  def stubFetchApiDefinitionsVisibleToUserFailure(userId: UserId): StubMapping = {
-    stubFor(
-      get(urlEqualTo(s"/combined-api-definitions?developerId=${userId.toString()}"))
-        .willReturn(
-          aResponse()
-            .withStatus(INTERNAL_SERVER_ERROR)
-        )
-    )
-  }
+  object FetchApiDefinitionsVisibleToUser {
 
-  def stubFetchApiDefinitionsVisibleToUser(userId: UserId, body: String): StubMapping = {
-    stubFor(
-      get(urlEqualTo(s"/combined-api-definitions?developerId=${userId.toString()}"))
-        .willReturn(
-          aResponse()
-            .withStatus(OK)
-            .withBody(body)
-            .withHeader("content-type", "application/json")
-        )
-    )
+    def succeeds(userId: UserId, body: String): StubMapping = {
+      stubFor(
+        get(urlEqualTo(s"/combined-api-definitions?developerId=${userId.toString()}"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(body)
+              .withHeader("content-type", "application/json")
+          )
+      )
+    }
+
+    def fails(userId: UserId): StubMapping = {
+      stubFor(
+        get(urlEqualTo(s"/combined-api-definitions?developerId=${userId.toString()}"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+          )
+      )
+    }
   }
 }

@@ -19,6 +19,7 @@ package uk.gov.hmrc.devhubsupportfrontend.connectors
 import org.scalatest.EitherValues
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
+import play.api.http.Status._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication, Configuration, Mode}
@@ -56,26 +57,27 @@ class ApmConnectorIntegrationSpec
 
   "fetchApiDefinitionsVisibleToUser" should {
     "retrieve a list of service a user can see" in new Setup {
-      val userId                     = UserId.random
-      val serviceName                = ServiceName("api1")
-      val name                       = "API 1"
-      ApiPlatformMicroserviceStub
-        .stubFetchApiDefinitionsVisibleToUser(
-          userId,
-          s"""[{ "serviceName": "$serviceName", "serviceBaseUrl": "http://serviceBaseUrl", "name": "$name", "description": "", "context": "context", "versions": [], "categories": ["AGENTS", "VAT"] }]"""
-        )
+      val userId      = UserId.random
+      val serviceName = ServiceName("api1")
+      val name        = "API 1"
+      ApiPlatformMicroserviceStub.FetchApiDefinitionsVisibleToUser.succeeds(
+        userId,
+        s"""[{ "serviceName": "$serviceName", "serviceBaseUrl": "http://serviceBaseUrl", "name": "$name", "description": "", "context": "context", "versions": [], "categories": ["AGENTS", "VAT"] }]"""
+      )
+
       val result: Seq[ApiDefinition] = await(underTest.fetchApiDefinitionsVisibleToUser(Some(userId)))
+
       result.head.serviceName shouldBe serviceName
       result.head.name shouldBe name
     }
 
     "fail on Upstream5xxResponse when the call return a 500" in new Setup {
       val userId = UserId.random
-      ApiPlatformMicroserviceStub.stubFetchApiDefinitionsVisibleToUserFailure(userId)
+      ApiPlatformMicroserviceStub.FetchApiDefinitionsVisibleToUser.fails(userId)
 
       intercept[UpstreamErrorResponse] {
         await(underTest.fetchApiDefinitionsVisibleToUser(Some(userId)))
-      }
+      }.statusCode shouldBe INTERNAL_SERVER_ERROR
     }
   }
 }

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import play.api.http.Status._
@@ -31,6 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
+import uk.gov.hmrc.devhubsupportfrontend.stubs.ThirdPartyDeveloperStub
 import uk.gov.hmrc.devhubsupportfrontend.utils.WireMockExtensions
 
 class ThirdPartyDeveloperConnectorIntegrationSpec extends BaseConnectorIntegrationSpec
@@ -59,59 +59,24 @@ class ThirdPartyDeveloperConnectorIntegrationSpec extends BaseConnectorIntegrati
   }
 
   "fetchSession" should {
-    "return the session" in new Setup {
-      stubFor(
-        get(urlPathEqualTo(s"/session/$sessionId"))
-          .willReturn(
-            aResponse()
-              .withStatus(OK)
-              .withHeader("Content-Type", "application/json")
-              .withBody(s"""{
-                           |  "sessionId": "$sessionId",
-                           |  "loggedInState": "LOGGED_IN",
-                           |    "developer": {
-                           |      "userId":"$userId",
-                           |      "email":"${userEmail.text}",
-                           |      "firstName":"John",
-                           |      "lastName": "Doe",
-                           |      "registrationTime": "${nowAsText}",
-                           |      "lastModified": "${nowAsText}",
-                           |      "verified": true,
-                           |      "mfaEnabled": false,
-                           |      "mfaDetails": [],
-                           |      "emailPreferences": { "interests" : [], "topics": [] }
-                           |    }
-                           |}""".stripMargin)
-          )
-      )
+    "return a session when a session exists" in new Setup {
+      ThirdPartyDeveloperStub.FetchSession.succeeds(sessionId, userId, userEmail, nowAsText)
 
       private val result = await(underTest.fetchSession(sessionId))
 
       result shouldBe Some(UserSession(sessionId, loggedInState = LoggedInState.LOGGED_IN, buildTrackedUser(userEmail)))
     }
 
-    "return None when the session doesnt exist" in new Setup {
-      stubFor(
-        get(urlPathEqualTo(s"/session/$sessionId"))
-          .willReturn(
-            aResponse()
-              .withStatus(NOT_FOUND)
-          )
-      )
+    "not return a session when a session does not exist" in new Setup {
+      ThirdPartyDeveloperStub.FetchSession.failsToFindSession(sessionId)
 
       val result = await(underTest.fetchSession(sessionId))
 
       result shouldBe None
     }
 
-    "fail on Upstream5xxResponse when the call return a 500" in new Setup {
-      stubFor(
-        get(urlPathEqualTo(s"/session/$sessionId"))
-          .willReturn(
-            aResponse()
-              .withStatus(INTERNAL_SERVER_ERROR)
-          )
-      )
+    "throw an UpstreamErrorResponse when the call returns an internal server error" in new Setup {
+      ThirdPartyDeveloperStub.FetchSession.throwsAnException(sessionId)
 
       intercept[UpstreamErrorResponse] {
         await(underTest.fetchSession(sessionId))
