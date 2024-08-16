@@ -19,6 +19,7 @@ package uk.gov.hmrc.devhubsupportfrontend.domain.models.views
 import play.api.libs.json._
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
+import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
 
 case class NavLink(label: String, href: String, truncate: Boolean = false, openInNewWindow: Boolean = false, isSensitive: Boolean = false)
 
@@ -32,7 +33,7 @@ case object StaticNavLinks {
     Seq(
       NavLink("Documentation", s"$apiDocumentationFrontendUrl/api-documentation/docs/using-the-hub"),
       NavLink("Applications", s"$thirdPartyDeveloperFrontendUrl/developer/applications"),
-      NavLink("Support", "/devhub-support/new-support"),
+      NavLink("Support", routes.SupportEnquiryInitialChoiceController.page().url),
       NavLink("Service Availability", "https://api-platform-status.production.tax.service.gov.uk/", openInNewWindow = true)
     )
   }

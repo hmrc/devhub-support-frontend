@@ -61,17 +61,17 @@ class ChooseAPrivateApiControllerSpec extends BaseControllerSpec with WithCSRFAd
 
     def shouldBeRedirectedToPreviousPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/api/choose-api"
+      redirectLocation(result).value shouldBe "/devhub-support/api/choose-api"
     }
 
     def shouldBeRedirectedToApplyPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/api/private-api/apply"
+      redirectLocation(result).value shouldBe "/devhub-support/api/private-api/apply"
     }
 
     def shouldBeRedirectedToConfirmCdsPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/api/private-api/cds-check"
+      redirectLocation(result).value shouldBe "/devhub-support/api/private-api/cds-check"
     }
   }
 

@@ -60,17 +60,17 @@ class HelpWithApplicationControllerSpec extends BaseControllerSpec with WithCSRF
 
     def shouldBeRedirectedToPreviousPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support"
+      redirectLocation(result).value shouldBe "/devhub-support"
     }
 
     def shouldBeRedirectedToNextPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/details"
+      redirectLocation(result).value shouldBe "/devhub-support/details"
     }
 
     def shouldBeRedirectedToRemoveAccessCodesPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/signing-in/remove-access-codes"
+      redirectLocation(result).value shouldBe "/devhub-support/signing-in/remove-access-codes"
     }
   }
 
@@ -120,7 +120,7 @@ class HelpWithApplicationControllerSpec extends BaseControllerSpec with WithCSRF
         val result = addToken(underTest.submit())(formRequest)
 
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some("/devhub-support/new-support/details")
+        redirectLocation(result) shouldBe Some("/devhub-support/details")
       }
 
       "redirect to the giving team member access page when Giving a Team Member Access  is selected" in new Setup {
@@ -133,7 +133,7 @@ class HelpWithApplicationControllerSpec extends BaseControllerSpec with WithCSRF
         val result = addToken(underTest.submit())(formRequest)
 
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some("/devhub-support/new-support/app/giving-team-member-access")
+        redirectLocation(result) shouldBe Some("/devhub-support/app/giving-team-member-access")
       }
 
       "redirect to the generic support details page when General Application Details is selected" in new Setup {
@@ -146,7 +146,7 @@ class HelpWithApplicationControllerSpec extends BaseControllerSpec with WithCSRF
         val result = addToken(underTest.submit())(formRequest)
 
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some("/devhub-support/new-support/details")
+        redirectLocation(result) shouldBe Some("/devhub-support/details")
       }
     }
   }

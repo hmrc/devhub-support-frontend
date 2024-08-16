@@ -84,7 +84,7 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
         val result = addToken(underTest.submit())(formRequest)
 
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some("/devhub-support/new-support/api/choose-api")
+        redirectLocation(result) shouldBe Some("/devhub-support/api/choose-api")
       }
 
       "redirect to the generic support details page when any other option is selected" in new Setup {
@@ -94,7 +94,7 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
         val result = addToken(underTest.submit())(formRequest)
 
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some("/devhub-support/new-support/details")
+        redirectLocation(result) shouldBe Some("/devhub-support/details")
       }
 
       "submit invalid request returns BAD_REQUEST" in new Setup {

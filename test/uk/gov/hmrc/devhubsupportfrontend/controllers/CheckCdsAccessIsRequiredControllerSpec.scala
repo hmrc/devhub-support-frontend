@@ -68,22 +68,22 @@ class CheckCdsAccessIsRequiredControllerSpec extends BaseControllerSpec with Wit
 
     def shouldBeRedirectedToPreviousPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/api/private-api"
+      redirectLocation(result).value shouldBe "/devhub-support/api/private-api"
     }
 
     def shouldBeRedirectedToApplyPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/api/private-api/apply"
+      redirectLocation(result).value shouldBe "/devhub-support/api/private-api/apply"
     }
 
     def shouldBeRedirectedToNotRequiredPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/api/private-api/cds-access-not-required"
+      redirectLocation(result).value shouldBe "/devhub-support/api/private-api/cds-access-not-required"
     }
 
     def shouldBeRedirectedToCheckPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/api/private-api/cds-check"
+      redirectLocation(result).value shouldBe "/devhub-support/api/private-api/cds-check"
     }
   }
 

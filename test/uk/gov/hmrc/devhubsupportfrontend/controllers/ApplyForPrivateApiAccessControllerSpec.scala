@@ -61,12 +61,12 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
 
     def shouldBeRedirectedToPreviousPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/api/private-api"
+      redirectLocation(result).value shouldBe "/devhub-support/api/private-api"
     }
 
     def shouldBeRedirectedToConfirmationPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/confirmation"
+      redirectLocation(result).value shouldBe "/devhub-support/confirmation"
     }
   }
 

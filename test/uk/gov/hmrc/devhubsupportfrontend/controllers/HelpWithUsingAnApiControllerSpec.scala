@@ -74,17 +74,17 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
 
     def shouldBeRedirectedToPreviousPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support"
+      redirectLocation(result).value shouldBe "/devhub-support"
     }
 
     def shouldBeRedirectedToDetailsPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/details"
+      redirectLocation(result).value shouldBe "/devhub-support/details"
     }
 
     def shouldBeRedirectedToChoosePrivateApiPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/api/private-api"
+      redirectLocation(result).value shouldBe "/devhub-support/api/private-api"
     }
   }
 

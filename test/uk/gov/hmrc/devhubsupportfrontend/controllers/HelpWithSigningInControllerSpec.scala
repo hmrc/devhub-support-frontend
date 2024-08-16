@@ -61,17 +61,17 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
 
     def shouldBeRedirectedToPreviousPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support"
+      redirectLocation(result).value shouldBe "/devhub-support"
     }
 
     def shouldBeRedirectedToNextPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/details"
+      redirectLocation(result).value shouldBe "/devhub-support/details"
     }
 
     def shouldBeRedirectedToRemoveAccessCodesPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result).value shouldBe "/devhub-support/new-support/signing-in/remove-access-codes"
+      redirectLocation(result).value shouldBe "/devhub-support/signing-in/remove-access-codes"
     }
   }
 

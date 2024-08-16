@@ -109,7 +109,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         val result = addToken(underTest.submitSupportDetails())(request)
 
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/devhub-support/new-support/confirmation")
+        redirectLocation(result) shouldBe Some("/devhub-support/confirmation")
       }
 
       "submit request with name, email and invalid details returns BAD_REQUEST" in new Setup {
