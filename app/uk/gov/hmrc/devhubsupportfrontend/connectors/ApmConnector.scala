@@ -31,8 +31,7 @@ object ApmConnector {
 }
 
 @Singleton
-class ApmConnector @Inject() (http: HttpClientV2, config: ApmConnector.Config, metrics: ConnectorMetrics)(implicit ec: ExecutionContext)
-    extends CommonResponseHandlers {
+class ApmConnector @Inject() (http: HttpClientV2, config: ApmConnector.Config, metrics: ConnectorMetrics)(implicit ec: ExecutionContext) {
 
   val api = API("api-platform-microservice")
 

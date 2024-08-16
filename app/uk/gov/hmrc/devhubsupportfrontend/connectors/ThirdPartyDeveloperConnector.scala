@@ -34,7 +34,7 @@ class ThirdPartyDeveloperConnector @Inject() (
     config: AppConfig,
     metrics: ConnectorMetrics
   )(implicit val ec: ExecutionContext
-  ) extends CommonResponseHandlers with Logging {
+  ) extends Logging {
 
   lazy val serviceBaseUrl: String = config.thirdPartyDeveloperUrl
 

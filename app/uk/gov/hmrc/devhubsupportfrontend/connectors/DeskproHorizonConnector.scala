@@ -32,7 +32,7 @@ import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.connectors.models._
 
 class DeskproHorizonConnector @Inject() (http: HttpClientV2, config: AppConfig, metrics: ConnectorMetrics)(implicit val ec: ExecutionContext)
-    extends CommonResponseHandlers with ApplicationLogger {
+    extends ApplicationLogger {
 
   lazy val serviceBaseUrl: String = config.deskproHorizonUrl
   val api                         = API("deskpro-horizon")

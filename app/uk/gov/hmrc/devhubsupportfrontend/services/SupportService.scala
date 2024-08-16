@@ -61,16 +61,6 @@ class SupportService @Inject() (
     flowRepository.saveFlow(fn(flow))
   }
 
-  def setPrivateApiChoice(sessionId: SupportSessionId, apiChoice: String): Future[Either[Throwable, SupportFlow]] = {
-    (
-      for {
-        flow       <- ET.liftF(fetchSupportFlow(sessionId))
-        updatedFlow = flow.copy(subSelection = Some(SupportData.PrivateApiDocumentation.id), privateApi = Some(apiChoice))
-        savedFlow  <- ET.liftF(flowRepository.saveFlow(updatedFlow))
-      } yield savedFlow
-    ).value
-  }
-
   def createFlow(sessionId: SupportSessionId, entrypoint: String): Future[SupportFlow] = {
     flowRepository.saveFlow(SupportFlow(sessionId, entrypoint, None))
   }
