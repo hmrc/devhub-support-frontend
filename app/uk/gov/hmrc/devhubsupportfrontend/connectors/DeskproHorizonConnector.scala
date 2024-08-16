@@ -56,8 +56,7 @@ class DeskproHorizonConnector @Inject() (http: HttpClientV2, config: AppConfig, 
             throw (err)
 
           case Left(err @ UpstreamErrorResponse(msg, _, _, _)) =>
-            // TODO: ************************* FIX THE LOG MESSAGE
-            logger.error(s"Deskpro horizon ticket creation failed due to ??? for: ${deskproHorizonTicket.subject}")
+            logger.error(s"Deskpro horizon ticket creation failed due to other error for: ${deskproHorizonTicket.subject}")
             logger.error(msg)
             throw (err)
         })
