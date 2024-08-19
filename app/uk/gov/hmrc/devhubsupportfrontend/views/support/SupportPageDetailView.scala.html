@@ -31,7 +31,7 @@
   govukCharacterCount : GovukCharacterCount
 )
 
-@(loggedInSession: Option[UserSession], form: Form[SupportDetailsForm], supportFlow: SupportFlow)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[SupportDetailsForm], supportFlow: SupportFlow)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @makingACallHeading={
     <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Tell us about the @{supportFlow.api.getOrElse("")} API call you need help with</h1>

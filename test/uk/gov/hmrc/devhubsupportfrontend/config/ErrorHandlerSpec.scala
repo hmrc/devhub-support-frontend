@@ -16,19 +16,16 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.config
 
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 
-class ErrorHandlerSpec extends AnyWordSpec
-    with Matchers
-    with GuiceOneAppPerSuite
-    with ScalaFutures {
+import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec
+
+class ErrorHandlerSpec extends AsyncHmrcSpec
+    with GuiceOneAppPerSuite {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
@@ -40,7 +37,7 @@ class ErrorHandlerSpec extends AnyWordSpec
 
   "standardErrorTemplate" should {
     "render HTML" in {
-      val html = handler.standardErrorTemplate("title", "heading", "message")(fakeRequest)
+      val html = await(handler.standardErrorTemplate("title", "heading", "message")(fakeRequest))
       html.contentType shouldBe "text/html"
     }
   }

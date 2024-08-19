@@ -30,7 +30,7 @@
   govukSelect : GovukSelect
 )
 
-@(loggedInSession: Option[UserSession], form: Form[HelpWithApplicationsForm], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[HelpWithApplicationsForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(
   pageTitle = "What do you need help with?",

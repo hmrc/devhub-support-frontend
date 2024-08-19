@@ -27,7 +27,7 @@
   govukSelect : GovukSelect
 )
 
-@(loggedInSession: Option[UserSession], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(
   pageTitle = "You don't need access to this documentation",

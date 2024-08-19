@@ -31,7 +31,7 @@
   govukSelect : GovukSelect
 )
 
-@(loggedInSession: Option[UserSession], form: Form[HelpWithUsingAnApiForm], backUri: String, apis: List[ApiDefinition])(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[HelpWithUsingAnApiForm], backUri: String, apis: List[ApiDefinition])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @selectItems = @{
   apis.map( api =>

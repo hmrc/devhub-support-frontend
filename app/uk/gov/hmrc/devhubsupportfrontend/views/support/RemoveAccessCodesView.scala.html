@@ -27,7 +27,7 @@
   govukSelect : GovukSelect
 )
 
-@(loggedInSession: Option[UserSession], backUrl: String, loginUrl: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], backUrl: String, loginUrl: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(
   pageTitle = "How to remove access codes for signing in",

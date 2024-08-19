@@ -56,7 +56,7 @@
   form: Option[Form[_]] = None,
 )(
   contentBlock: Html
-)(implicit request: Request[Any], messages: Messages)
+)(implicit request: RequestHeader, messages: Messages)
 
 @timeoutBlock = {
   @hmrcTimeoutDialog(
