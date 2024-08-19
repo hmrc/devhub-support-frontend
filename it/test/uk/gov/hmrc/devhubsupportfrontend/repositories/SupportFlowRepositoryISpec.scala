@@ -37,7 +37,7 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 
-class FlowRepositoryISpec extends AnyWordSpec
+class SupportFlowRepositoryISpec extends AnyWordSpec
     with GuiceOneAppPerSuite
     with Matchers
     with OptionValues
@@ -50,7 +50,7 @@ class FlowRepositoryISpec extends AnyWordSpec
   private val currentEntrySelection = "current"
   private val anotherEntrySelection = "another"
 
-  private val flowRepository = app.injector.instanceOf[FlowRepository]
+  private val flowRepository = app.injector.instanceOf[SupportFlowRepository]
 
   override implicit lazy val app: Application =
     new GuiceApplicationBuilder()

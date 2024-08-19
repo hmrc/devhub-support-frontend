@@ -32,18 +32,18 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 
-object FlowRepository {
+object SupportFlowRepository {
   import play.api.libs.json._
   implicit val dateFormat: Format[Instant]            = MongoJavatimeFormats.instantFormat
   implicit val formatSupportFlow: Format[SupportFlow] = Json.format[SupportFlow]
 }
 
 @Singleton
-class FlowRepository @Inject() (mongo: MongoComponent, appConfig: AppConfig)(implicit val ec: ExecutionContext)
+class SupportFlowRepository @Inject() (mongo: MongoComponent, appConfig: AppConfig)(implicit val ec: ExecutionContext)
     extends PlayMongoRepository[SupportFlow](
       collectionName = "flows",
       mongoComponent = mongo,
-      domainFormat = FlowRepository.formatSupportFlow,
+      domainFormat = SupportFlowRepository.formatSupportFlow,
       indexes = Seq(
         IndexModel(
           ascending("sessionId"),

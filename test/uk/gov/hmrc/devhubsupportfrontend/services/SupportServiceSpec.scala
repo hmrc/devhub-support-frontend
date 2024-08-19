@@ -28,7 +28,7 @@ import uk.gov.hmrc.devhubsupportfrontend.connectors.models.{DeskproHorizonTicket
 import uk.gov.hmrc.devhubsupportfrontend.controllers.{SupportData, SupportDetailsForm}
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ApmConnectorMockModule, DeskproHorizonConnectorMockModule}
-import uk.gov.hmrc.devhubsupportfrontend.mocks.repositories.FlowRepositoryMockModule
+import uk.gov.hmrc.devhubsupportfrontend.mocks.repositories.SupportFlowRepositoryMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec
 
 class SupportServiceSpec extends AsyncHmrcSpec {
@@ -41,37 +41,37 @@ class SupportServiceSpec extends AsyncHmrcSpec {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  trait Setup extends ApmConnectorMockModule with FlowRepositoryMockModule with DeskproHorizonConnectorMockModule {
-    val underTest        = new SupportService(ApmConnectorMock.aMock, DeskproHorizonConnectorMock.aMock, FlowRepositoryMock.aMock, mockAppConfig)
+  trait Setup extends ApmConnectorMockModule with SupportFlowRepositoryMockModule with DeskproHorizonConnectorMockModule {
+    val underTest        = new SupportService(ApmConnectorMock.aMock, DeskproHorizonConnectorMock.aMock, SupportFlowRepositoryMock.aMock, mockAppConfig)
     val brand            = 5
     val apiNameConfig    = "5"
     val entryPointConfig = "7"
     when(mockAppConfig.deskproHorizonApiName).thenReturn(apiNameConfig)
     when(mockAppConfig.deskproHorizonSupportReason).thenReturn(entryPointConfig)
     when(mockAppConfig.deskproHorizonBrand).thenReturn(brand)
-    FlowRepositoryMock.SaveFlow.thenReturnSuccess
+    SupportFlowRepositoryMock.SaveFlow.thenReturnSuccess
   }
 
   "getSupportFlow" should {
     "default to a fixed SupportFlow if not found" in new Setup {
-      FlowRepositoryMock.FetchBySessionId.thenReturnNothing
+      SupportFlowRepositoryMock.FetchBySessionId.thenReturnNothing
 
       underTest.getSupportFlow(sessionId)
-      FlowRepositoryMock.SaveFlow.verifyCalledWith(defaultFlow)
+      SupportFlowRepositoryMock.SaveFlow.verifyCalledWith(defaultFlow)
     }
 
     "get stored SupportFlow if found" in new Setup {
-      FlowRepositoryMock.FetchBySessionId.thenReturn(savedFlow)
+      SupportFlowRepositoryMock.FetchBySessionId.thenReturn(savedFlow)
       val result = await(underTest.getSupportFlow(sessionId))
       result shouldBe savedFlow
-      FlowRepositoryMock.SaveFlow.verifyCalledWith(savedFlow)
+      SupportFlowRepositoryMock.SaveFlow.verifyCalledWith(savedFlow)
     }
   }
 
   "createFlow" should {
     "save a newly created flow in the flow repository" in new Setup {
       underTest.createFlow(sessionId, entryPoint)
-      FlowRepositoryMock.SaveFlow.verifyCalledWith(savedFlow)
+      SupportFlowRepositoryMock.SaveFlow.verifyCalledWith(savedFlow)
     }
   }
 
@@ -110,7 +110,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
     "send no API when one is NOT provided" in new Setup {
       val fullName = "test name"
       val email    = "email@test.com"
-      FlowRepositoryMock.FetchBySessionId.thenReturn(savedFlow)
+      SupportFlowRepositoryMock.FetchBySessionId.thenReturn(savedFlow)
       DeskproHorizonConnectorMock.CreateTicket.thenReturnsSuccess()
 
       await(
@@ -142,7 +142,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       val apiName  = "Hello world"
       val fullName = "test name"
       val email    = "email@test.com"
-      FlowRepositoryMock.FetchBySessionId.thenReturn(savedFlow)
+      SupportFlowRepositoryMock.FetchBySessionId.thenReturn(savedFlow)
       DeskproHorizonConnectorMock.CreateTicket.thenReturnsSuccess()
 
       await(

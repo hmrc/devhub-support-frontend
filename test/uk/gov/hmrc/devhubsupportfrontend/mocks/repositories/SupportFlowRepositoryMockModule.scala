@@ -22,12 +22,12 @@ import org.mockito.quality.Strictness
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
-import uk.gov.hmrc.devhubsupportfrontend.repositories.FlowRepository
+import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
 
-trait FlowRepositoryMockModule extends MockitoSugar with ArgumentMatchersSugar {
+trait SupportFlowRepositoryMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
-  protected trait BaseFlowRepositoryMock {
-    def aMock: FlowRepository
+  protected trait BaseSupportFlowRepositoryMock {
+    def aMock: SupportFlowRepository
 
     def verify = MockitoSugar.verify(aMock)
 
@@ -49,7 +49,7 @@ trait FlowRepositoryMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
   }
 
-  object FlowRepositoryMock extends BaseFlowRepositoryMock {
-    val aMock = mock[FlowRepository](withSettings.strictness(Strictness.LENIENT))
+  object SupportFlowRepositoryMock extends BaseSupportFlowRepositoryMock {
+    val aMock = mock[SupportFlowRepository](withSettings.strictness(Strictness.LENIENT))
   }
 }

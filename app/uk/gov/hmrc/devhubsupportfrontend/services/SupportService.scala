@@ -29,13 +29,13 @@ import uk.gov.hmrc.devhubsupportfrontend.connectors.models.{DeskproHorizonTicket
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApmConnector, DeskproHorizonConnector}
 import uk.gov.hmrc.devhubsupportfrontend.controllers._
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, _}
-import uk.gov.hmrc.devhubsupportfrontend.repositories.FlowRepository
+import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
 
 @Singleton
 class SupportService @Inject() (
     val apmConnector: ApmConnector,
     deskproConnector: DeskproHorizonConnector,
-    flowRepository: FlowRepository,
+    flowRepository: SupportFlowRepository,
     config: AppConfig
   )(implicit val ec: ExecutionContext
   ) extends ApplicationLogger {
