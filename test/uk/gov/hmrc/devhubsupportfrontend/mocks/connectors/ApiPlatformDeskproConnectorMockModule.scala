@@ -20,18 +20,17 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import uk.gov.hmrc.devhubsupportfrontend.connectors.DeskproHorizonConnector
-import uk.gov.hmrc.devhubsupportfrontend.connectors.models.{DeskproHorizonTicketRequest, DeskproHorizonTicketResponse}
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
 
-trait DeskproHorizonConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
+trait ApiPlatformDeskproConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
-  object DeskproHorizonConnectorMock {
-    val aMock = mock[DeskproHorizonConnector]
+  object ApiPlatformDeskproConnectorMock {
+    val aMock = mock[ApiPlatformDeskproConnector]
 
     object CreateTicket {
 
       def thenReturnsSuccess() = {
-        when(aMock.createTicket(*[DeskproHorizonTicketRequest])(*)).thenReturn(Future.successful(DeskproHorizonTicketResponse("test")))
+        when(aMock.createTicket(*[ApiPlatformDeskproConnector.CreateTicketRequest])(*)).thenReturn(Future.successful("test"))
       }
     }
   }

@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.devhubsupportfrontend.connectors.models
+package uk.gov.hmrc.devhubsupportfrontend.config
 
-import play.api.libs.json._
+import com.google.inject.{Inject, Provider, Singleton}
 
-case class DeskproHorizonTicketResponse(ref: String)
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-case object DeskproHorizonTicketResponse {
-  implicit val reader: Reads[DeskproHorizonTicketResponse] = (__ \ "data" \ "ref").read[String].map(DeskproHorizonTicketResponse(_))
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
+
+@Singleton
+class LiveApiPlatformDeskproConnectorConfigProvider @Inject() (config: ServicesConfig) extends Provider[ApiPlatformDeskproConnector.Config] {
+
+  override def get(): ApiPlatformDeskproConnector.Config =
+    ApiPlatformDeskproConnector.Config(
+      serviceBaseUrl = config.baseUrl("api-platform-deskpro")
+    )
 }

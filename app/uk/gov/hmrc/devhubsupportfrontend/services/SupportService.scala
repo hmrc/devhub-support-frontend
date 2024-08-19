@@ -25,8 +25,7 @@ import uk.gov.hmrc.apiplatform.modules.common.services.{ApplicationLogger, Eithe
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-import uk.gov.hmrc.devhubsupportfrontend.connectors.models.{DeskproHorizonTicketMessage, DeskproHorizonTicketPerson, DeskproHorizonTicketRequest}
-import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApmConnector, DeskproHorizonConnector}
+import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApiPlatformDeskproConnector, ApmConnector}
 import uk.gov.hmrc.devhubsupportfrontend.controllers._
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, _}
 import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
@@ -34,7 +33,7 @@ import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
 @Singleton
 class SupportService @Inject() (
     val apmConnector: ApmConnector,
-    deskproConnector: DeskproHorizonConnector,
+    deskproConnector: ApiPlatformDeskproConnector,
     flowRepository: SupportFlowRepository,
     config: AppConfig
   )(implicit val ec: ExecutionContext
@@ -80,10 +79,8 @@ class SupportService @Inject() (
     submitTicket(
       supportFlow,
       baseDeskproTicket.copy(
-        fields =
-          baseDeskproTicket.fields
-            ++ form.organisation.fold(Map.empty[String, String])(v => Map(config.deskproHorizonOrganisation -> v))
-            ++ form.teamMemberEmailAddress.fold(Map.empty[String, String])(v => Map(config.deskproHorizonTeamMemberEmail -> v))
+        organisation = form.organisation.filterNot(_.isBlank),
+        teamMemberEmailAddress = form.teamMemberEmailAddress.filterNot(_.isBlank)
       )
     )
   }
@@ -99,17 +96,13 @@ class SupportService @Inject() (
     submitTicket(
       supportFlow,
       baseDeskproTicket.copy(
-        fields =
-          baseDeskproTicket.fields
-            ++ Map(
-              config.deskproHorizonOrganisation  -> form.organisation,
-              config.deskproHorizonApplicationId -> form.applicationId
-            )
+        organisation = Some(form.organisation).filterNot(_.isBlank),
+        applicationId = Some(form.applicationId).filterNot(_.isBlank)
       )
     )
   }
 
-  private def buildTicket(supportFlow: SupportFlow, fullName: String, emailAddress: String, messageContents: String): DeskproHorizonTicketRequest = {
+  private def buildTicket(supportFlow: SupportFlow, fullName: String, emailAddress: String, messageContents: String): ApiPlatformDeskproConnector.CreateTicketRequest = {
     // Entry point is currently the value of the text on the radio button but may not always be so.
     def deriveSupportReason(): String = {
       (supportFlow.entrySelection, supportFlow.subSelection) match {
@@ -130,21 +123,19 @@ class SupportService @Inject() (
       }
     }
 
-    DeskproHorizonTicketRequest(
-      person = DeskproHorizonTicketPerson(fullName, emailAddress),
+    ApiPlatformDeskproConnector.CreateTicketRequest(
+      person = ApiPlatformDeskproConnector.Person(fullName, emailAddress),
       subject = "HMRC Developer Hub: Support Enquiry",
-      message = DeskproHorizonTicketMessage.fromRaw(messageContents),
-      brand = config.deskproHorizonBrand,
-      fields = Map(
-        config.deskproHorizonSupportReason -> deriveSupportReason()
-      ) ++ supportFlow.api.fold(Map.empty[String, String])(v => Map(config.deskproHorizonApiName -> v))
+      message = messageContents,
+      supportReason = Some(deriveSupportReason()),
+      apiName = supportFlow.api
     )
   }
 
-  private def submitTicket(supportFlow: SupportFlow, ticket: DeskproHorizonTicketRequest)(implicit hc: HeaderCarrier): Future[SupportFlow] = {
+  private def submitTicket(supportFlow: SupportFlow, ticket: ApiPlatformDeskproConnector.CreateTicketRequest)(implicit hc: HeaderCarrier): Future[SupportFlow] = {
     for {
-      ticketResult <- deskproConnector.createTicket(ticket)
-      flow         <- flowRepository.saveFlow(supportFlow.copy(referenceNumber = Some(ticketResult.ref), emailAddress = Some(ticket.person.email)))
+      ticketReference <- deskproConnector.createTicket(ticket)
+      flow            <- flowRepository.saveFlow(supportFlow.copy(referenceNumber = Some(ticketReference), emailAddress = Some(ticket.person.email)))
     } yield flow
   }
 }

@@ -24,10 +24,10 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-import uk.gov.hmrc.devhubsupportfrontend.connectors.models.{DeskproHorizonTicketMessage, DeskproHorizonTicketPerson, DeskproHorizonTicketRequest}
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
 import uk.gov.hmrc.devhubsupportfrontend.controllers.{SupportData, SupportDetailsForm}
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
-import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ApmConnectorMockModule, DeskproHorizonConnectorMockModule}
+import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ApiPlatformDeskproConnectorMockModule, ApmConnectorMockModule}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.repositories.SupportFlowRepositoryMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec
 
@@ -41,14 +41,8 @@ class SupportServiceSpec extends AsyncHmrcSpec {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  trait Setup extends ApmConnectorMockModule with SupportFlowRepositoryMockModule with DeskproHorizonConnectorMockModule {
-    val underTest        = new SupportService(ApmConnectorMock.aMock, DeskproHorizonConnectorMock.aMock, SupportFlowRepositoryMock.aMock, mockAppConfig)
-    val brand            = 5
-    val apiNameConfig    = "5"
-    val entryPointConfig = "7"
-    when(mockAppConfig.deskproHorizonApiName).thenReturn(apiNameConfig)
-    when(mockAppConfig.deskproHorizonSupportReason).thenReturn(entryPointConfig)
-    when(mockAppConfig.deskproHorizonBrand).thenReturn(brand)
+  trait Setup extends ApmConnectorMockModule with SupportFlowRepositoryMockModule with ApiPlatformDeskproConnectorMockModule {
+    val underTest = new SupportService(ApmConnectorMock.aMock, ApiPlatformDeskproConnectorMock.aMock, SupportFlowRepositoryMock.aMock, mockAppConfig)
     SupportFlowRepositoryMock.SaveFlow.thenReturnSuccess
   }
 
@@ -108,10 +102,11 @@ class SupportServiceSpec extends AsyncHmrcSpec {
 
   "submitTicket" should {
     "send no API when one is NOT provided" in new Setup {
+      val details  = "This is some\ndescription"
       val fullName = "test name"
       val email    = "email@test.com"
       SupportFlowRepositoryMock.FetchBySessionId.thenReturn(savedFlow)
-      DeskproHorizonConnectorMock.CreateTicket.thenReturnsSuccess()
+      ApiPlatformDeskproConnectorMock.CreateTicket.thenReturnsSuccess()
 
       await(
         underTest.submitTicket(
@@ -120,7 +115,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
             SupportData.FindingAnApi.id
           ),
           SupportDetailsForm(
-            "This is some\ndescription",
+            details,
             fullName,
             email,
             organisation = None,
@@ -129,21 +124,21 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         )
       )
 
-      verify(DeskproHorizonConnectorMock.aMock).createTicket(eqTo(DeskproHorizonTicketRequest(
-        person = DeskproHorizonTicketPerson(fullName, email),
+      verify(ApiPlatformDeskproConnectorMock.aMock).createTicket(eqTo(ApiPlatformDeskproConnector.CreateTicketRequest(
+        person = ApiPlatformDeskproConnector.Person(fullName, email),
         subject = "HMRC Developer Hub: Support Enquiry",
-        message = DeskproHorizonTicketMessage("This is some<br>description"),
-        brand = brand,
-        fields = Map(entryPointConfig -> SupportData.FindingAnApi.text)
+        message = details,
+        supportReason = Some(SupportData.FindingAnApi.text)
       )))(*)
     }
 
     "send the API when one is provided" in new Setup {
       val apiName  = "Hello world"
+      val details  = "This is some\ndescription"
       val fullName = "test name"
       val email    = "email@test.com"
       SupportFlowRepositoryMock.FetchBySessionId.thenReturn(savedFlow)
-      DeskproHorizonConnectorMock.CreateTicket.thenReturnsSuccess()
+      ApiPlatformDeskproConnectorMock.CreateTicket.thenReturnsSuccess()
 
       await(
         underTest.submitTicket(
@@ -154,7 +149,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
             Some(apiName)
           ),
           SupportDetailsForm(
-            "This is some\ndescription",
+            details,
             fullName,
             email,
             organisation = None,
@@ -163,15 +158,14 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         )
       )
 
-      verify(DeskproHorizonConnectorMock.aMock).createTicket(eqTo(DeskproHorizonTicketRequest(
-        person = DeskproHorizonTicketPerson(fullName, email),
+      verify(ApiPlatformDeskproConnectorMock.aMock).createTicket(eqTo(ApiPlatformDeskproConnector.CreateTicketRequest(
+        person = ApiPlatformDeskproConnector.Person(fullName, email),
         subject = "HMRC Developer Hub: Support Enquiry",
-        message = DeskproHorizonTicketMessage("This is some<br>description"),
-        brand = brand,
-        fields = Map(apiNameConfig -> apiName, entryPointConfig -> SupportData.MakingAnApiCall.text)
+        message = details,
+        apiName = Some(apiName),
+        supportReason = Some(SupportData.MakingAnApiCall.text)
       )))(*)
     }
 
   }
-
 }
