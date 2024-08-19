@@ -31,22 +31,24 @@ class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config)
 
   val feedbackSurveyUrl = getString("feedbackBanner.generic.surveyUrl")
 
-  val platformFrontendHost: String = getConfigDefaulted("platform.frontend.host", "http://localhost:9695")
+  val thirdPartyDeveloperUrl: String = baseUrl("third-party-developer")
 
-  val thirdPartyDeveloperUrl: String         = baseUrl("third-party-developer")
-  val thirdPartyDeveloperFrontendUrl: String = baseUrl("third-party-developer-frontend")
-  val apiDocumentationFrontendUrl: String    = baseUrl("api-documentation-frontend")
+  private val platformFrontendHost: Option[String] = config.getOptional[String]("platform.frontend.host")
+  lazy val accessibilityStatementUrl               = platformFrontendHost.getOrElse("http://localhost:12346")
+
+  private val internalPlatformHost: Option[String] = config.getOptional[String]("internal.platform.host")
+  lazy val apiDocumentationFrontendUrl: String     = internalPlatformHost.getOrElse("http://localhost:9680")
+  lazy val thirdPartyDeveloperFrontendUrl: String  = internalPlatformHost.getOrElse("http://localhost:9685")
+  lazy val reportProblemHost: String               = internalPlatformHost.getOrElse("http://localhost:9250")
 
   lazy val keepAliveUrl: String = s"$thirdPartyDeveloperFrontendUrl/developer/keep-alive"
   lazy val logOutUrl: String    = s"$thirdPartyDeveloperFrontendUrl/developer/logout"
   lazy val logInUrl: String     = s"$thirdPartyDeveloperFrontendUrl/developer/login"
 
-  lazy val reportProblemHost: String = config.underlying.getString("urls.report-a-problem.baseUrl") + config.underlying.getString("urls.report-a-problem.problem")
-
   val securedCookie: Boolean = getConfigDefaulted("cookie.secure", true)
 
-  val sessionTimeout: Duration   = config.underlying.getDuration("sessiontimeout.timeout")
-  val sessionCountdown: Duration = config.underlying.getDuration("sessiontimeout.countdown")
+  val sessionTimeout: Duration   = config.underlying.getDuration("session.timeout")
+  val sessionCountdown: Duration = config.underlying.getDuration("session.countdown")
 
   val supportSessionTimeout: Duration = config.underlying.getDuration("supportsession.timeout")
 

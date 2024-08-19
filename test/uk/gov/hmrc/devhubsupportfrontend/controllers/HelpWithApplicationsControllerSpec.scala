@@ -40,8 +40,8 @@ class HelpWithApplicationsControllerSpec extends BaseControllerSpec with WithCSR
     val givingTeamMembersAccessView = app.injector.instanceOf[GivingTeamMemberAccessView]
 
     lazy val request = FakeRequest()
-      .withSupport(underTest, cookieSigner)(supportSessionId)
-      .withUser(underTest, cookieSigner)(sessionId)
+      .withSupport(underTest)(supportSessionId)
+      .withUser(underTest)(sessionId)
 
     val underTest        = new HelpWithApplicationsController(
       mcc,

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.utils
 
-import play.api.libs.crypto.CookieSigner
 import play.api.test.FakeRequest
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSessionId
 
@@ -27,11 +26,11 @@ object WithLoggedInSession {
 
   implicit class AuthFakeRequest[A](fakeRequest: FakeRequest[A]) {
 
-    def withUser(implicit cookieEncoding: CookieEncoding, cookieSigner: CookieSigner): UserSessionId => FakeRequest[A] = { id =>
+    def withUser(implicit cookieEncoding: CookieEncoding): UserSessionId => FakeRequest[A] = { id =>
       fakeRequest.withCookies(cookieEncoding.createUserCookie(id))
     }
 
-    def withSupport(implicit cookieEncoding: CookieEncoding, cookieSigner: CookieSigner): SupportSessionId => FakeRequest[A] = { id =>
+    def withSupport(implicit cookieEncoding: CookieEncoding): SupportSessionId => FakeRequest[A] = { id =>
       fakeRequest.withCookies(cookieEncoding.createUserCookie(id))
     }
   }

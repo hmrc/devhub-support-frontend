@@ -45,8 +45,8 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
     val helpWithUsingAnApiView = app.injector.instanceOf[HelpWithUsingAnApiView]
 
     lazy val request = FakeRequest()
-      .withSupport(underTest, cookieSigner)(supportSessionId)
-      .withUser(underTest, cookieSigner)(sessionId)
+      .withSupport(underTest)(supportSessionId)
+      .withUser(underTest)(sessionId)
 
     val underTest = new HelpWithUsingAnApiController(
       mcc,

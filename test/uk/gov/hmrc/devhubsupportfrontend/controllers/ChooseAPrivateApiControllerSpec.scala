@@ -39,8 +39,8 @@ class ChooseAPrivateApiControllerSpec extends BaseControllerSpec with WithCSRFAd
     val chooseAPrivateApiView = app.injector.instanceOf[ChooseAPrivateApiView]
 
     lazy val request = FakeRequest()
-      .withSupport(underTest, cookieSigner)(supportSessionId)
-      .withUser(underTest, cookieSigner)(sessionId)
+      .withSupport(underTest)(supportSessionId)
+      .withUser(underTest)(sessionId)
 
     val underTest = new ChooseAPrivateApiController(
       mcc,

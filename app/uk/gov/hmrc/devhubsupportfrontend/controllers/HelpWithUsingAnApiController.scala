@@ -112,6 +112,7 @@ class HelpWithUsingAnApiController @Inject() (
       case SupportData.GettingExamples.id         => updateFlowAndRedirect(chooseGettingExamples(form))(routes.SupportDetailsController.supportDetailsPage())(flow)
       case SupportData.ReportingDocumentation.id  => updateFlowAndRedirect(chooseReporting(form))(routes.SupportDetailsController.supportDetailsPage())(flow)
       case SupportData.PrivateApiDocumentation.id => updateFlowAndRedirect(choosePrivateApi(form))(routes.ChooseAPrivateApiController.page())(flow)
+      case _                                      => throw new RuntimeException("Validation failed to eliminate bad data during Form processing")
     }
   }
 

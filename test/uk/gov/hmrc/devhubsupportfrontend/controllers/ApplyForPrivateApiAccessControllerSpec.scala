@@ -39,8 +39,8 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
     val applyForPrivateApiAccessView = app.injector.instanceOf[ApplyForPrivateApiAccessView]
 
     lazy val request = FakeRequest()
-      .withSupport(underTest, cookieSigner)(supportSessionId)
-      .withUser(underTest, cookieSigner)(sessionId)
+      .withSupport(underTest)(supportSessionId)
+      .withUser(underTest)(sessionId)
 
     val underTest = new ApplyForPrivateApiAccessController(
       mcc,

@@ -126,6 +126,7 @@ class SupportService @Inject() (
         case (SupportData.SettingUpApplication.id, _)                                                  => SupportData.SettingUpApplication.text
         case (SupportData.ReportingDocumentation.id, _)                                                => SupportData.ReportingDocumentation.text
         case (SupportData.NoneOfTheAbove.id, _)                                                        => "General Issue"
+        case _                                                                                         => throw new RuntimeException("SupportFlow state cannot support ticket creation")
       }
     }
 

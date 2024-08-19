@@ -17,6 +17,7 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
+import scala.annotation.nowarn
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -51,7 +52,7 @@ class ApplyForPrivateApiAccessController @Inject() (
 
   def form() = ApplyForPrivateApiAccessForm.form
 
-  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
+  def extraData()(implicit @nowarn request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
 
   def pageContents(flow: SupportFlow, form: Form[ApplyForPrivateApiAccessForm], extras: Unit)(implicit request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable = {
     applyForPrivateApiAccessView(

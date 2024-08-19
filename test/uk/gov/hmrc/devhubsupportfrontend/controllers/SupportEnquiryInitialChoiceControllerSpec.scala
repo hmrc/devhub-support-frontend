@@ -42,8 +42,8 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
     val appropriateFlow  = SupportFlow(supportSessionId, SupportData.SigningIn.id)
 
     lazy val request = FakeRequest()
-      .withSupport(underTest, cookieSigner)(supportSessionId)
-      .withUser(underTest, cookieSigner)(sessionId)
+      .withSupport(underTest)(supportSessionId)
+      .withUser(underTest)(sessionId)
 
     val underTest = new SupportEnquiryInitialChoiceController(
       mcc,

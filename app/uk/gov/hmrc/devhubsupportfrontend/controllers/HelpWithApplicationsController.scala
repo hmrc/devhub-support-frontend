@@ -17,6 +17,7 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
+import scala.annotation.nowarn
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -72,19 +73,19 @@ class HelpWithApplicationsController @Inject() (
 
   def onValidForm(flow: SupportFlow, form: HelpWithApplicationsForm)(implicit request: MaybeUserRequest[AnyContent]): Future[Result] = {
     form.choice match {
-      case SupportData.GivingTeamMemberAccess.id => successful(Redirect(routes.HelpWithApplicationsController.givingTeamMembersAccess()))
-      case SupportData.CompletingTermsOfUseAgreement.id |
-          SupportData.GeneralApplicationDetails.id =>
+      case SupportData.GivingTeamMemberAccess.id                                                   => successful(Redirect(routes.HelpWithApplicationsController.givingTeamMembersAccess()))
+      case SupportData.CompletingTermsOfUseAgreement.id | SupportData.GeneralApplicationDetails.id =>
         supportService.updateWithDelta(choose(form))(flow).map { newFlow =>
           Redirect(routes.SupportDetailsController.supportDetailsPage())
         }
+      case _                                                                                       => throw new RuntimeException("Validation failed to eliminate bad data during Form processing")
     }
   }
 
   def form(): Form[HelpWithApplicationsForm] = HelpWithApplicationsForm.form
 
   // Typically can be successful(Unit) if nothing is needed (see HelpWithUsingAnApiController for use to get api list)
-  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
+  def extraData()(implicit @nowarn request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
 
   def givingTeamMembersAccess(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
     successful(Ok(

@@ -17,6 +17,7 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
+import scala.annotation.nowarn
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -75,9 +76,10 @@ class ChooseAPrivateApiController @Inject() (
     form.chosenApiName match {
       case c @ SupportData.ChooseBusinessRates.id => updateFlowAndRedirect(chooseBusinessRates)(routes.ApplyForPrivateApiAccessController.page())(flow)
       case c @ SupportData.ChooseCDS.id           => updateFlowAndRedirect(chooseCDS)(routes.CheckCdsAccessIsRequiredController.page())(flow)
+      case _                                      => throw new RuntimeException("Validation failed to eliminate bad data during Form processing")
     }
 
   def form(): Form[ChooseAPrivateApiForm] = ChooseAPrivateApiForm.form
 
-  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
+  def extraData()(implicit @nowarn request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
 }

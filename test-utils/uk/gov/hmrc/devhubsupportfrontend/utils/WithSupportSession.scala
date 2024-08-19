@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.utils
 
-import play.api.libs.crypto.CookieSigner
 import play.api.test.FakeRequest
 
 import uk.gov.hmrc.devhubsupportfrontend.controllers.security.CookieEncoding
@@ -26,7 +25,7 @@ object WithSupportSession {
 
   implicit class SupportSessionFakeRequest[A](fakeRequest: FakeRequest[A]) {
 
-    def withSupportSession(implicit cookieEncoding: CookieEncoding, cookieSigner: CookieSigner): SupportSessionId => FakeRequest[A] = { id =>
+    def withSupportSession(implicit cookieEncoding: CookieEncoding): SupportSessionId => FakeRequest[A] = { id =>
       fakeRequest.withCookies(cookieEncoding.createSupportCookie(id))
     }
   }
