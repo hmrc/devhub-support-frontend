@@ -1,5 +1,26 @@
 # microservice specific routes
 
-->         /hmrc-frontend           hmrcfrontend.Routes
-GET        /                        uk.gov.hmrc.devhubsupportfrontend.controllers.HelloWorldController.helloWorld
-GET        /assets/*file            controllers.Assets.versioned(path = "/public", file: Asset)
+->          /hmrc-frontend                                  hmrcfrontend.Routes
+
+GET         /                                               uk.gov.hmrc.devhubsupportfrontend.controllers.SupportEnquiryInitialChoiceController.page()
+POST        /                                               uk.gov.hmrc.devhubsupportfrontend.controllers.SupportEnquiryInitialChoiceController.submit()
+GET         /api/choose-api                                 uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithUsingAnApiController.page()
+POST        /api/choose-api                                 uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithUsingAnApiController.submit()
+GET         /api/private-api                                uk.gov.hmrc.devhubsupportfrontend.controllers.ChooseAPrivateApiController.page()
+POST        /api/private-api                                uk.gov.hmrc.devhubsupportfrontend.controllers.ChooseAPrivateApiController.submit()
+GET         /api/private-api/apply                          uk.gov.hmrc.devhubsupportfrontend.controllers.ApplyForPrivateApiAccessController.page()
+POST        /api/private-api/apply                          uk.gov.hmrc.devhubsupportfrontend.controllers.ApplyForPrivateApiAccessController.submit()
+GET         /api/private-api/cds-check                      uk.gov.hmrc.devhubsupportfrontend.controllers.CheckCdsAccessIsRequiredController.page()
+POST        /api/private-api/cds-check                      uk.gov.hmrc.devhubsupportfrontend.controllers.CheckCdsAccessIsRequiredController.submit()
+GET         /api/private-api/cds-access-not-required        uk.gov.hmrc.devhubsupportfrontend.controllers.CheckCdsAccessIsRequiredController.cdsAccessIsNotRequiredPage()
+GET         /details                                        uk.gov.hmrc.devhubsupportfrontend.controllers.SupportDetailsController.supportDetailsPage()
+POST        /details                                        uk.gov.hmrc.devhubsupportfrontend.controllers.SupportDetailsController.submitSupportDetails()
+GET         /signing-in                                     uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithSigningInController.page()
+POST        /signing-in                                     uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithSigningInController.submit()
+GET         /signing-in/remove-access-codes                 uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithSigningInController.removeAccessCodesPage()
+GET         /confirmation                                   uk.gov.hmrc.devhubsupportfrontend.controllers.SupportDetailsController.supportConfirmationPage()
+GET         /app                                            uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithApplicationsController.page()
+POST        /app                                            uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithApplicationsController.submit()
+GET         /app/giving-team-member-access                  uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithApplicationsController.givingTeamMembersAccess()
+
+GET         /assets/*file                                   controllers.Assets.versioned(path = "/public", file: Asset)

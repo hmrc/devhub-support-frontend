@@ -1,0 +1,150 @@
+/*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.devhubsupportfrontend.services
+
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
+
+import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+import uk.gov.hmrc.apiplatform.modules.common.services.{ApplicationLogger, EitherTHelper}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+
+import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
+import uk.gov.hmrc.devhubsupportfrontend.connectors.models.{DeskproHorizonTicketMessage, DeskproHorizonTicketPerson, DeskproHorizonTicketRequest}
+import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApmConnector, DeskproHorizonConnector}
+import uk.gov.hmrc.devhubsupportfrontend.controllers._
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, _}
+import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
+
+@Singleton
+class SupportService @Inject() (
+    val apmConnector: ApmConnector,
+    deskproConnector: DeskproHorizonConnector,
+    flowRepository: SupportFlowRepository,
+    config: AppConfig
+  )(implicit val ec: ExecutionContext
+  ) extends ApplicationLogger {
+
+  val ET = EitherTHelper.make[Throwable]
+  val ES = EitherTHelper.make[UpstreamErrorResponse]
+
+  private def fetchSupportFlow(sessionId: SupportSessionId): Future[SupportFlow] = {
+    flowRepository.fetchBySessionId(sessionId) map {
+      case Some(flow) => flow
+      case None       => SupportFlow(sessionId, "unknown", None)
+    }
+  }
+
+  def getSupportFlow(sessionId: SupportSessionId): Future[SupportFlow] = {
+    for {
+      flow      <- fetchSupportFlow(sessionId)
+      savedFlow <- flowRepository.saveFlow(flow)
+    } yield savedFlow
+  }
+
+  def updateWithDelta(fn: SupportFlow => SupportFlow)(flow: SupportFlow): Future[SupportFlow] = {
+    flowRepository.saveFlow(fn(flow))
+  }
+
+  def createFlow(sessionId: SupportSessionId, entrypoint: String): Future[SupportFlow] = {
+    flowRepository.saveFlow(SupportFlow(sessionId, entrypoint, None))
+  }
+
+  def fetchAllPublicApis(userId: Option[UserId])(implicit hc: HeaderCarrier): Future[List[ApiDefinition]] = {
+    apmConnector.fetchApiDefinitionsVisibleToUser(userId)
+  }
+
+  def submitTicket(supportFlow: SupportFlow, form: SupportDetailsForm)(implicit hc: HeaderCarrier): Future[SupportFlow] = {
+    val baseDeskproTicket = buildTicket(
+      supportFlow,
+      form.fullName,
+      form.emailAddress,
+      form.details
+    )
+
+    submitTicket(
+      supportFlow,
+      baseDeskproTicket.copy(
+        fields =
+          baseDeskproTicket.fields
+            ++ form.organisation.fold(Map.empty[String, String])(v => Map(config.deskproHorizonOrganisation -> v))
+            ++ form.teamMemberEmailAddress.fold(Map.empty[String, String])(v => Map(config.deskproHorizonTeamMemberEmail -> v))
+      )
+    )
+  }
+
+  def submitTicket(supportFlow: SupportFlow, form: ApplyForPrivateApiAccessForm)(implicit hc: HeaderCarrier): Future[SupportFlow] = {
+    val baseDeskproTicket = buildTicket(
+      supportFlow,
+      form.fullName,
+      form.emailAddress,
+      s"Private API documentation access request for Application Id[${form.applicationId}] to ${supportFlow.privateApi.getOrElse("?")} API."
+    )
+
+    submitTicket(
+      supportFlow,
+      baseDeskproTicket.copy(
+        fields =
+          baseDeskproTicket.fields
+            ++ Map(
+              config.deskproHorizonOrganisation  -> form.organisation,
+              config.deskproHorizonApplicationId -> form.applicationId
+            )
+      )
+    )
+  }
+
+  private def buildTicket(supportFlow: SupportFlow, fullName: String, emailAddress: String, messageContents: String): DeskproHorizonTicketRequest = {
+    // Entry point is currently the value of the text on the radio button but may not always be so.
+    def deriveSupportReason(): String = {
+      (supportFlow.entrySelection, supportFlow.subSelection) match {
+        case (SupportData.FindingAnApi.id, _)                                                          => SupportData.FindingAnApi.text
+        case (SupportData.UsingAnApi.id, Some(SupportData.MakingAnApiCall.id))                         => SupportData.MakingAnApiCall.text
+        case (SupportData.UsingAnApi.id, Some(SupportData.GettingExamples.id))                         => SupportData.GettingExamples.text
+        case (SupportData.UsingAnApi.id, Some(SupportData.ReportingDocumentation.id))                  => SupportData.ReportingDocumentation.text
+        case (SupportData.UsingAnApi.id, Some(SupportData.PrivateApiDocumentation.id))                 => SupportData.PrivateApiDocumentation.text
+        case (SupportData.PrivateApiDocumentation.id, _)                                               => SupportData.PrivateApiDocumentation.text // TODO - fix
+        case (SupportData.SigningIn.id, _)                                                             => SupportData.SigningIn.text
+        case (SupportData.SettingUpApplication.id, Some(SupportData.CompletingTermsOfUseAgreement.id)) => SupportData.CompletingTermsOfUseAgreement.text
+        case (SupportData.SettingUpApplication.id, Some(SupportData.GivingTeamMemberAccess.id))        => SupportData.GivingTeamMemberAccess.text
+        case (SupportData.SettingUpApplication.id, Some(SupportData.GeneralApplicationDetails.id))     => SupportData.GeneralApplicationDetails.text
+        case (SupportData.SettingUpApplication.id, _)                                                  => SupportData.SettingUpApplication.text
+        case (SupportData.ReportingDocumentation.id, _)                                                => SupportData.ReportingDocumentation.text
+        case (SupportData.NoneOfTheAbove.id, _)                                                        => "General Issue"
+        case _                                                                                         => throw new RuntimeException("SupportFlow state cannot support ticket creation")
+      }
+    }
+
+    DeskproHorizonTicketRequest(
+      person = DeskproHorizonTicketPerson(fullName, emailAddress),
+      subject = "HMRC Developer Hub: Support Enquiry",
+      message = DeskproHorizonTicketMessage.fromRaw(messageContents),
+      brand = config.deskproHorizonBrand,
+      fields = Map(
+        config.deskproHorizonSupportReason -> deriveSupportReason()
+      ) ++ supportFlow.api.fold(Map.empty[String, String])(v => Map(config.deskproHorizonApiName -> v))
+    )
+  }
+
+  private def submitTicket(supportFlow: SupportFlow, ticket: DeskproHorizonTicketRequest)(implicit hc: HeaderCarrier): Future[SupportFlow] = {
+    for {
+      ticketResult <- deskproConnector.createTicket(ticket)
+      flow         <- flowRepository.saveFlow(supportFlow.copy(referenceNumber = Some(ticketResult.ref), emailAddress = Some(ticket.person.email)))
+    } yield flow
+  }
+}
