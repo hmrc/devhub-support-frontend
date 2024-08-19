@@ -37,9 +37,9 @@ class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config)
   val thirdPartyDeveloperFrontendUrl: String = baseUrl("third-party-developer-frontend")
   val apiDocumentationFrontendUrl: String    = baseUrl("api-documentation-frontend")
 
-  val keepAliveUrl: String = s"$thirdPartyDeveloperFrontendUrl/developer/keep-alive"
-  val logOutUrl: String    = s"$thirdPartyDeveloperFrontendUrl/developer/logout"
-  val logInUrl: String     = s"$thirdPartyDeveloperFrontendUrl/developer/login"
+  lazy val keepAliveUrl: String = s"$thirdPartyDeveloperFrontendUrl/developer/keep-alive"
+  lazy val logOutUrl: String    = s"$thirdPartyDeveloperFrontendUrl/developer/logout"
+  lazy val logInUrl: String     = s"$thirdPartyDeveloperFrontendUrl/developer/login"
 
   lazy val reportProblemHost: String = config.underlying.getString("urls.report-a-problem.baseUrl") + config.underlying.getString("urls.report-a-problem.problem")
 
