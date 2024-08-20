@@ -31,7 +31,7 @@
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 @import uk.gov.hmrc.devhubsupportfrontend.domain.models.views._
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.include.{breadcrumbs, errorSummaryForFormErrors, headerNavLinks}
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.include.{breadcrumbs, errorSummary, headerNavLinks}
 
 @this(
   appConfig: AppConfig,
@@ -132,16 +132,16 @@
   </div>
 }
 
-@errorSummary(form: Option[Form[_]]) = {
+@formErrorSummary(form: Option[Form[_]]) = {
   @if(form.isDefined) {
-    @errorSummaryForFormErrors(form.get.errors)
+    @errorSummary(form.get.errors)
   } else {}
 }
 
 @mainContentBlock = {
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      @errorSummary(form)
+      @formErrorSummary(form)
       @contentBlock 
     </div>
   </div>

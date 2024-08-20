@@ -102,6 +102,9 @@
 ) {
   <span class="govuk-caption-l">Developer Hub support</span>
 
+  //$COVERAGE-OFF$
+  @* The following section is tested in acceptance tests *@
+
   @{supportFlow.entrySelection match {
       case SupportData.UsingAnApi.id => supportFlow.subSelection match {
         case Some(SupportData.MakingAnApiCall.id) => makingACallHeading
@@ -120,6 +123,8 @@
       case SupportData.NoneOfTheAbove.id => noneOfTheAboveHeading
       case _ => defaultHeading
   }}
+
+  //$COVERAGE-ON$
 
   <p class="govuk-body">
     Our support team will get back to you within 2 working days.

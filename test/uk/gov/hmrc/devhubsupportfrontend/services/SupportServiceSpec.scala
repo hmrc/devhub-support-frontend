@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
-import uk.gov.hmrc.devhubsupportfrontend.controllers.{SupportData, SupportDetailsForm}
+import uk.gov.hmrc.devhubsupportfrontend.controllers.{ApplyForPrivateApiAccessForm, SupportData, SupportDetailsForm}
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ApiPlatformDeskproConnectorMockModule, ApmConnectorMockModule}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.repositories.SupportFlowRepositoryMockModule
@@ -100,12 +100,11 @@ class SupportServiceSpec extends AsyncHmrcSpec {
     }
   }
 
-  "submitTicket" should {
+  "submitTicket for Support Details" should {
     "send no API when one is NOT provided" in new Setup {
       val details  = "This is some\ndescription"
       val fullName = "test name"
       val email    = "email@test.com"
-      SupportFlowRepositoryMock.FetchBySessionId.thenReturn(savedFlow)
       ApiPlatformDeskproConnectorMock.CreateTicket.thenReturnsSuccess()
 
       await(
@@ -137,7 +136,6 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       val details  = "This is some\ndescription"
       val fullName = "test name"
       val email    = "email@test.com"
-      SupportFlowRepositoryMock.FetchBySessionId.thenReturn(savedFlow)
       ApiPlatformDeskproConnectorMock.CreateTicket.thenReturnsSuccess()
 
       await(
@@ -166,6 +164,43 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         supportReason = Some(SupportData.MakingAnApiCall.text)
       )))(*)
     }
+  }
 
+  "submitTicket for Applying for Private API Access" should {
+    "send the API name, organisation and application ID" in new Setup {
+      val details       = "Private API documentation access request for Application Id[12345] to my API API."
+      val fullName      = "test name"
+      val email         = "email@test.com"
+      val organisation  = "anOrg"
+      val applicationId = "12345"
+
+      ApiPlatformDeskproConnectorMock.CreateTicket.thenReturnsSuccess()
+
+      await(
+        underTest.submitTicket(
+          SupportFlow(
+            SupportSessionId.random,
+            SupportData.UsingAnApi.id,
+            Some(SupportData.PrivateApiDocumentation.id),
+            privateApi = Some("my API")
+          ),
+          ApplyForPrivateApiAccessForm(
+            fullName,
+            email,
+            organisation,
+            applicationId
+          )
+        )
+      )
+
+      verify(ApiPlatformDeskproConnectorMock.aMock).createTicket(eqTo(ApiPlatformDeskproConnector.CreateTicketRequest(
+        person = ApiPlatformDeskproConnector.Person(fullName, email),
+        subject = "HMRC Developer Hub: Support Enquiry",
+        message = details,
+        supportReason = Some(SupportData.PrivateApiDocumentation.text),
+        organisation = Some(organisation),
+        applicationId = Some(applicationId)
+      )))(*)
+    }
   }
 }
