@@ -28,7 +28,7 @@ object ApiPlatformDeskproStub {
 
     def succeeds(ticketReference: String): StubMapping = {
       stubFor(
-        post(urlEqualTo(s"/ticket"))
+        post(urlEqualTo("/ticket"))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -38,12 +38,12 @@ object ApiPlatformDeskproStub {
       )
     }
 
-    def fails(): StubMapping = {
+    def fails(status: Int): StubMapping = {
       stubFor(
-        post(urlEqualTo(s"/ticket"))
+        post(urlEqualTo("/ticket"))
           .willReturn(
             aResponse()
-              .withStatus(INTERNAL_SERVER_ERROR)
+              .withStatus(status)
           )
       )
     }

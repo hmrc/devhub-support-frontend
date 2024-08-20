@@ -57,21 +57,20 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     "return a ticket reference" in new Setup {
       val ticketReference = "DP12345"
 
-      ApiPlatformDeskproStub.CreateTicket.succeeds(
-        ticketReference
-      )
+      ApiPlatformDeskproStub.CreateTicket.succeeds(ticketReference)
 
       val result: String = await(underTest.createTicket(deskproTicket))
 
       result shouldBe ticketReference
     }
 
-    "fail on Upstream5xxResponse when the call return a 500" in new Setup {
-      ApiPlatformDeskproStub.CreateTicket.fails()
+    "fail when the ticket creation call returns an error" in new Setup {
+      val failureStatus = INTERNAL_SERVER_ERROR
+      ApiPlatformDeskproStub.CreateTicket.fails(failureStatus)
 
       intercept[UpstreamErrorResponse] {
         await(underTest.createTicket(deskproTicket))
-      }.statusCode shouldBe INTERNAL_SERVER_ERROR
+      }.statusCode shouldBe failureStatus
     }
   }
 }

@@ -4,8 +4,8 @@ object AppDependencies {
 
   private val bootstrapVersion = "9.3.0"
   private val hmrcMongoVersion = "2.2.0"
-  private val apiDomainVersion = "0.16.0"
-  private val appDomainVersion = "0.55.0"
+  private val apiDomainVersion = "0.17.0"
+  private val appDomainVersion = "0.56.0"
   private val tpdDomainVersion = "0.5.0"
 
   val compile = Seq(
