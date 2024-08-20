@@ -27,7 +27,7 @@ import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.services._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.{SupportPageConfirmationView, SupportPageDetailView}
+import uk.gov.hmrc.devhubsupportfrontend.views.html.{SupportPageConfirmationView, SupportPageDetailView}
 
 @Singleton
 class SupportDetailsController @Inject() (

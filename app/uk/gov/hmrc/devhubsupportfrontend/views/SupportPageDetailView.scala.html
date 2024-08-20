@@ -22,7 +22,7 @@
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportDetailsForm
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
 @import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
 
 @this(
   layout: Layout,
@@ -31,7 +31,7 @@
   govukCharacterCount : GovukCharacterCount
 )
 
-@(loggedInSession: Option[UserSession], form: Form[SupportDetailsForm], supportFlow: SupportFlow)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[SupportDetailsForm], supportFlow: SupportFlow)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @makingACallHeading={
     <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Tell us about the @{supportFlow.api.getOrElse("")} API call you need help with</h1>
@@ -102,6 +102,11 @@
 ) {
   <span class="govuk-caption-l">Developer Hub support</span>
 
+  @{
+    //$COVERAGE-OFF$
+  }
+  @* The following section is tested in acceptance tests *@
+
   @{supportFlow.entrySelection match {
       case SupportData.UsingAnApi.id => supportFlow.subSelection match {
         case Some(SupportData.MakingAnApiCall.id) => makingACallHeading
@@ -120,6 +125,10 @@
       case SupportData.NoneOfTheAbove.id => noneOfTheAboveHeading
       case _ => defaultHeading
   }}
+
+  @{
+    //$COVERAGE-ON$
+  }
 
   <p class="govuk-body">
     Our support team will get back to you within 2 working days.

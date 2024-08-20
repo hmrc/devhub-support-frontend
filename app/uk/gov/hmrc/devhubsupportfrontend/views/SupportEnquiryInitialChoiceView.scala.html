@@ -21,7 +21,7 @@
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportEnquiryInitialChoiceForm
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
 @import uk.gov.hmrc.devhubsupportfrontend.domain.models.views.Crumb
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
 
 @this(
   layout: Layout,
@@ -29,7 +29,7 @@
   govukButton : GovukButton
 )
 
-@(loggedInSession: Option[UserSession], form: Form[SupportEnquiryInitialChoiceForm])(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[SupportEnquiryInitialChoiceForm])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(
   pageTitle = "What do you need help with?",

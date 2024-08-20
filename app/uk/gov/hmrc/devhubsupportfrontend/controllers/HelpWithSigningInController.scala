@@ -31,7 +31,7 @@ import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
 import uk.gov.hmrc.devhubsupportfrontend.services._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.{HelpWithSigningInView, RemoveAccessCodesView}
+import uk.gov.hmrc.devhubsupportfrontend.views.html.{HelpWithSigningInView, RemoveAccessCodesView}
 
 object HelpWithSigningInController {
   SupportFlow

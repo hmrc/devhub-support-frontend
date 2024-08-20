@@ -20,7 +20,7 @@
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.ChooseAPrivateApiForm
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
 
 @this(
   layout: Layout,
@@ -30,7 +30,7 @@
   govukSelect : GovukSelect
 )
 
-@(loggedInSession: Option[UserSession], form: Form[ChooseAPrivateApiForm], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[ChooseAPrivateApiForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(
   pageTitle = "Which private API documentation do you want to access?",

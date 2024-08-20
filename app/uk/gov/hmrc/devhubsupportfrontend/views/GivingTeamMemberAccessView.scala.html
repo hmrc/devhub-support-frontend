@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
 
 @this(
   layout: Layout,
@@ -27,7 +27,7 @@
   govukSelect : GovukSelect
 )
 
-@(loggedInSession: Option[UserSession], backUri: String, signInUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], backUri: String, signInUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(
   pageTitle = "Adding team members to an application",

@@ -18,14 +18,14 @@
 
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
 
 @this(
   layout: Layout,
   govukPanel : GovukPanel
 )
 
-@(loggedInSession: Option[UserSession], supportFlow: SupportFlow)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], supportFlow: SupportFlow)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 
 @layout(

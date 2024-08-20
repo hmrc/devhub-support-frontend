@@ -18,7 +18,7 @@
 
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.ApplyForPrivateApiAccessForm
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
 
 @this(
   layout: Layout,
@@ -28,7 +28,7 @@
   govukSelect : GovukSelect
 )
 
-@(loggedInSession: Option[UserSession], chosenApiName: String, form: Form[ApplyForPrivateApiAccessForm], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], chosenApiName: String, form: Form[ApplyForPrivateApiAccessForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(
   pageTitle = "Apply for access to the @{chosenApiName} API",

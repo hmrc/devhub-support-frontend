@@ -18,9 +18,8 @@
 
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
-@import uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithApplicationsForm
-@import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
+@import uk.gov.hmrc.devhubsupportfrontend.controllers.CheckCdsAccessIsRequiredForm
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
 
 @this(
   layout: Layout,
@@ -30,15 +29,15 @@
   govukSelect : GovukSelect
 )
 
-@(loggedInSession: Option[UserSession], form: Form[HelpWithApplicationsForm], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[CheckCdsAccessIsRequiredForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(
-  pageTitle = "What do you need help with?",
+  pageTitle = "Are you intending to build software to integrate with the Customs Declaration Service(CDS)?",
   backLink = Some(BackLink(backUri)),
   loggedInSession = loggedInSession,
   form = Some(form)
 ) {
-  @helper.form(action = routes.HelpWithApplicationsController.submit()) {
+  @helper.form(action = routes.CheckCdsAccessIsRequiredController.submit()) {
     @helper.CSRF.formField
     <span class="govuk-caption-l">Developer Hub support</span>
     @govukRadios(
@@ -47,34 +46,27 @@
           Fieldset(
             legend = Some(
               Legend(
-                content = Text("Which best describes what you need help with?"),
+                content = Text("Are you intending to build software to integrate with the Customs Declaration Service(CDS)?"),
                 classes = "govuk-fieldset__legend--l",
                 isPageHeading = true
               )
             )
           )
         ),
-        errorMessage = form.error("choice").map(e => ErrorMessage(content = Text(messages(e.message)))),
-        name = "choice",
+        errorMessage = form.error("confirmCdsIntegration").map(e => ErrorMessage(content = Text(messages(e.message)))),
+        name = "confirmCdsIntegration",
         items = Seq(
           RadioItem(
-            id = Some(SupportData.CompletingTermsOfUseAgreement.id),
-            content = Text(SupportData.CompletingTermsOfUseAgreement.text),
-            value = Some(SupportData.CompletingTermsOfUseAgreement.id),
+            id = Some("yes"),
+            content = Text("Yes"),
+            value = Some("yes"),
             hint = None,
             conditionalHtml = None
           ), 
           RadioItem(
-            id = Some(SupportData.GivingTeamMemberAccess.id),
-            content = Text(SupportData.GivingTeamMemberAccess.text),
-            value = Some(SupportData.GivingTeamMemberAccess.id),
-            hint = None,
-            conditionalHtml = None
-          ), 
-          RadioItem(
-            id = Some(SupportData.GeneralApplicationDetails.id),
-            content = Text(SupportData.GeneralApplicationDetails.text),
-            value = Some(SupportData.GeneralApplicationDetails.id),
+            id = Some("no"),
+            content = Text("No, I want to use third-party software"),
+            value = Some("no"),
             hint = None,
             conditionalHtml = None
           )

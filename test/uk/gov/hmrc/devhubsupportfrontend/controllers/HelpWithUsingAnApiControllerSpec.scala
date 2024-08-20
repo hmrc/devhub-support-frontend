@@ -35,7 +35,7 @@ import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperCon
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.HelpWithUsingAnApiView
+import uk.gov.hmrc.devhubsupportfrontend.views.html.HelpWithUsingAnApiView
 
 class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
   val supportSessionId   = SupportSessionId.random

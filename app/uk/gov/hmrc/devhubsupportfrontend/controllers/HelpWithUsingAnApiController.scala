@@ -31,7 +31,7 @@ import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
 import uk.gov.hmrc.devhubsupportfrontend.controllers.security.SupportCookie
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
 import uk.gov.hmrc.devhubsupportfrontend.services.SupportService
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.HelpWithUsingAnApiView
+import uk.gov.hmrc.devhubsupportfrontend.views.html.HelpWithUsingAnApiView
 
 object HelpWithUsingAnApiController {
 

@@ -18,9 +18,9 @@
 
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
-@import uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithSigningInForm
+@import uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithApplicationsForm
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
-@import uk.gov.hmrc.devhubsupportfrontend.views.html.Layout
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
 
 @this(
   layout: Layout,
@@ -30,7 +30,7 @@
   govukSelect : GovukSelect
 )
 
-@(loggedInSession: Option[UserSession], form: Form[HelpWithSigningInForm], backUri: String)(implicit request: play.api.mvc.Request[Any], messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[HelpWithApplicationsForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(
   pageTitle = "What do you need help with?",
@@ -38,7 +38,7 @@
   loggedInSession = loggedInSession,
   form = Some(form)
 ) {
-  @helper.form(action = routes.HelpWithSigningInController.submit()) {
+  @helper.form(action = routes.HelpWithApplicationsController.submit()) {
     @helper.CSRF.formField
     <span class="govuk-caption-l">Developer Hub support</span>
     @govukRadios(
@@ -47,7 +47,7 @@
           Fieldset(
             legend = Some(
               Legend(
-                content = Text("What do you need help with?"),
+                content = Text("Which best describes what you need help with?"),
                 classes = "govuk-fieldset__legend--l",
                 isPageHeading = true
               )
@@ -58,16 +58,23 @@
         name = "choice",
         items = Seq(
           RadioItem(
-            id = Some(SupportData.ForgottenPassword.id),
-            content = Text(SupportData.ForgottenPassword.text),
-            value = Some(SupportData.ForgottenPassword.id),
+            id = Some(SupportData.CompletingTermsOfUseAgreement.id),
+            content = Text(SupportData.CompletingTermsOfUseAgreement.text),
+            value = Some(SupportData.CompletingTermsOfUseAgreement.id),
             hint = None,
             conditionalHtml = None
           ), 
           RadioItem(
-            id = Some(SupportData.AccessCodes.id),
-            content = Text(SupportData.AccessCodes.text),
-            value = Some(SupportData.AccessCodes.id),
+            id = Some(SupportData.GivingTeamMemberAccess.id),
+            content = Text(SupportData.GivingTeamMemberAccess.text),
+            value = Some(SupportData.GivingTeamMemberAccess.id),
+            hint = None,
+            conditionalHtml = None
+          ), 
+          RadioItem(
+            id = Some(SupportData.GeneralApplicationDetails.id),
+            content = Text(SupportData.GeneralApplicationDetails.text),
+            value = Some(SupportData.GeneralApplicationDetails.id),
             hint = None,
             conditionalHtml = None
           )

@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.mocks.services
 
+import scala.concurrent.Future.successful
+
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import play.twirl.api.Html
@@ -24,6 +26,6 @@ import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
 
 trait ErrorHandlerMock extends MockitoSugar with ArgumentMatchersSugar {
   val mockErrorHandler = mock[ErrorHandler]
-  when(mockErrorHandler.notFoundTemplate(*)).thenReturn(Html(""))
-  when(mockErrorHandler.badRequestTemplate(*)).thenReturn(Html(""))
+  when(mockErrorHandler.notFoundTemplate(*)).thenReturn(successful(Html("")))
+  when(mockErrorHandler.badRequestTemplate(*)).thenReturn(successful(Html("")))
 }
