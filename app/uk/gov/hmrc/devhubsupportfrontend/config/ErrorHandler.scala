@@ -25,7 +25,7 @@ import play.api.mvc.RequestHeader
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 
-import uk.gov.hmrc.devhubsupportfrontend.views.html.ErrorTemplate
+import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.ErrorTemplate
 
 @Singleton
 class ErrorHandler @Inject() (

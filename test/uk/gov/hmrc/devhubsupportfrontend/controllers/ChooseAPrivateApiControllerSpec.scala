@@ -31,7 +31,7 @@ import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperCon
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.ChooseAPrivateApiView
+import uk.gov.hmrc.devhubsupportfrontend.views.html.ChooseAPrivateApiView
 
 class ChooseAPrivateApiControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 

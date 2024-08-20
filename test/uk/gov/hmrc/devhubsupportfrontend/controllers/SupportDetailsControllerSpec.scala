@@ -31,7 +31,7 @@ import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithSupportSession._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.support.{SupportPageConfirmationView, SupportPageDetailView}
+import uk.gov.hmrc.devhubsupportfrontend.views.html.{SupportPageConfirmationView, SupportPageDetailView}
 
 class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
