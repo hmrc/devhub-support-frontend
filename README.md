@@ -15,7 +15,7 @@ sbt test
 To run the integration tests:
 
 ```
-sbt it:test
+sbt it/test
 ```
 
 ## Running locally
