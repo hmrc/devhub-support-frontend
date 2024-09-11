@@ -1,7 +1,7 @@
 
-# DevHub Suppor Frontend
+# DevHub Support Frontend
 
-This is the frontend component of the developer hub that provides the access to the support pages.
+This is the frontend component of the developer hub that provides access to the support pages.
 
 ## Unit tests
 To run the unit tests:
