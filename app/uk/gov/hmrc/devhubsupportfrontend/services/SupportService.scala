@@ -134,7 +134,7 @@ class SupportService @Inject() (
 
   private def submitTicket(supportFlow: SupportFlow, ticket: ApiPlatformDeskproConnector.CreateTicketRequest)(implicit hc: HeaderCarrier): Future[SupportFlow] = {
     for {
-      ticketReference <- deskproConnector.createTicket(ticket)
+      ticketReference <- deskproConnector.createTicket(ticket, hc)
       flow            <- flowRepository.saveFlow(supportFlow.copy(referenceNumber = Some(ticketReference), emailAddress = Some(ticket.person.email)))
     } yield flow
   }

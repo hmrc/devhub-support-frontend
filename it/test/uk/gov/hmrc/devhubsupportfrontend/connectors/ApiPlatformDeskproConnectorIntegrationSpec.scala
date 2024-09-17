@@ -59,7 +59,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
 
       ApiPlatformDeskproStub.CreateTicket.succeeds(ticketReference)
 
-      val result: String = await(underTest.createTicket(deskproTicket))
+      val result: String = await(underTest.createTicket(deskproTicket, hc))
 
       result shouldBe ticketReference
     }
@@ -69,7 +69,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
       ApiPlatformDeskproStub.CreateTicket.fails(failureStatus)
 
       intercept[UpstreamErrorResponse] {
-        await(underTest.createTicket(deskproTicket))
+        await(underTest.createTicket(deskproTicket, hc))
       }.statusCode shouldBe failureStatus
     }
   }

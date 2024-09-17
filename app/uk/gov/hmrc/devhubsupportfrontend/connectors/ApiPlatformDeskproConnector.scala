@@ -23,11 +23,15 @@ import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
+import uk.gov.hmrc.http.{Authorization, HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.play.http.metrics.common.API
 
 object ApiPlatformDeskproConnector {
-  case class Config(serviceBaseUrl: String)
+
+  case class Config(
+      serviceBaseUrl: String,
+      authToken: String
+    )
 
   case class Person(
       name: String,
@@ -60,7 +64,8 @@ class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlat
 
   val api = API("api-platform-deskpro")
 
-  def createTicket(createRequest: CreateTicketRequest)(implicit hc: HeaderCarrier): Future[String] = metrics.record(api) {
+  def createTicket(createRequest: CreateTicketRequest, hc: HeaderCarrier): Future[String] = metrics.record(api) {
+    implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
     http.post(url"${config.serviceBaseUrl}/ticket")
       .withBody(Json.toJson(createRequest))
       .execute[CreateTicketResponse]

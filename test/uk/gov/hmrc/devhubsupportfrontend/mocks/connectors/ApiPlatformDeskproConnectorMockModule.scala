@@ -30,7 +30,7 @@ trait ApiPlatformDeskproConnectorMockModule extends MockitoSugar with ArgumentMa
     object CreateTicket {
 
       def thenReturnsSuccess() = {
-        when(aMock.createTicket(*[ApiPlatformDeskproConnector.CreateTicketRequest])(*)).thenReturn(Future.successful("test"))
+        when(aMock.createTicket(*[ApiPlatformDeskproConnector.CreateTicketRequest], *)).thenReturn(Future.successful("test"))
       }
     }
   }
