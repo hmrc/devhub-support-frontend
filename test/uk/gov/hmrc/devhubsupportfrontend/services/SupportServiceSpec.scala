@@ -123,12 +123,15 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         )
       )
 
-      verify(ApiPlatformDeskproConnectorMock.aMock).createTicket(eqTo(ApiPlatformDeskproConnector.CreateTicketRequest(
-        person = ApiPlatformDeskproConnector.Person(fullName, email),
-        subject = "HMRC Developer Hub: Support Enquiry",
-        message = details,
-        supportReason = Some(SupportData.FindingAnApi.text)
-      )))(*)
+      verify(ApiPlatformDeskproConnectorMock.aMock).createTicket(
+        eqTo(ApiPlatformDeskproConnector.CreateTicketRequest(
+          person = ApiPlatformDeskproConnector.Person(fullName, email),
+          subject = "HMRC Developer Hub: Support Enquiry",
+          message = details,
+          supportReason = Some(SupportData.FindingAnApi.text)
+        )),
+        *
+      )
     }
 
     "send the API when one is provided" in new Setup {
@@ -156,13 +159,16 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         )
       )
 
-      verify(ApiPlatformDeskproConnectorMock.aMock).createTicket(eqTo(ApiPlatformDeskproConnector.CreateTicketRequest(
-        person = ApiPlatformDeskproConnector.Person(fullName, email),
-        subject = "HMRC Developer Hub: Support Enquiry",
-        message = details,
-        apiName = Some(apiName),
-        supportReason = Some(SupportData.MakingAnApiCall.text)
-      )))(*)
+      verify(ApiPlatformDeskproConnectorMock.aMock).createTicket(
+        eqTo(ApiPlatformDeskproConnector.CreateTicketRequest(
+          person = ApiPlatformDeskproConnector.Person(fullName, email),
+          subject = "HMRC Developer Hub: Support Enquiry",
+          message = details,
+          apiName = Some(apiName),
+          supportReason = Some(SupportData.MakingAnApiCall.text)
+        )),
+        *
+      )
     }
   }
 
@@ -193,14 +199,17 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         )
       )
 
-      verify(ApiPlatformDeskproConnectorMock.aMock).createTicket(eqTo(ApiPlatformDeskproConnector.CreateTicketRequest(
-        person = ApiPlatformDeskproConnector.Person(fullName, email),
-        subject = "HMRC Developer Hub: Support Enquiry",
-        message = details,
-        supportReason = Some(SupportData.PrivateApiDocumentation.text),
-        organisation = Some(organisation),
-        applicationId = Some(applicationId)
-      )))(*)
+      verify(ApiPlatformDeskproConnectorMock.aMock).createTicket(
+        eqTo(ApiPlatformDeskproConnector.CreateTicketRequest(
+          person = ApiPlatformDeskproConnector.Person(fullName, email),
+          subject = "HMRC Developer Hub: Support Enquiry",
+          message = details,
+          supportReason = Some(SupportData.PrivateApiDocumentation.text),
+          organisation = Some(organisation),
+          applicationId = Some(applicationId)
+        )),
+        *
+      )
     }
   }
 }
