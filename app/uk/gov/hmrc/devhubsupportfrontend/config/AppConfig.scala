@@ -52,14 +52,5 @@ class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config)
 
   val supportSessionTimeout: Duration = config.underlying.getDuration("supportsession.timeout")
 
-  val deskproHorizonUrl: String             = config.get[String]("deskpro-horizon.uri")
-  val deskproHorizonApiKey: String          = config.getOptional[String]("deskpro-horizon.api-key").map(key => s"key $key").getOrElse("")
-  val deskproHorizonBrand: Int              = config.get[Int]("deskpro-horizon.brand")
-  val deskproHorizonApiName: String         = config.get[String]("deskpro-horizon.api-name")
-  val deskproHorizonSupportReason: String   = config.get[String]("deskpro-horizon.support-reason")
-  val deskproHorizonOrganisation: String    = config.get[String]("deskpro-horizon.organisation")
-  val deskproHorizonApplicationId: String   = config.get[String]("deskpro-horizon.application-id")
-  val deskproHorizonTeamMemberEmail: String = config.get[String]("deskpro-horizon.team-member-email")
-
   private def getConfigDefaulted[A](key: String, default: => A)(implicit loader: ConfigLoader[A]): A = config.getOptional[A](key)(loader).getOrElse(default)
 }
