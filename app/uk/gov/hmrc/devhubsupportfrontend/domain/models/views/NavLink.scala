@@ -33,8 +33,7 @@ case object StaticNavLinks {
     Seq(
       NavLink("Documentation", s"$apiDocumentationFrontendUrl/api-documentation/docs/using-the-hub"),
       NavLink("Applications", s"$thirdPartyDeveloperFrontendUrl/developer/applications"),
-      NavLink("Support", routes.SupportEnquiryInitialChoiceController.page().url),
-      NavLink("Service Availability", "https://api-platform-status.production.tax.service.gov.uk/", openInNewWindow = true)
+      NavLink("Support", routes.SupportEnquiryInitialChoiceController.page().url)
     )
   }
 }
