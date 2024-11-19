@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.devhubsupportfrontend.mocks.connectors
-
-import scala.concurrent.Future
+package uk.gov.hmrc.devhubsupportfrontend.mocks.services
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.CreateTicketRequest
+import uk.gov.hmrc.devhubsupportfrontend.services.AuditService
 
-trait ApiPlatformDeskproConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
+trait AuditServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
-  object ApiPlatformDeskproConnectorMock {
-    val aMock = mock[ApiPlatformDeskproConnector]
+  trait AbstractAuditServiceMock {
+    def aMock: AuditService
 
-    object CreateTicket {
+    object ExplicitAudit {
 
-      def succeeds() = {
-        when(aMock.createTicket(*[ApiPlatformDeskproConnector.CreateTicketRequest], *)).thenReturn(Future.successful("test"))
-      }
+      def succeeds() =
+        doNothing.when(aMock).explicitAudit(*, *[CreateTicketRequest])(*)
 
-      def verifyCalledWith(request: CreateTicketRequest) = {
-        verify(aMock).createTicket(eqTo(request), *)
-      }
+      def verifyCalledWith(auditType: String, ticket: CreateTicketRequest) =
+        verify(aMock).explicitAudit(eqTo(auditType), eqTo(ticket))(*)
     }
+  }
+
+  object AuditServiceMock extends AbstractAuditServiceMock {
+    val aMock: AuditService = mock[AuditService]
   }
 }

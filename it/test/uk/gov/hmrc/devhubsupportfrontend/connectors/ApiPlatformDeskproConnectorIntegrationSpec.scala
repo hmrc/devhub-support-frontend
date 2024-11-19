@@ -47,10 +47,11 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val underTest                  = app.injector.instanceOf[ApiPlatformDeskproConnector]
 
-    val person        = ApiPlatformDeskproConnector.Person("Bob", "bob@example.com")
+    val fullName      = "Bob"
+    val email         = "bob@example.com"
     val subject       = "Test"
     val message       = "Message"
-    val deskproTicket = ApiPlatformDeskproConnector.CreateTicketRequest(person, subject, message)
+    val deskproTicket = ApiPlatformDeskproConnector.CreateTicketRequest(fullName, email, subject, message)
   }
 
   "createTicket" should {

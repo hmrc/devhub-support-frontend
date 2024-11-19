@@ -33,25 +33,20 @@ object ApiPlatformDeskproConnector {
       authToken: String
     )
 
-  case class Person(
-      name: String,
-      email: String
-    )
-
   case class CreateTicketRequest(
-      person: Person,
+      fullName: String,
+      email: String,
       subject: String,
       message: String,
       apiName: Option[String] = None,
       applicationId: Option[String] = None,
       organisation: Option[String] = None,
       supportReason: Option[String] = None,
-      teamMemberEmailAddress: Option[String] = None
+      teamMemberEmail: Option[String] = None
     )
 
   case class CreateTicketResponse(ref: String)
 
-  implicit val personFormat: Format[Person]                             = Json.format[Person]
   implicit val createTicketRequestFormat: Format[CreateTicketRequest]   = Json.format[CreateTicketRequest]
   implicit val createTicketResponseFormat: Format[CreateTicketResponse] = Json.format[CreateTicketResponse]
 }
