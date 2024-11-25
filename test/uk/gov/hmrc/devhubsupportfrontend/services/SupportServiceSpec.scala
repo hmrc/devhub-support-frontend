@@ -19,30 +19,32 @@ package uk.gov.hmrc.devhubsupportfrontend.services
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import uk.gov.hmrc.apiplatform.modules.apis.domain.models.{ApiDefinition, _}
+import uk.gov.hmrc.apiplatform.modules.apis.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.CreateTicketRequest
 import uk.gov.hmrc.devhubsupportfrontend.controllers.{ApplyForPrivateApiAccessForm, SupportData, SupportDetailsForm}
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ApiPlatformDeskproConnectorMockModule, ApmConnectorMockModule}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.repositories.SupportFlowRepositoryMockModule
+import uk.gov.hmrc.devhubsupportfrontend.mocks.services.AuditServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec
 
 class SupportServiceSpec extends AsyncHmrcSpec {
 
-  val sessionId                = SupportSessionId.random
-  val entryPoint               = SupportData.UsingAnApi.id
-  val savedFlow: SupportFlow   = SupportFlow(sessionId, entryPoint)
-  val defaultFlow: SupportFlow = SupportFlow(sessionId, "unknown")
-  val mockAppConfig: AppConfig = mock[AppConfig]
+  val sessionId     = SupportSessionId.random
+  val entryPoint    = SupportData.UsingAnApi.id
+  val savedFlow     = SupportFlow(sessionId, entryPoint)
+  val defaultFlow   = SupportFlow(sessionId, "unknown")
+  val mockAppConfig = mock[AppConfig]
+  val auditType     = "CreateTicket"
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  trait Setup extends ApmConnectorMockModule with SupportFlowRepositoryMockModule with ApiPlatformDeskproConnectorMockModule {
-    val underTest = new SupportService(ApmConnectorMock.aMock, ApiPlatformDeskproConnectorMock.aMock, SupportFlowRepositoryMock.aMock, mockAppConfig)
+  trait Setup extends ApmConnectorMockModule with SupportFlowRepositoryMockModule with ApiPlatformDeskproConnectorMockModule with AuditServiceMockModule {
+    val underTest = new SupportService(ApmConnectorMock.aMock, ApiPlatformDeskproConnectorMock.aMock, SupportFlowRepositoryMock.aMock, mockAppConfig, AuditServiceMock.aMock)
     SupportFlowRepositoryMock.SaveFlow.thenReturnSuccess
   }
 
@@ -105,7 +107,8 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       val details  = "This is some\ndescription"
       val fullName = "test name"
       val email    = "email@test.com"
-      ApiPlatformDeskproConnectorMock.CreateTicket.thenReturnsSuccess()
+      ApiPlatformDeskproConnectorMock.CreateTicket.succeeds()
+      AuditServiceMock.ExplicitAudit.succeeds()
 
       await(
         underTest.submitTicket(
@@ -123,15 +126,16 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         )
       )
 
-      verify(ApiPlatformDeskproConnectorMock.aMock).createTicket(
-        eqTo(ApiPlatformDeskproConnector.CreateTicketRequest(
-          person = ApiPlatformDeskproConnector.Person(fullName, email),
-          subject = "HMRC Developer Hub: Support Enquiry",
-          message = details,
-          supportReason = Some(SupportData.FindingAnApi.text)
-        )),
-        *
+      val createTicketRequest: CreateTicketRequest = CreateTicketRequest(
+        fullName = fullName,
+        email = email,
+        subject = "HMRC Developer Hub: Support Enquiry",
+        message = details,
+        supportReason = Some(SupportData.FindingAnApi.text)
       )
+
+      ApiPlatformDeskproConnectorMock.CreateTicket.verifyCalledWith(createTicketRequest)
+      AuditServiceMock.ExplicitAudit.verifyCalledWith(auditType, createTicketRequest)
     }
 
     "send the API when one is provided" in new Setup {
@@ -139,7 +143,8 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       val details  = "This is some\ndescription"
       val fullName = "test name"
       val email    = "email@test.com"
-      ApiPlatformDeskproConnectorMock.CreateTicket.thenReturnsSuccess()
+      ApiPlatformDeskproConnectorMock.CreateTicket.succeeds()
+      AuditServiceMock.ExplicitAudit.succeeds()
 
       await(
         underTest.submitTicket(
@@ -159,16 +164,17 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         )
       )
 
-      verify(ApiPlatformDeskproConnectorMock.aMock).createTicket(
-        eqTo(ApiPlatformDeskproConnector.CreateTicketRequest(
-          person = ApiPlatformDeskproConnector.Person(fullName, email),
-          subject = "HMRC Developer Hub: Support Enquiry",
-          message = details,
-          apiName = Some(apiName),
-          supportReason = Some(SupportData.MakingAnApiCall.text)
-        )),
-        *
+      val createTicketRequest = CreateTicketRequest(
+        fullName = fullName,
+        email = email,
+        subject = "HMRC Developer Hub: Support Enquiry",
+        message = details,
+        apiName = Some(apiName),
+        supportReason = Some(SupportData.MakingAnApiCall.text)
       )
+
+      ApiPlatformDeskproConnectorMock.CreateTicket.verifyCalledWith(createTicketRequest)
+      AuditServiceMock.ExplicitAudit.verifyCalledWith(auditType, createTicketRequest)
     }
   }
 
@@ -180,7 +186,8 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       val organisation  = "anOrg"
       val applicationId = "12345"
 
-      ApiPlatformDeskproConnectorMock.CreateTicket.thenReturnsSuccess()
+      ApiPlatformDeskproConnectorMock.CreateTicket.succeeds()
+      AuditServiceMock.ExplicitAudit.succeeds()
 
       await(
         underTest.submitTicket(
@@ -199,17 +206,18 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         )
       )
 
-      verify(ApiPlatformDeskproConnectorMock.aMock).createTicket(
-        eqTo(ApiPlatformDeskproConnector.CreateTicketRequest(
-          person = ApiPlatformDeskproConnector.Person(fullName, email),
-          subject = "HMRC Developer Hub: Support Enquiry",
-          message = details,
-          supportReason = Some(SupportData.PrivateApiDocumentation.text),
-          organisation = Some(organisation),
-          applicationId = Some(applicationId)
-        )),
-        *
+      val createTicketRequest = CreateTicketRequest(
+        fullName = fullName,
+        email = email,
+        subject = "HMRC Developer Hub: Support Enquiry",
+        message = details,
+        supportReason = Some(SupportData.PrivateApiDocumentation.text),
+        organisation = Some(organisation),
+        applicationId = Some(applicationId)
       )
+
+      ApiPlatformDeskproConnectorMock.CreateTicket.verifyCalledWith(createTicketRequest)
+      AuditServiceMock.ExplicitAudit.verifyCalledWith(auditType, createTicketRequest)
     }
   }
 }

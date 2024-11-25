@@ -35,7 +35,8 @@ class SupportService @Inject() (
     val apmConnector: ApmConnector,
     deskproConnector: ApiPlatformDeskproConnector,
     flowRepository: SupportFlowRepository,
-    config: AppConfig
+    config: AppConfig,
+    auditService: AuditService
   )(implicit val ec: ExecutionContext
   ) extends ApplicationLogger {
 
@@ -80,7 +81,7 @@ class SupportService @Inject() (
       supportFlow,
       baseDeskproTicket.copy(
         organisation = form.organisation.filterNot(_.isBlank),
-        teamMemberEmailAddress = form.teamMemberEmailAddress.filterNot(_.isBlank)
+        teamMemberEmail = form.teamMemberEmailAddress.filterNot(_.isBlank)
       )
     )
   }
@@ -102,7 +103,7 @@ class SupportService @Inject() (
     )
   }
 
-  private def buildTicket(supportFlow: SupportFlow, fullName: String, emailAddress: String, messageContents: String): ApiPlatformDeskproConnector.CreateTicketRequest = {
+  private def buildTicket(supportFlow: SupportFlow, fullName: String, email: String, messageContents: String): ApiPlatformDeskproConnector.CreateTicketRequest = {
     // Entry point is currently the value of the text on the radio button but may not always be so.
     def deriveSupportReason(): String = {
       (supportFlow.entrySelection, supportFlow.subSelection) match {
@@ -124,7 +125,8 @@ class SupportService @Inject() (
     }
 
     ApiPlatformDeskproConnector.CreateTicketRequest(
-      person = ApiPlatformDeskproConnector.Person(fullName, emailAddress),
+      fullName = fullName,
+      email = email,
       subject = "HMRC Developer Hub: Support Enquiry",
       message = messageContents,
       supportReason = Some(deriveSupportReason()),
@@ -135,7 +137,8 @@ class SupportService @Inject() (
   private def submitTicket(supportFlow: SupportFlow, ticket: ApiPlatformDeskproConnector.CreateTicketRequest)(implicit hc: HeaderCarrier): Future[SupportFlow] = {
     for {
       ticketReference <- deskproConnector.createTicket(ticket, hc)
-      flow            <- flowRepository.saveFlow(supportFlow.copy(referenceNumber = Some(ticketReference), emailAddress = Some(ticket.person.email)))
+      _                = auditService.explicitAudit("CreateTicket", ticket)
+      flow            <- flowRepository.saveFlow(supportFlow.copy(referenceNumber = Some(ticketReference), emailAddress = Some(ticket.email)))
     } yield flow
   }
 }
