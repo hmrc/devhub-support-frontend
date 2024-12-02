@@ -18,8 +18,7 @@ package uk.gov.hmrc.devhubsupportfrontend.mocks.services
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.CreateTicketRequest
-import uk.gov.hmrc.devhubsupportfrontend.services.AuditService
+import uk.gov.hmrc.devhubsupportfrontend.services.{AuditAction, AuditService}
 
 trait AuditServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
@@ -29,10 +28,10 @@ trait AuditServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
     object ExplicitAudit {
 
       def succeeds() =
-        doNothing.when(aMock).explicitAudit(*, *[CreateTicketRequest])(*)
+        doNothing.when(aMock).explicitAudit(*)(*)
 
-      def verifyCalledWith(auditType: String, ticket: CreateTicketRequest) =
-        verify(aMock).explicitAudit(eqTo(auditType), eqTo(ticket))(*)
+      def verifyCalledWith(auditAction: AuditAction) =
+        verify(aMock).explicitAudit(eqTo(auditAction))(*)
     }
   }
 
