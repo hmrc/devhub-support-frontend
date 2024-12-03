@@ -23,12 +23,13 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
-
 @Singleton
 class AuditService @Inject() (val auditConnector: AuditConnector)(implicit ec: ExecutionContext) {
 
-  def explicitAudit(auditType: String, ticket: ApiPlatformDeskproConnector.CreateTicketRequest)(implicit hc: HeaderCarrier): Unit = {
-    auditConnector.sendExplicitAudit(auditType, Json.toJson(ticket))
+  def explicitAudit(auditAction: AuditAction)(implicit hc: HeaderCarrier): Unit = {
+    val details = auditAction match {
+      case action: CreateTicketAuditAction => Json.toJson(CreateTicketDetails(action.createTicketRequest))
+    }
+    auditConnector.sendExplicitAudit(auditAction.auditType, details)
   }
 }
