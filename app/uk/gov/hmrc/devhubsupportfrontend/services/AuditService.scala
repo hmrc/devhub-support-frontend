@@ -19,11 +19,9 @@ package uk.gov.hmrc.devhubsupportfrontend.services
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
 
 @Singleton
 class AuditService @Inject() (val auditConnector: AuditConnector)(implicit ec: ExecutionContext) {
@@ -34,41 +32,4 @@ class AuditService @Inject() (val auditConnector: AuditConnector)(implicit ec: E
     }
     auditConnector.sendExplicitAudit(auditAction.auditType, details)
   }
-}
-
-sealed trait AuditAction {
-  val auditType: String
-}
-
-case class CreateTicketDetails(
-    fullName: String,
-    email: String,
-    subject: String,
-    message: String,
-    apiName: Option[String] = None,
-    applicationId: Option[String] = None,
-    organisation: Option[String] = None,
-    supportReason: Option[String] = None,
-    teamMemberEmail: Option[String] = None
-  )
-
-object CreateTicketDetails {
-
-  def apply(createTicketRequest: ApiPlatformDeskproConnector.CreateTicketRequest): CreateTicketDetails = CreateTicketDetails(
-    fullName = createTicketRequest.fullName,
-    email = createTicketRequest.email,
-    subject = createTicketRequest.subject,
-    message = createTicketRequest.message,
-    apiName = createTicketRequest.apiName,
-    applicationId = createTicketRequest.applicationId,
-    organisation = createTicketRequest.organisation,
-    supportReason = createTicketRequest.supportReason,
-    teamMemberEmail = createTicketRequest.teamMemberEmail
-  )
-
-  implicit val format: OFormat[CreateTicketDetails] = Json.format[CreateTicketDetails]
-}
-
-case class CreateTicketAuditAction(createTicketRequest: ApiPlatformDeskproConnector.CreateTicketRequest) extends AuditAction {
-  val auditType = "TicketCreated"
 }
