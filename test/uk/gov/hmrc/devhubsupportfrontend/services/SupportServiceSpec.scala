@@ -39,7 +39,6 @@ class SupportServiceSpec extends AsyncHmrcSpec {
   val savedFlow     = SupportFlow(sessionId, entryPoint)
   val defaultFlow   = SupportFlow(sessionId, "unknown")
   val mockAppConfig = mock[AppConfig]
-  val auditType     = "CreateTicket"
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -133,9 +132,10 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         message = details,
         supportReason = Some(SupportData.FindingAnApi.text)
       )
+      val auditAction                              = CreateTicketAuditAction(createTicketRequest)
 
       ApiPlatformDeskproConnectorMock.CreateTicket.verifyCalledWith(createTicketRequest)
-      AuditServiceMock.ExplicitAudit.verifyCalledWith(auditType, createTicketRequest)
+      AuditServiceMock.ExplicitAudit.verifyCalledWith(auditAction)
     }
 
     "send the API when one is provided" in new Setup {
@@ -172,9 +172,10 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         apiName = Some(apiName),
         supportReason = Some(SupportData.MakingAnApiCall.text)
       )
+      val auditAction         = CreateTicketAuditAction(createTicketRequest)
 
       ApiPlatformDeskproConnectorMock.CreateTicket.verifyCalledWith(createTicketRequest)
-      AuditServiceMock.ExplicitAudit.verifyCalledWith(auditType, createTicketRequest)
+      AuditServiceMock.ExplicitAudit.verifyCalledWith(auditAction)
     }
   }
 
@@ -215,9 +216,10 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         organisation = Some(organisation),
         applicationId = Some(applicationId)
       )
+      val auditAction         = CreateTicketAuditAction(createTicketRequest)
 
       ApiPlatformDeskproConnectorMock.CreateTicket.verifyCalledWith(createTicketRequest)
-      AuditServiceMock.ExplicitAudit.verifyCalledWith(auditType, createTicketRequest)
+      AuditServiceMock.ExplicitAudit.verifyCalledWith(auditAction)
     }
   }
 }
