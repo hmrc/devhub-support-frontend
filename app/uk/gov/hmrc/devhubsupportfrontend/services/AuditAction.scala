@@ -54,5 +54,5 @@ private[services] object CreateTicketDetails {
 }
 
 case class CreateTicketAuditAction(createTicketRequest: ApiPlatformDeskproConnector.CreateTicketRequest) extends AuditAction {
-  val auditType = "TicketCreated"
+  val auditType = "CreateTicket"
 }
