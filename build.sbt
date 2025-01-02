@@ -1,7 +1,5 @@
 import com.typesafe.sbt.digest.Import._
-import com.typesafe.sbt.uglify.Import._
 import com.typesafe.sbt.web.Import._
-import net.ground5hark.sbt.concat.Import._
 import uk.gov.hmrc.DefaultBuildSettings
 
 Global / bloopAggregateSourceDependencies := true
@@ -17,21 +15,7 @@ lazy val microservice = Project("devhub-support-frontend", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
   .settings(
-    Concat.groups := Seq(
-      "javascripts/apis-app.js" -> group(
-        (baseDirectory.value / "app" / "assets" / "javascripts") ** "*.js"
-      )
-    ),
-    uglifyCompressOptions := Seq(
-      "unused=true",
-      "dead_code=true"
-    ),
-    uglify / includeFilter := GlobFilter("apis-*.js"),
-    pipelineStages := Seq(digest),
-    Assets / pipelineStages := Seq(
-      concat,
-      uglify
-    )
+    pipelineStages := Seq(digest)
   )
   .settings(
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test
