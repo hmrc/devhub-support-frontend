@@ -11,7 +11,7 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "bootstrap-frontend-play-30"             % bootstrapVersion,
     "uk.gov.hmrc"             %% "play-frontend-hmrc-play-30"             % "11.11.0",
     "uk.gov.hmrc.mongo"       %% "hmrc-mongo-play-30"                     % hmrcMongoVersion,
-    "uk.gov.hmrc"             %% "emailaddress-play-30"                   % "4.0.0",
+    "uk.gov.hmrc"             %% "emailaddress-play-30"                   % "4.1.0",
     "uk.gov.hmrc"             %% "http-metrics"                           % "2.9.0",
     "uk.gov.hmrc"             %% "api-platform-api-domain"                % apiDomainVersion,
     "uk.gov.hmrc"             %% "api-platform-tpd-domain"                % tpdDomainVersion
