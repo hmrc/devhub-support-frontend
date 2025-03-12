@@ -2,8 +2,8 @@ import sbt._
 
 object AppDependencies {
 
-  private val bootstrapVersion = "9.7.0"
-  private val hmrcMongoVersion = "2.4.0"
+  private val bootstrapVersion = "9.11.0"
+  private val hmrcMongoVersion = "2.5.0"
   private val apiDomainVersion = "0.19.1"
   private val tpdDomainVersion = "0.10.0"
 
@@ -11,7 +11,7 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "bootstrap-frontend-play-30"             % bootstrapVersion,
     "uk.gov.hmrc"             %% "play-frontend-hmrc-play-30"             % "11.11.0",
     "uk.gov.hmrc.mongo"       %% "hmrc-mongo-play-30"                     % hmrcMongoVersion,
-    "uk.gov.hmrc"             %% "emailaddress-play-30"                   % "4.1.0",
+    "commons-validator"       %  "commons-validator"                      % "1.9.0",
     "uk.gov.hmrc"             %% "http-metrics"                           % "2.9.0",
     "uk.gov.hmrc"             %% "api-platform-api-domain"                % apiDomainVersion,
     "uk.gov.hmrc"             %% "api-platform-tpd-domain"                % tpdDomainVersion
