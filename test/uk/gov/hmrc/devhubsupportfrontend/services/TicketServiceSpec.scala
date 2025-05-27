@@ -39,6 +39,7 @@ class TicketServiceSpec extends AsyncHmrcSpec {
       ticketId,
       "SDST-2025XON927",
       61,
+      LaxEmailAddress("bob@example.com"),
       "awaiting_user",
       instant,
       Some(instant),

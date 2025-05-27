@@ -92,12 +92,13 @@ class ApiPlatformDeskproConnectorIntegrationSpec
 
       val result = await(underTest.fetchTicket(ticketId, hc))
 
-      val message1       = DeskproMessage(3467, ticketId, 33, message1CreatedDate, "Hi.  What API do I need to get next weeks lottery numbers?")
-      val message2       = DeskproMessage(3698, ticketId, 61, message2CreatedDate, "<p>Reply message from agent.  What else gets filled in? </p>")
+      val message1       = DeskproMessage(3467, ticketId, 33, message1CreatedDate, "Hi. What API do I need to get next weeks lottery numbers?")
+      val message2       = DeskproMessage(3698, ticketId, 61, message2CreatedDate, "Reply message from agent. What else gets filled in?")
       val expectedTicket = DeskproTicket(
         ticketId,
         "SDST-2025XON927",
         61,
+        LaxEmailAddress("bob@example.com"),
         "awaiting_user",
         ticketCreatedDate,
         Some(dateLastAgentReply),
@@ -143,6 +144,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
         3432,
         "SDST-2025XON927",
         61,
+        LaxEmailAddress("bob@example.com"),
         "awaiting_user",
         ticket1CreatedDate,
         Some(ticket1DateLastAgentReply),
@@ -153,6 +155,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
         1041,
         "SDST-2024LTN085",
         61,
+        LaxEmailAddress("bob@example.com"),
         "awaiting_agent",
         ticket2CreatedDate,
         None,

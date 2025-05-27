@@ -21,6 +21,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.filters.csrf.CSRF.TokenProvider
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
@@ -57,10 +58,12 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       instant,
       "Test message contents"
     )
+
     val ticket = DeskproTicket(
       ticketId,
       "SDST-2025XON927",
       61,
+      LaxEmailAddress("bob@example.com"),
       "awaiting_user",
       instant,
       Some(instant),

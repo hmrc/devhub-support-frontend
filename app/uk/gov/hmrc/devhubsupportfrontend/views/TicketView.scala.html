@@ -38,12 +38,13 @@
   <span class="govuk-caption-l">Developer Hub support</span>
   <h1 class="govuk-heading-l">Support Ticket</h1>
 
-  @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy")) { dateFormatter =>
+  @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm")) { dateFormatter =>
       @govukTable(Table(
           firstCellIsHeader = true,
           rows = Seq(
             Seq(TableRow(content = Text("Reference")), TableRow(content = Text(ticket.ref))),
-            Seq(TableRow(content = Text("Created")), TableRow(content = Text(dateFormatter.format(ticket.dateCreated.atOffset(ZoneOffset.UTC).toLocalDateTime)))),
+            Seq(TableRow(content = Text("Created by")), TableRow(content = Text(ticket.personEmail.text))),
+            Seq(TableRow(content = Text("Created on")), TableRow(content = Text(dateFormatter.format(ticket.dateCreated.atOffset(ZoneOffset.UTC).toLocalDateTime)))),
             Seq(TableRow(content = Text("Status")), TableRow(content = Text(ticket.status))),
             Seq(TableRow(content = Text("Subject")), TableRow(content = Text(ticket.subject)))
           )

@@ -63,6 +63,7 @@ object ApiPlatformDeskproStub {
                           |  "id": 3432,
                           |  "ref": "SDST-2025XON927",
                           |  "person": 61,
+                          |  "personEmail": "bob@example.com",
                           |  "status": "awaiting_user",
                           |  "dateCreated": "2025-05-01T08:02:02Z",
                           |  "dateLastAgentReply": "2025-05-20T07:24:41Z",
@@ -73,14 +74,14 @@ object ApiPlatformDeskproStub {
                           |      "ticketId": 3432,
                           |      "person": 33,
                           |      "dateCreated": "2025-05-01T08:02:02Z",
-                          |      "message": "Hi.  What API do I need to get next weeks lottery numbers?"
+                          |      "message": "Hi. What API do I need to get next weeks lottery numbers?"
                           |    },
                           |    {
                           |      "id": 3698,
                           |      "ticketId": 3432,
                           |      "person": 61,
                           |      "dateCreated": "2025-05-19T11:54:53Z",
-                          |      "message": "<p>Reply message from agent.  What else gets filled in? </p>"
+                          |      "message": "Reply message from agent. What else gets filled in?"
                           |    }
                           |  ]
                           |}""".stripMargin)
@@ -120,6 +121,7 @@ object ApiPlatformDeskproStub {
                           |    "id": 3432,
                           |    "ref": "SDST-2025XON927",
                           |    "person": 61,
+                          |    "personEmail": "bob@example.com",
                           |    "status": "awaiting_user",
                           |    "dateCreated": "2025-05-01T08:02:02Z",
                           |    "dateLastAgentReply": "2025-05-20T07:24:41Z",
@@ -130,6 +132,7 @@ object ApiPlatformDeskproStub {
                           |    "id": 1041,
                           |    "ref": "SDST-2024LTN085",
                           |    "person": 61,
+                          |    "personEmail": "bob@example.com",
                           |    "status": "awaiting_agent",
                           |    "dateCreated": "2024-09-17T08:11:10Z",
                           |    "subject": "HMRC Developer Hub: Support Enquiry",

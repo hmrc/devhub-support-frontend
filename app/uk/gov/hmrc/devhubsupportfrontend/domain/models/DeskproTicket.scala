@@ -19,6 +19,7 @@ package uk.gov.hmrc.devhubsupportfrontend.domain.models
 import java.time.Instant
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 
 case class DeskproMessage(
     id: Int,
@@ -36,6 +37,7 @@ case class DeskproTicket(
     id: Int,
     ref: String,
     person: Int,
+    personEmail: LaxEmailAddress,
     status: String,
     dateCreated: Instant,
     dateLastAgentReply: Option[Instant],
