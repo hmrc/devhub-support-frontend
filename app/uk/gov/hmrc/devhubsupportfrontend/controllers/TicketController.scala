@@ -25,7 +25,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.services._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.TicketListView
+import uk.gov.hmrc.devhubsupportfrontend.views.html.{TicketListView, TicketView}
 
 @Singleton
 class TicketController @Inject() (
@@ -34,7 +34,8 @@ class TicketController @Inject() (
     val errorHandler: ErrorHandler,
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     ticketService: TicketService,
-    ticketListView: TicketListView
+    ticketListView: TicketListView,
+    ticketView: TicketView
   )(implicit val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
@@ -43,4 +44,10 @@ class TicketController @Inject() (
     ticketService.getTicketsForUser(request.userSession.developer.email).map(tickets => Ok(ticketListView(Some(request.userSession), tickets)))
   }
 
+  def ticketPage(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
+    ticketService.fetchTicket(ticketId).map {
+      case Some(ticket) => Ok(ticketView(Some(request.userSession), ticket))
+      case _            => NotFound
+    }
+  }
 }

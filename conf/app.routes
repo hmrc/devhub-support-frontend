@@ -24,5 +24,6 @@ POST        /app                                            uk.gov.hmrc.devhubsu
 GET         /app/giving-team-member-access                  uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithApplicationsController.givingTeamMembersAccess()
 
 GET         /tickets                                        uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketListPage()
+GET         /ticket/:tid                                    uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketPage(tid: Int)
 
 GET         /assets/*file                                   controllers.Assets.versioned(path = "/public", file: Asset)
