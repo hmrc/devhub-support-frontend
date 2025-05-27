@@ -16,14 +16,19 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.connectors
 
+import java.time.Instant
+import java.time.format.DateTimeFormatter
+
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import play.api.http.Status._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication, Configuration, Mode}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{DeskproMessage, DeskproTicket}
 import uk.gov.hmrc.devhubsupportfrontend.stubs.ApiPlatformDeskproStub
 import uk.gov.hmrc.devhubsupportfrontend.utils.WireMockExtensions
 
@@ -71,6 +76,100 @@ class ApiPlatformDeskproConnectorIntegrationSpec
 
       intercept[UpstreamErrorResponse] {
         await(underTest.createTicket(deskproTicket, hc))
+      }.statusCode shouldBe failureStatus
+    }
+  }
+
+  "fetchTicket" should {
+    val ticketId: Int = 3432
+    "return a ticket" in new Setup {
+      val ticketCreatedDate: Instant   = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-01T08:02:02Z"))
+      val dateLastAgentReply: Instant  = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-20T07:24:41Z"))
+      val message1CreatedDate: Instant = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-01T08:02:02Z"))
+      val message2CreatedDate: Instant = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-19T11:54:53Z"))
+
+      ApiPlatformDeskproStub.FetchTicket.succeeds(ticketId)
+
+      val result = await(underTest.fetchTicket(ticketId, hc))
+
+      val message1       = DeskproMessage(3467, ticketId, 33, message1CreatedDate, "Hi.  What API do I need to get next weeks lottery numbers?")
+      val message2       = DeskproMessage(3698, ticketId, 61, message2CreatedDate, "<p>Reply message from agent.  What else gets filled in? </p>")
+      val expectedTicket = DeskproTicket(
+        ticketId,
+        "SDST-2025XON927",
+        61,
+        "awaiting_user",
+        ticketCreatedDate,
+        Some(dateLastAgentReply),
+        "HMRC Developer Hub: Support Enquiry",
+        List(message1, message2)
+      )
+
+      result shouldBe Some(expectedTicket)
+    }
+
+    "return None when not found" in new Setup {
+      ApiPlatformDeskproStub.FetchTicket.fails(ticketId, NOT_FOUND)
+
+      val result = await(underTest.fetchTicket(ticketId, hc))
+
+      result shouldBe None
+    }
+
+    "fail when the ticket creation call returns an error" in new Setup {
+      val failureStatus = INTERNAL_SERVER_ERROR
+
+      ApiPlatformDeskproStub.FetchTicket.fails(ticketId, failureStatus)
+
+      intercept[UpstreamErrorResponse] {
+        await(underTest.fetchTicket(ticketId, hc))
+      }.statusCode shouldBe failureStatus
+    }
+  }
+
+  "getTicketsForUser" should {
+    val userEmail = LaxEmailAddress("bob@example.com")
+
+    "return a ticket" in new Setup {
+      val ticket1CreatedDate: Instant        = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-01T08:02:02Z"))
+      val ticket1DateLastAgentReply: Instant = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-20T07:24:41Z"))
+      val ticket2CreatedDate: Instant        = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2024-09-17T08:11:10Z"))
+
+      ApiPlatformDeskproStub.GetTicketsForUser.succeeds(userEmail)
+
+      val result = await(underTest.getTicketsForUser(userEmail, hc))
+
+      val expectedTicket1 = DeskproTicket(
+        3432,
+        "SDST-2025XON927",
+        61,
+        "awaiting_user",
+        ticket1CreatedDate,
+        Some(ticket1DateLastAgentReply),
+        "HMRC Developer Hub: Support Enquiry",
+        List.empty
+      )
+      val expectedTicket2 = DeskproTicket(
+        1041,
+        "SDST-2024LTN085",
+        61,
+        "awaiting_agent",
+        ticket2CreatedDate,
+        None,
+        "HMRC Developer Hub: Support Enquiry",
+        List.empty
+      )
+
+      result shouldBe List(expectedTicket1, expectedTicket2)
+    }
+
+    "fail when the ticket creation call returns an error" in new Setup {
+      val failureStatus = INTERNAL_SERVER_ERROR
+
+      ApiPlatformDeskproStub.GetTicketsForUser.fails(userEmail, failureStatus)
+
+      intercept[UpstreamErrorResponse] {
+        await(underTest.getTicketsForUser(userEmail, hc))
       }.statusCode shouldBe failureStatus
     }
   }

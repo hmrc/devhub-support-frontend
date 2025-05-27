@@ -18,15 +18,17 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers.security
 
 import scala.concurrent.{ExecutionContext, Future}
 
+import cats.data.OptionT
+
 import play.api.mvc._
-import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.{UserSession, UserSessionId}
+import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.{LoggedInState, UserSession, UserSessionId}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.controllers.BaseController
-import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
+import uk.gov.hmrc.devhubsupportfrontend.controllers.models.{MaybeUserRequest, UserRequest}
 
 trait DevHubAuthorization extends FrontendHeaderCarrierProvider with CookieEncoding {
   self: BaseController =>
@@ -35,9 +37,37 @@ trait DevHubAuthorization extends FrontendHeaderCarrierProvider with CookieEncod
 
   implicit val appConfig: AppConfig
 
+  object DeveloperSessionFilter {
+    type Type = UserSession => Boolean
+
+    val onlyTrueIfLoggedInFilter: DeveloperSessionFilter.Type = _.loggedInState == LoggedInState.LOGGED_IN
+  }
+
   def maybeAtLeastPartLoggedInEnablingMfa(body: MaybeUserRequest[AnyContent] => Future[Result])(implicit ec: ExecutionContext): Action[AnyContent] = Action.async {
     implicit request: MessagesRequest[AnyContent] => loadSession.flatMap(maybeDeveloperSession => body(new MaybeUserRequest(maybeDeveloperSession, request)))
   }
+
+  def loggedInActionRefiner(filter: DeveloperSessionFilter.Type = DeveloperSessionFilter.onlyTrueIfLoggedInFilter): ActionRefiner[MessagesRequest, UserRequest] =
+    new ActionRefiner[MessagesRequest, UserRequest] {
+      def executionContext = ec
+
+      def refine[A](msgRequest: MessagesRequest[A]): Future[Either[Result, UserRequest[A]]] = {
+        lazy val loginRedirect = Redirect(s"${appConfig.thirdPartyDeveloperFrontendUrl}/developer/login")
+
+        implicit val request = msgRequest
+
+        OptionT(loadSession)
+          .filter(filter)
+          .toRight(loginRedirect)
+          .map(new UserRequest(_, msgRequest))
+          .value
+      }
+    }
+
+  def loggedInAction(block: UserRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+    Action.async { implicit request =>
+      loggedInActionRefiner().invokeBlock(request, block)
+    }
 
   private[security] def loadSession[A](implicit request: Request[A]): Future[Option[UserSession]] = {
     (for {
