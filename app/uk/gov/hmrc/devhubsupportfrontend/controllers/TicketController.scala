@@ -46,8 +46,8 @@ class TicketController @Inject() (
 
   def ticketPage(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
     ticketService.fetchTicket(ticketId).map {
-      case Some(ticket) => Ok(ticketView(Some(request.userSession), ticket))
-      case _            => NotFound
+      case Some(ticket) if ticket.personEmail == request.userSession.developer.email => Ok(ticketView(Some(request.userSession), ticket))
+      case _                                                                         => NotFound
     }
   }
 }

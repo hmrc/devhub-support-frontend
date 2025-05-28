@@ -63,7 +63,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       ticketId,
       "SDST-2025XON927",
       61,
-      LaxEmailAddress("bob@example.com"),
+      LaxEmailAddress("something@example.com"),
       "awaiting_user",
       instant,
       Some(instant),
@@ -94,16 +94,6 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     ThirdPartyDeveloperConnectorMock.FetchSession.fails()
   }
 
-  trait IsPartLoggedInEnablingMFA {
-    self: Setup =>
-
-    lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
-
-    ThirdPartyDeveloperConnectorMock.FetchSession.succeedsPartLoggedInEnablingMfa()
-  }
-
   "Show list of tickets for the user" when {
     "invoke ticketListPage" should {
       "render the ticket list page" in new Setup with IsLoggedIn {
@@ -114,6 +104,13 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         status(result) shouldBe OK
         contentAsString(result) should include("SDST-2025XON927")
         contentAsString(result) should include("HMRC Developer Hub: Support Enquiry")
+      }
+
+      "redirect to logon page if not logged in" in new Setup with NotLoggedIn {
+        val result = addToken(underTest.ticketListPage())(request)
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some("/developer/login")
       }
     }
   }
@@ -130,6 +127,30 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         contentAsString(result) should include("HMRC Developer Hub: Support Enquiry")
         contentAsString(result) should include("awaiting_user")
         contentAsString(result) should include("Test message contents")
+      }
+
+      "return 404 if ticket not found" in new Setup with IsLoggedIn {
+        TicketServiceMock.FetchTicket.succeeds(None)
+
+        val result = addToken(underTest.ticketPage(ticketId))(request)
+
+        status(result) shouldBe NOT_FOUND
+      }
+
+      "return 404 if user email is different from person email in ticket" in new Setup with IsLoggedIn {
+        val ticketDiffPersonEmail = ticket.copy(personEmail = LaxEmailAddress("bob@example.com"))
+        TicketServiceMock.FetchTicket.succeeds(Some(ticketDiffPersonEmail))
+
+        val result = addToken(underTest.ticketPage(ticketId))(request)
+
+        status(result) shouldBe NOT_FOUND
+      }
+
+      "redirect to logon page if not logged in" in new Setup with NotLoggedIn {
+        val result = addToken(underTest.ticketPage(ticketId))(request)
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some("/developer/login")
       }
     }
   }
