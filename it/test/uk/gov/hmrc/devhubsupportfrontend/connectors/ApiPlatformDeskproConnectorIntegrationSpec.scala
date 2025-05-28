@@ -92,8 +92,8 @@ class ApiPlatformDeskproConnectorIntegrationSpec
 
       val result = await(underTest.fetchTicket(ticketId, hc))
 
-      val message1       = DeskproMessage(3467, ticketId, 33, message1CreatedDate, "Hi. What API do I need to get next weeks lottery numbers?")
-      val message2       = DeskproMessage(3698, ticketId, 61, message2CreatedDate, "Reply message from agent. What else gets filled in?")
+      val message1       = DeskproMessage(3467, ticketId, 33, message1CreatedDate, false, "Hi. What API do I need to get next weeks lottery numbers?")
+      val message2       = DeskproMessage(3698, ticketId, 61, message2CreatedDate, false, "Reply message from agent. What else gets filled in?")
       val expectedTicket = DeskproTicket(
         ticketId,
         "SDST-2025XON927",

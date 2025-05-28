@@ -26,6 +26,7 @@ case class DeskproMessage(
     ticketId: Int,
     person: Int,
     dateCreated: Instant,
+    isAgentNote: Boolean,
     message: String
   )
 
