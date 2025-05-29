@@ -33,11 +33,12 @@
 @(loggedInSession: Option[UserSession], ticket: DeskproTicket)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(
-  pageTitle = "Support Ticket",
+  pageTitle = "Your support request",
+  backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
   loggedInSession = loggedInSession,
 ) {
   <span class="govuk-caption-l">Developer Hub support</span>
-  <h1 class="govuk-heading-l">Support Ticket</h1>
+  <h1 class="govuk-heading-l">Your support request</h1>
 
   @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm")) { dateFormatter =>
       @govukTable(Table(

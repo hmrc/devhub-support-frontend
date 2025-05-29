@@ -36,11 +36,11 @@
 }
 
 @layout(
-  pageTitle = "Support Tickets for User",
+  pageTitle = "Your support requests",
   loggedInSession = loggedInSession,
 ) {
   <span class="govuk-caption-l">Developer Hub support</span>
-  <h1 class="govuk-heading-l">List of support tickets</h1>
+  <h1 class="govuk-heading-l">Your support requests</h1>
 
   @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy")) { dateFormatter =>
       @govukTable(Table(
