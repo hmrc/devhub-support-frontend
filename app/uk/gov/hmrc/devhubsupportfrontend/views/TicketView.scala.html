@@ -52,8 +52,6 @@
           )
       ))
 
-      <h2 class="govuk-heading-l">Messages</h2>
-
       @hmrcTimeline(Timeline(
         events = ticket.messages.filter(t => t.isAgentNote == false).map(message => 
           Event(
