@@ -60,12 +60,22 @@ class TicketServiceSpec extends AsyncHmrcSpec {
   }
 
   "getTicketsForUser" should {
-    "get a list of tickets from Deskpro" in new Setup {
+    "get a list of open tickets from Deskpro" in new Setup {
       ApiPlatformDeskproConnectorMock.GetTicketsForUser.succeeds(List(ticket))
 
-      val result = await(underTest.getTicketsForUser(userEmail))
+      val result = await(underTest.getTicketsForUser(userEmail, false))
 
       result shouldBe List(ticket)
+      ApiPlatformDeskproConnectorMock.GetTicketsForUser.verifyCalledWith(userEmail, None)
+    }
+
+    "get a list of resolved tickets from Deskpro" in new Setup {
+      ApiPlatformDeskproConnectorMock.GetTicketsForUser.succeeds(List(ticket))
+
+      val result = await(underTest.getTicketsForUser(userEmail, true))
+
+      result shouldBe List(ticket)
+      ApiPlatformDeskproConnectorMock.GetTicketsForUser.verifyCalledWith(userEmail, Some("resolved"))
     }
   }
 }

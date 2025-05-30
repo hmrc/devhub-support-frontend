@@ -19,6 +19,8 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
+import play.api.data.Form
+import play.api.data.Forms._
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
@@ -26,6 +28,19 @@ import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.services._
 import uk.gov.hmrc.devhubsupportfrontend.views.html.{TicketListView, TicketView}
+
+object TicketController {
+
+  case class FilterForm(
+      status: String = "open"
+    )
+
+  val filterForm: Form[FilterForm] = Form(
+    mapping(
+      "status"     -> text
+    )(FilterForm.apply)(FilterForm.unapply)
+  )
+}
 
 @Singleton
 class TicketController @Inject() (
@@ -40,8 +55,26 @@ class TicketController @Inject() (
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
 
+  import TicketController._
+
   def ticketListPage(): Action[AnyContent] = loggedInAction { implicit request =>
-    ticketService.getTicketsForUser(request.userSession.developer.email).map(tickets => Ok(ticketListView(Some(request.userSession), tickets)))
+    def doSearch(form: FilterForm) = {
+      val getResolvedTickets = (form.status == "resolved")
+      val queryForm          = filterForm.fill(form)
+
+      ticketService.getTicketsForUser(request.userSession.developer.email, getResolvedTickets).map(tickets => Ok(ticketListView(queryForm, Some(request.userSession), tickets)))
+    }
+
+    def handleValidForm(form: FilterForm) = {
+      doSearch(form)
+    }
+
+    def handleInvalidForm(form: Form[FilterForm]) = {
+      val defaultForm = FilterForm("open")
+      doSearch(defaultForm)
+    }
+
+    filterForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
   }
 
   def ticketPage(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>

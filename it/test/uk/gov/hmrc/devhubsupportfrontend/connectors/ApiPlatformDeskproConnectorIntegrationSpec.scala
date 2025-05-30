@@ -138,7 +138,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
 
       ApiPlatformDeskproStub.GetTicketsForUser.succeeds(userEmail)
 
-      val result = await(underTest.getTicketsForUser(userEmail, hc))
+      val result = await(underTest.getTicketsForUser(userEmail, None, hc))
 
       val expectedTicket1 = DeskproTicket(
         3432,
@@ -172,7 +172,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
       ApiPlatformDeskproStub.GetTicketsForUser.fails(userEmail, failureStatus)
 
       intercept[UpstreamErrorResponse] {
-        await(underTest.getTicketsForUser(userEmail, hc))
+        await(underTest.getTicketsForUser(userEmail, None, hc))
       }.statusCode shouldBe failureStatus
     }
   }

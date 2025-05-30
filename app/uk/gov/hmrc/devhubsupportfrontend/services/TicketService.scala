@@ -32,8 +32,9 @@ class TicketService @Inject() (
   )(implicit val ec: ExecutionContext
   ) extends ApplicationLogger {
 
-  def getTicketsForUser(email: LaxEmailAddress)(implicit hc: HeaderCarrier): Future[List[DeskproTicket]] = {
-    deskproConnector.getTicketsForUser(email, hc)
+  def getTicketsForUser(email: LaxEmailAddress, getResolvedTickets: Boolean)(implicit hc: HeaderCarrier): Future[List[DeskproTicket]] = {
+    val status = if (getResolvedTickets) Some("resolved") else None
+    deskproConnector.getTicketsForUser(email, status, hc)
   }
 
   def fetchTicket(ticketId: Int)(implicit hc: HeaderCarrier): Future[Option[DeskproTicket]] = {

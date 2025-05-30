@@ -52,7 +52,11 @@ trait ApiPlatformDeskproConnectorMockModule extends MockitoSugar with ArgumentMa
     object GetTicketsForUser {
 
       def succeeds(tickets: List[DeskproTicket]) = {
-        when(aMock.getTicketsForUser(*[LaxEmailAddress], *)).thenReturn(Future.successful(tickets))
+        when(aMock.getTicketsForUser(*[LaxEmailAddress], *, *)).thenReturn(Future.successful(tickets))
+      }
+
+      def verifyCalledWith(email: LaxEmailAddress, status: Option[String]) = {
+        verify(aMock).getTicketsForUser(eqTo(email), eqTo(status), *)
       }
     }
   }

@@ -39,7 +39,7 @@ trait TicketServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
     object GetTicketsForUser {
 
       def succeeds(tickets: List[DeskproTicket]) =
-        when(aMock.getTicketsForUser(*[LaxEmailAddress])(*)).thenReturn(successful(tickets))
+        when(aMock.getTicketsForUser(*[LaxEmailAddress], *)(*)).thenReturn(successful(tickets))
     }
   }
 
