@@ -37,25 +37,25 @@
   backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
   loggedInSession = loggedInSession,
 ) {
-  <span class="govuk-caption-l">Developer Hub support</span>
-  <h1 class="govuk-heading-l">Your support request</h1>
+  <span class="govuk-caption-l">@{messages("ticketdetails.subtitle")}</span>
+  <h1 class="govuk-heading-l">@{messages("ticketdetails.title")}</h1>
 
   @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm")) { dateFormatter =>
       @govukTable(Table(
           firstCellIsHeader = true,
           rows = Seq(
-            Seq(TableRow(content = Text("Reference")), TableRow(content = Text(ticket.ref))),
-            Seq(TableRow(content = Text("Created by")), TableRow(content = Text(ticket.personEmail.text))),
-            Seq(TableRow(content = Text("Created on")), TableRow(content = Text(dateFormatter.format(ticket.dateCreated.atOffset(ZoneOffset.UTC).toLocalDateTime)))),
-            Seq(TableRow(content = Text("Status")), TableRow(content = HtmlContent(buildStatusHtml(ticket.status)))),
-            Seq(TableRow(content = Text("Subject")), TableRow(content = Text(ticket.subject)))
+            Seq(TableRow(content = Text(messages("ticketdetails.field.reference"))), TableRow(content = Text(ticket.ref))),
+            Seq(TableRow(content = Text(messages("ticketdetails.field.createdby"))), TableRow(content = Text(ticket.personEmail.text))),
+            Seq(TableRow(content = Text(messages("ticketdetails.field.createdon"))), TableRow(content = Text(dateFormatter.format(ticket.dateCreated.atOffset(ZoneOffset.UTC).toLocalDateTime)))),
+            Seq(TableRow(content = Text(messages("ticketdetails.field.status"))), TableRow(content = HtmlContent(buildStatusHtml(ticket.status)))),
+            Seq(TableRow(content = Text(messages("ticketdetails.field.subject"))), TableRow(content = Text(ticket.subject)))
           )
       ))
 
       @hmrcTimeline(Timeline(
         events = ticket.messages.filter(t => t.isAgentNote == false).map(message => 
           Event(
-            title = "Message",
+            title = messages("ticketdetails.field.message"),
             content = "<p class='govuk-body'>" + message.message + "</p>", 
             time = dateFormatter.format(message.dateCreated.atOffset(ZoneOffset.UTC).toLocalDateTime)
           )

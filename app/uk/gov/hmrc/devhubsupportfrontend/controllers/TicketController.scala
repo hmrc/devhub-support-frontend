@@ -32,12 +32,13 @@ import uk.gov.hmrc.devhubsupportfrontend.views.html.{TicketListView, TicketView}
 object TicketController {
 
   case class FilterForm(
-      status: String = "open"
+      status: Option[String] = Some("open")
     )
 
   val filterForm: Form[FilterForm] = Form(
     mapping(
-      "status" -> text
+      "status" -> optional(text)
+        .verifying("ticketlist.status.no.choice.field", _.isDefined)
     )(FilterForm.apply)(FilterForm.unapply)
   )
 }
@@ -59,7 +60,7 @@ class TicketController @Inject() (
 
   def ticketListPage(): Action[AnyContent] = loggedInAction { implicit request =>
     def doSearch(form: FilterForm) = {
-      val getResolvedTickets = (form.status == "resolved")
+      val getResolvedTickets = (form.status == Some("resolved"))
       val queryForm          = filterForm.fill(form)
 
       ticketService.getTicketsForUser(request.userSession.developer.email, getResolvedTickets).map(tickets => Ok(ticketListView(queryForm, Some(request.userSession), tickets)))
@@ -70,7 +71,7 @@ class TicketController @Inject() (
     }
 
     def handleInvalidForm(form: Form[FilterForm]) = {
-      val defaultForm = FilterForm("open")
+      val defaultForm = FilterForm()
       doSearch(defaultForm)
     }
 

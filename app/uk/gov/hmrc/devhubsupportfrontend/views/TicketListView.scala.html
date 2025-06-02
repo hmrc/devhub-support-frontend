@@ -14,7 +14,8 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukTable, GovukRadios, HeadCell, HtmlContent, Radios, Table, TableRow, Text, RadioItem}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
@@ -27,7 +28,8 @@
 
 @this(
   layout: Layout,
-  govukTable: GovukTable
+  govukTable: GovukTable,
+  govukRadios: GovukRadios
 )
 
 @(form: Form[FilterForm], loggedInSession: Option[UserSession], tickets: List[DeskproTicket])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
@@ -40,56 +42,41 @@
   pageTitle = "Your support requests",
   loggedInSession = loggedInSession,
 ) {
-  <span class="govuk-caption-l">Developer Hub support</span>
-  <h1 class="govuk-heading-l">Your support requests</h1>
+  <span class="govuk-caption-l">@{messages("ticketlist.subtitle")}</span>
+  <h1 class="govuk-heading-l">@{messages("ticketlist.title")}</h1>
 
-  @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketListPage, Symbol("class") -> "form") {
+  @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketListPage(), Symbol("class") -> "form") {
 
-    <div class="govuk-form-group">
-      <fieldset class="govuk-fieldset">
-        <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
-          <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
-            @defining(if(form("status").value == Some("open")) """checked="checked"""" else "") { checked =>
-                <div class="govuk-radios__item">
-                  <input class="govuk-radios__input" type="radio" id="openStatusFilter" 
-                    name="status" value="open" @{checked}>
-                  <label class="govuk-body-s govuk-radios__label" for="openStatusFilter">
-                    Open
-                  </label>
-                </div>
-            }
-            @defining(if(form("status").value == Some("resolved")) """checked="checked"""" else "") { checked =>
-                <div class="govuk-radios__item">
-                  <input class="govuk-radios__input" type="radio" id="resolvedStatusFilter" 
-                    name="status" value="resolved" @{checked}>
-                  <label class="govuk-body-s govuk-radios__label" for="resolvedStatusFilter">
-                    Resolved
-                  </label>
-                </div>
-            }
-        </div>
-      </fieldset>
-    </div>          
+    @govukRadios(Radios(
+      name = "status",
+      classes = "govuk-radios--small govuk-radios--inline",
+      items = Seq(
+        RadioItem(
+          content = Text(messages("ticketlist.status.open")),
+          value = Some("open")
+        ),
+        RadioItem(
+          content = Text(messages("ticketlist.status.resolved")),
+          value = Some("resolved")
+        )
+      )
+    ).withFormField(form("status")))
 
     <div class="govuk-form-group govuk-!-margin-bottom-0">
-      <button id="filterResults" class="govuk-button" type="submit">Show</button>
+      <button id="filterResults" class="govuk-button" type="submit">@{messages("ticketlist.status.show")}</button>
     </div>
   }
 
-
-  @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy")) { dateFormatter =>
-      @govukTable(Table(
-          head = Some(Seq(
-              HeadCell(content = Text("Reference")),
-              HeadCell(content = Text("Status")),
-              HeadCell(content = Text("Subject"))
-          )),
-          rows = tickets.map(ticket => Seq(
-              TableRow(content = HtmlContent(buildTicketLinkHtml(ticket))),
-              TableRow(content = HtmlContent(buildStatusHtml(ticket.status))),
-              TableRow(content = Text(ticket.subject))
-          ))
-      ))
-  }
-
+  @govukTable(Table(
+    head = Some(Seq(
+      HeadCell(content = Text(messages("ticketlist.column.reference"))),
+      HeadCell(content = Text(messages("ticketlist.column.status"))),
+      HeadCell(content = Text(messages("ticketlist.column.subject")))
+    )),
+    rows = tickets.map(ticket => Seq(
+      TableRow(content = HtmlContent(buildTicketLinkHtml(ticket))),
+      TableRow(content = HtmlContent(buildStatusHtml(ticket.status))),
+      TableRow(content = Text(ticket.subject))
+    ))
+  ))
 }

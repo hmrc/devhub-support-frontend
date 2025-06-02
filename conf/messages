@@ -35,3 +35,22 @@ emailaddress.error.not.valid.global=Enter an email address in the correct format
 
 emailaddress.error.maxLength.field=Provide an email address with fewer than 320 characters
 emailaddress.error.maxLength.global=Provide an email address with fewer than 320 characters
+
+ticketlist.title=Your support requests
+ticketlist.subtitle=Developer Hub support
+ticketlist.status.no.choice.field=Please select open or resolved requests to view
+ticketlist.status.open=Open
+ticketlist.status.resolved=Resolved
+ticketlist.status.show=Show
+ticketlist.column.reference=Reference
+ticketlist.column.status=Status
+ticketlist.column.subject=Subject
+
+ticketdetails.title=Your support request
+ticketdetails.subtitle=Developer Hub support
+ticketdetails.field.reference=Reference
+ticketdetails.field.createdby=Created by
+ticketdetails.field.createdon=Created on
+ticketdetails.field.status=Status
+ticketdetails.field.subject=Subject
+ticketdetails.field.message=Message
