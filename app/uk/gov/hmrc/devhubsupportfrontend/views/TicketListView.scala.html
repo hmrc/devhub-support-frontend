@@ -48,9 +48,8 @@
     <div class="govuk-form-group">
       <fieldset class="govuk-fieldset">
         <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
-          <div class="govuk-grid-row">
-            @defining(if(form("status").value == "open") """checked="checked"""" else "") { checked =>
-              <div class="govuk-grid-column-one-third">
+          <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+            @defining(if(form("status").value == Some("open")) """checked="checked"""" else "") { checked =>
                 <div class="govuk-radios__item">
                   <input class="govuk-radios__input" type="radio" id="openStatusFilter" 
                     name="status" value="open" @{checked}>
@@ -58,10 +57,8 @@
                     Open
                   </label>
                 </div>
-              </div>
             }
-            @defining(if(form("status").value == "resolved") """checked="checked"""" else "") { checked =>
-              <div class="govuk-grid-column-one-third">
+            @defining(if(form("status").value == Some("resolved")) """checked="checked"""" else "") { checked =>
                 <div class="govuk-radios__item">
                   <input class="govuk-radios__input" type="radio" id="resolvedStatusFilter" 
                     name="status" value="resolved" @{checked}>
@@ -69,7 +66,6 @@
                     Resolved
                   </label>
                 </div>
-              </div>
             }
         </div>
       </fieldset>

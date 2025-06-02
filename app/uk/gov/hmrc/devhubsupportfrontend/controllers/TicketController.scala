@@ -37,7 +37,7 @@ object TicketController {
 
   val filterForm: Form[FilterForm] = Form(
     mapping(
-      "status"     -> text
+      "status" -> text
     )(FilterForm.apply)(FilterForm.unapply)
   )
 }
