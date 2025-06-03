@@ -1,0 +1,82 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukTable, GovukRadios, HeadCell, HtmlContent, Radios, Table, TableRow, Text, RadioItem}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+
+@import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
+@import uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.FilterForm
+@import uk.gov.hmrc.devhubsupportfrontend.domain.models.DeskproTicket
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
+
+@import java.time.ZoneOffset
+@import java.time.format.DateTimeFormatter
+
+@this(
+  layout: Layout,
+  govukTable: GovukTable,
+  govukRadios: GovukRadios
+)
+
+@(form: Form[FilterForm], loggedInSession: Option[UserSession], tickets: List[DeskproTicket])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+
+@buildTicketLinkHtml(t: DeskproTicket) = {
+  <a href='@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketPage(t.id)' class='govuk-link govuk-link--no-visited-state'>@{t.ref}</a>
+}
+
+@layout(
+  pageTitle = "Your support requests",
+  loggedInSession = loggedInSession,
+) {
+  <span class="govuk-caption-l">@{messages("ticketlist.subtitle")}</span>
+  <h1 class="govuk-heading-l">@{messages("ticketlist.title")}</h1>
+
+  @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketListPage(), Symbol("class") -> "form") {
+
+    @govukRadios(Radios(
+      name = "status",
+      classes = "govuk-radios--small govuk-radios--inline",
+      items = Seq(
+        RadioItem(
+          content = Text(messages("ticketlist.status.open")),
+          value = Some("open")
+        ),
+        RadioItem(
+          content = Text(messages("ticketlist.status.resolved")),
+          value = Some("resolved")
+        )
+      )
+    ).withFormField(form("status")))
+
+    <div class="govuk-form-group govuk-!-margin-bottom-0">
+      <button id="filterResults" class="govuk-button" type="submit">@{messages("ticketlist.status.show")}</button>
+    </div>
+  }
+
+  @govukTable(Table(
+    head = Some(Seq(
+      HeadCell(content = Text(messages("ticketlist.column.reference"))),
+      HeadCell(content = Text(messages("ticketlist.column.status"))),
+      HeadCell(content = Text(messages("ticketlist.column.subject")))
+    )),
+    rows = tickets.map(ticket => Seq(
+      TableRow(content = HtmlContent(buildTicketLinkHtml(ticket))),
+      TableRow(content = HtmlContent(buildStatusHtml(ticket.status))),
+      TableRow(content = Text(ticket.subject))
+    ))
+  ))
+}

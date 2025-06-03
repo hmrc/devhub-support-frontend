@@ -6,7 +6,7 @@ Global / bloopAggregateSourceDependencies := true
 Global / bloopExportJarClassifiers := Some(Set("sources"))
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "2.13.16"
 
 ThisBuild / semanticdbEnabled := true
 ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
@@ -24,7 +24,6 @@ lazy val microservice = Project("devhub-support-frontend", file("."))
     Test / unmanagedSourceDirectories += baseDirectory.value / "test-utils",
     Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-eT")
   )
-  .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
     .settings(
       routesImport ++= Seq(

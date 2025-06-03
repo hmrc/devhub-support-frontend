@@ -20,8 +20,11 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
+
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.CreateTicketRequest
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.DeskproTicket
 
 trait ApiPlatformDeskproConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
@@ -36,6 +39,24 @@ trait ApiPlatformDeskproConnectorMockModule extends MockitoSugar with ArgumentMa
 
       def verifyCalledWith(request: CreateTicketRequest) = {
         verify(aMock).createTicket(eqTo(request), *)
+      }
+    }
+
+    object FetchTicket {
+
+      def succeeds(ticket: Option[DeskproTicket]) = {
+        when(aMock.fetchTicket(*, *)).thenReturn(Future.successful(ticket))
+      }
+    }
+
+    object GetTicketsForUser {
+
+      def succeeds(tickets: List[DeskproTicket]) = {
+        when(aMock.getTicketsForUser(*[LaxEmailAddress], *, *)).thenReturn(Future.successful(tickets))
+      }
+
+      def verifyCalledWith(email: LaxEmailAddress, status: Option[String]) = {
+        verify(aMock).getTicketsForUser(eqTo(email), eqTo(status), *)
       }
     }
   }
