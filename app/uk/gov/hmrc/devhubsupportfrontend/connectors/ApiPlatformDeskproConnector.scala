@@ -19,12 +19,13 @@ package uk.gov.hmrc.devhubsupportfrontend.connectors
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+import play.api.http.Status.OK
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{Authorization, HeaderCarrier, StringContextOps}
+import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.http.metrics.common.API
 
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.DeskproTicket
@@ -49,6 +50,10 @@ object ApiPlatformDeskproConnector {
     )
 
   case class CreateTicketResponse(ref: String)
+
+  sealed trait DeskproTicketDeleteResult
+  object DeskproTicketDeleteSuccess extends DeskproTicketDeleteResult
+  object DeskproTicketDeleteFailure extends DeskproTicketDeleteResult
 
   case class GetTicketsByEmailRequest(email: LaxEmailAddress, status: Option[String] = None)
 
@@ -84,5 +89,21 @@ class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlat
     implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
     http.get(url"${config.serviceBaseUrl}/ticket/$ticketId")
       .execute[Option[DeskproTicket]]
+  }
+
+  def closeTicket(ticketId: Int, hc: HeaderCarrier): Future[DeskproTicketDeleteResult] = metrics.record(api) {
+    implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
+    http.delete(url"${config.serviceBaseUrl}/ticket/$ticketId")
+      .execute[HttpResponse]
+      .map(response =>
+        response.status match {
+          case OK =>
+            logger.info(s"Deskpro delete ticket '$ticketId' success")
+            DeskproTicketDeleteSuccess
+          case _  =>
+            logger.error(s"Deskpro delete ticket '$ticketId' failed status: ${response.status}")
+            DeskproTicketDeleteFailure
+        }
+      )
   }
 }

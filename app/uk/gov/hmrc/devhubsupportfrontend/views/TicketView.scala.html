@@ -27,7 +27,8 @@
 @this(
   layout: Layout,
   govukTable: GovukTable,
-  hmrcTimeline: HmrcTimeline
+  hmrcTimeline: HmrcTimeline,
+        govukButton: GovukButton
 )
 
 @(loggedInSession: Option[UserSession], ticket: DeskproTicket)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
@@ -51,6 +52,14 @@
             Seq(TableRow(content = Text(messages("ticketdetails.field.subject"))), TableRow(content = Text(ticket.subject)))
           )
       ))
+
+      <div class="govuk-button-group">
+          @govukButton(Button(
+              id = Some("closeTicket"),
+              isStartButton = false,
+              content = Text("Close this support request"),
+              href=Some(uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.closeTicket(ticket.id).url)))
+      </div>
 
       @hmrcTimeline(Timeline(
         events = ticket.messages.filter(t => t.isAgentNote == false).map(message => 
