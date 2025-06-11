@@ -28,7 +28,7 @@ import play.api.{Application => PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.{DeskproTicketDeleteFailure, DeskproTicketDeleteSuccess}
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.{DeskproTicketCloseFailure, DeskproTicketCloseNotFound, DeskproTicketCloseSuccess}
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{DeskproMessage, DeskproTicket}
 import uk.gov.hmrc.devhubsupportfrontend.stubs.ApiPlatformDeskproStub
 import uk.gov.hmrc.devhubsupportfrontend.utils.WireMockExtensions
@@ -136,17 +136,25 @@ class ApiPlatformDeskproConnectorIntegrationSpec
 
       val result = await(underTest.closeTicket(ticketId, hc))
 
-      result shouldBe DeskproTicketDeleteSuccess
+      result shouldBe DeskproTicketCloseSuccess
     }
 
-    "fail when the ticket delete call returns an error" in new Setup {
+    "fail when the ticket close call returns  not found" in new Setup {
+      ApiPlatformDeskproStub.CloseTicket.notFound(ticketId)
+
+      val result = await(underTest.closeTicket(ticketId, hc))
+
+      result shouldBe DeskproTicketCloseNotFound
+    }
+
+    "fail when the ticket close call returns an error" in new Setup {
       val failureStatus = INTERNAL_SERVER_ERROR
 
       ApiPlatformDeskproStub.CloseTicket.fails(ticketId, failureStatus)
 
       val result = await(underTest.closeTicket(ticketId, hc))
 
-      result shouldBe DeskproTicketDeleteFailure
+      result shouldBe DeskproTicketCloseFailure
     }
   }
 

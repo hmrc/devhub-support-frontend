@@ -25,7 +25,7 @@ import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.{DeskproTicketDeleteFailure, DeskproTicketDeleteSuccess}
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.{DeskproTicketCloseFailure, DeskproTicketCloseNotFound, DeskproTicketCloseSuccess}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.services._
 import uk.gov.hmrc.devhubsupportfrontend.views.html.{TicketListView, TicketView}
@@ -89,8 +89,9 @@ class TicketController @Inject() (
   def closeTicket(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
     ticketService.closeTicket(ticketId)
       .map {
-        case DeskproTicketDeleteSuccess => Redirect(routes.TicketController.ticketListPage().url)
-        case DeskproTicketDeleteFailure => InternalServerError
+        case DeskproTicketCloseSuccess  => Redirect(routes.TicketController.ticketListPage().url)
+        case DeskproTicketCloseNotFound => InternalServerError
+        case DeskproTicketCloseFailure  => InternalServerError
       }
   }
 }

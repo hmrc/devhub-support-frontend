@@ -19,7 +19,7 @@ package uk.gov.hmrc.devhubsupportfrontend.connectors
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import play.api.http.Status.OK
+import play.api.http.Status.{NOT_FOUND, OK}
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
@@ -51,9 +51,10 @@ object ApiPlatformDeskproConnector {
 
   case class CreateTicketResponse(ref: String)
 
-  sealed trait DeskproTicketDeleteResult
-  object DeskproTicketDeleteSuccess extends DeskproTicketDeleteResult
-  object DeskproTicketDeleteFailure extends DeskproTicketDeleteResult
+  sealed trait DeskproTicketCloseResult
+  object DeskproTicketCloseSuccess  extends DeskproTicketCloseResult
+  object DeskproTicketCloseNotFound extends DeskproTicketCloseResult
+  object DeskproTicketCloseFailure  extends DeskproTicketCloseResult
 
   case class GetTicketsByEmailRequest(email: LaxEmailAddress, status: Option[String] = None)
 
@@ -91,18 +92,21 @@ class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlat
       .execute[Option[DeskproTicket]]
   }
 
-  def closeTicket(ticketId: Int, hc: HeaderCarrier): Future[DeskproTicketDeleteResult] = metrics.record(api) {
+  def closeTicket(ticketId: Int, hc: HeaderCarrier): Future[DeskproTicketCloseResult] = metrics.record(api) {
     implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
-    http.delete(url"${config.serviceBaseUrl}/ticket/$ticketId")
+    http.post(url"${config.serviceBaseUrl}/ticket/$ticketId/close")
       .execute[HttpResponse]
       .map(response =>
         response.status match {
-          case OK =>
-            logger.info(s"Deskpro delete ticket '$ticketId' success")
-            DeskproTicketDeleteSuccess
-          case _  =>
-            logger.error(s"Deskpro delete ticket '$ticketId' failed status: ${response.status}")
-            DeskproTicketDeleteFailure
+          case OK        =>
+            logger.info(s"Deskpro close ticket '$ticketId' success")
+            DeskproTicketCloseSuccess
+          case NOT_FOUND =>
+            logger.warn(s"Deskpro close ticket '$ticketId' failed Not found")
+            DeskproTicketCloseNotFound
+          case _         =>
+            logger.error(s"Deskpro close ticket '$ticketId' failed status: ${response.status}")
+            DeskproTicketCloseFailure
         }
       )
   }

@@ -158,7 +158,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
   "Close a ticket" when {
     "invoke closeTicket" should {
-      "return to the tickets list when ticket deleted successfully" in new Setup with IsLoggedIn {
+      "return to the tickets list when ticket closed successfully" in new Setup with IsLoggedIn {
         TicketServiceMock.CloseTicket.succeeds()
 
         val result = addToken(underTest.closeTicket(ticketId))(request)
@@ -168,7 +168,15 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       }
 
-      "return 500 if ticket delete failed" in new Setup with IsLoggedIn {
+      "return 500 if ticket not found" in new Setup with IsLoggedIn {
+        TicketServiceMock.CloseTicket.notFound()
+
+        val result = addToken(underTest.closeTicket(ticketId))(request)
+
+        status(result) shouldBe INTERNAL_SERVER_ERROR
+      }
+
+      "return 500 if ticket close failed" in new Setup with IsLoggedIn {
         TicketServiceMock.CloseTicket.fails()
 
         val result = addToken(underTest.closeTicket(ticketId))(request)

@@ -106,18 +106,27 @@ object ApiPlatformDeskproStub {
 
     def succeeds(ticketId: Int): StubMapping = {
       stubFor(
-        delete(urlEqualTo(s"/ticket/$ticketId"))
+        post(urlEqualTo(s"/ticket/$ticketId/close"))
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withHeader("content-type", "application/json")
+          )
+      )
+    }
+
+    def notFound(ticketId: Int): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/ticket/$ticketId/close"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
           )
       )
     }
 
     def fails(ticketId: Int, status: Int): StubMapping = {
       stubFor(
-        delete(urlEqualTo(s"/ticket/$ticketId"))
+        post(urlEqualTo(s"/ticket/$ticketId/close"))
           .willReturn(
             aResponse()
               .withStatus(status)

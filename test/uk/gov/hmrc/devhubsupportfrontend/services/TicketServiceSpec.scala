@@ -22,7 +22,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.{DeskproTicketDeleteFailure, DeskproTicketDeleteSuccess}
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.{DeskproTicketCloseFailure, DeskproTicketCloseNotFound, DeskproTicketCloseSuccess}
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.DeskproTicket
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ApiPlatformDeskproConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec
@@ -66,15 +66,23 @@ class TicketServiceSpec extends AsyncHmrcSpec {
 
       val result = await(underTest.closeTicket(ticketId))
 
-      result shouldBe DeskproTicketDeleteSuccess
+      result shouldBe DeskproTicketCloseSuccess
     }
 
-    "return DeskproTicketDeleteFailure if ticket delete failed" in new Setup {
+    "return DeskproTicketCloseNotFound if ticket not found" in new Setup {
+      ApiPlatformDeskproConnectorMock.CloseTicket.notFound()
+
+      val result = await(underTest.closeTicket(ticketId))
+
+      result shouldBe DeskproTicketCloseNotFound
+    }
+
+    "return DeskproTicketCloseFailure if ticket close failed" in new Setup {
       ApiPlatformDeskproConnectorMock.CloseTicket.fails()
 
       val result = await(underTest.closeTicket(ticketId))
 
-      result shouldBe DeskproTicketDeleteFailure
+      result shouldBe DeskproTicketCloseFailure
     }
   }
 
