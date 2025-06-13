@@ -102,6 +102,39 @@ object ApiPlatformDeskproStub {
     }
   }
 
+  object CloseTicket {
+
+    def succeeds(ticketId: Int): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/ticket/$ticketId/close"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+          )
+      )
+    }
+
+    def notFound(ticketId: Int): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/ticket/$ticketId/close"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+    }
+
+    def fails(ticketId: Int, status: Int): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/ticket/$ticketId/close"))
+          .willReturn(
+            aResponse()
+              .withStatus(status)
+          )
+      )
+    }
+  }
+
   object GetTicketsForUser {
 
     def succeeds(emailAddress: LaxEmailAddress): StubMapping = {

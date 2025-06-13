@@ -23,7 +23,12 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.CreateTicketRequest
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.{
+  CreateTicketRequest,
+  DeskproTicketCloseFailure,
+  DeskproTicketCloseNotFound,
+  DeskproTicketCloseSuccess
+}
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.DeskproTicket
 
 trait ApiPlatformDeskproConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
@@ -46,6 +51,21 @@ trait ApiPlatformDeskproConnectorMockModule extends MockitoSugar with ArgumentMa
 
       def succeeds(ticket: Option[DeskproTicket]) = {
         when(aMock.fetchTicket(*, *)).thenReturn(Future.successful(ticket))
+      }
+    }
+
+    object CloseTicket {
+
+      def succeeds() = {
+        when(aMock.closeTicket(*, *)).thenReturn(Future.successful(DeskproTicketCloseSuccess))
+      }
+
+      def notFound() = {
+        when(aMock.closeTicket(*, *)).thenReturn(Future.successful(DeskproTicketCloseNotFound))
+      }
+
+      def fails() = {
+        when(aMock.closeTicket(*, *)).thenReturn(Future.successful(DeskproTicketCloseFailure))
       }
     }
 
