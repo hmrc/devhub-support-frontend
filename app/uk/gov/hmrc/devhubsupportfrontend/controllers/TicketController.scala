@@ -25,7 +25,7 @@ import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.{DeskproTicketCloseFailure, DeskproTicketCloseNotFound, DeskproTicketCloseSuccess}
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.services._
 import uk.gov.hmrc.devhubsupportfrontend.views.html.{TicketListView, TicketView}
@@ -41,6 +41,16 @@ object TicketController {
       "status" -> optional(text)
         .verifying("ticketlist.status.no.choice.field", _.isDefined)
     )(FilterForm.apply)(FilterForm.unapply)
+  )
+
+  case class TicketResponseForm(
+      response: Option[String]
+    )
+
+  val ticketResponseForm: Form[TicketResponseForm] = Form(
+    mapping(
+      "response" -> optional(text).verifying("ticketdetails.response.required", _.isDefined)
+    )(TicketResponseForm.apply)(TicketResponseForm.unapply)
   )
 }
 
@@ -81,7 +91,7 @@ class TicketController @Inject() (
 
   def ticketPage(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
     ticketService.fetchTicket(ticketId).map {
-      case Some(ticket) if ticket.personEmail == request.userSession.developer.email => Ok(ticketView(Some(request.userSession), ticket))
+      case Some(ticket) if ticket.personEmail == request.userSession.developer.email => Ok(ticketView(ticketResponseForm, Some(request.userSession), ticket))
       case _                                                                         => NotFound
     }
   }
@@ -93,5 +103,25 @@ class TicketController @Inject() (
         case DeskproTicketCloseNotFound => InternalServerError
         case DeskproTicketCloseFailure  => InternalServerError
       }
+  }
+
+  def submitTicketResponse(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
+    val requestForm: Form[TicketResponseForm] = ticketResponseForm.bindFromRequest()
+
+    def errors(errors: Form[TicketResponseForm]) =
+      ticketService.fetchTicket(ticketId).map {
+        case Some(ticket) if ticket.personEmail == request.userSession.developer.email => Ok(ticketView(errors, Some(request.userSession), ticket))
+        case _                                                                         => NotFound
+      }
+
+    def handleValidForm(validForm: TicketResponseForm) = {
+      ticketService.createResponse(ticketId, request.email, validForm.response.get).map {
+        case DeskproTicketResponseSuccess  => Redirect(routes.TicketController.ticketListPage().url)
+        case DeskproTicketResponseNotFound => InternalServerError
+        case DeskproTicketResponseFailure  => InternalServerError
+      }
+    }
+
+    requestForm.fold(errors, handleValidForm)
   }
 }

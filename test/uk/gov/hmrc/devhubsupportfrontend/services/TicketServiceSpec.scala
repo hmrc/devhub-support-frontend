@@ -22,7 +22,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.{DeskproTicketCloseFailure, DeskproTicketCloseNotFound, DeskproTicketCloseSuccess}
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.DeskproTicket
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ApiPlatformDeskproConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec
@@ -35,6 +35,7 @@ class TicketServiceSpec extends AsyncHmrcSpec {
 
     val ticketId: Int = 4232
     val userEmail     = LaxEmailAddress("bob@example.com")
+    val message       = "Test message"
 
     val ticket    = DeskproTicket(
       ticketId,
@@ -83,6 +84,32 @@ class TicketServiceSpec extends AsyncHmrcSpec {
       val result = await(underTest.closeTicket(ticketId))
 
       result shouldBe DeskproTicketCloseFailure
+    }
+  }
+
+  "createResponse" should {
+    "create a response for a Deskpro ticket" in new Setup {
+      ApiPlatformDeskproConnectorMock.CreateResponse.succeeds()
+
+      val result = await(underTest.createResponse(ticketId, userEmail, message))
+
+      result shouldBe DeskproTicketResponseSuccess
+    }
+
+    "return DeskproTicketResponseNotFound if ticket not found" in new Setup {
+      ApiPlatformDeskproConnectorMock.CreateResponse.notFound()
+
+      val result = await(underTest.createResponse(ticketId, userEmail, message))
+
+      result shouldBe DeskproTicketResponseNotFound
+    }
+
+    "return DeskproTicketResponseFailure if ticket response failed" in new Setup {
+      ApiPlatformDeskproConnectorMock.CreateResponse.fails()
+
+      val result = await(underTest.createResponse(ticketId, userEmail, message))
+
+      result shouldBe DeskproTicketResponseFailure
     }
   }
 

@@ -135,6 +135,43 @@ object ApiPlatformDeskproStub {
     }
   }
 
+  object CreateResponse {
+
+    def succeeds(ticketId: Int, userEmail: LaxEmailAddress, message: String): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/ticket/$ticketId/response"))
+          .withRequestBody(equalToJson(s"""{
+                                          |  "userEmail": "$userEmail",
+                                          |  "message": "$message"
+                                          |}""".stripMargin))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+          )
+      )
+    }
+
+    def notFound(ticketId: Int): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/ticket/$ticketId/response"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+    }
+
+    def fails(ticketId: Int): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/ticket/$ticketId/response"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+          )
+      )
+    }
+  }
+
   object GetTicketsForUser {
 
     def succeeds(emailAddress: LaxEmailAddress): StubMapping = {

@@ -54,3 +54,4 @@ ticketdetails.field.createdon=Created on
 ticketdetails.field.status=Status
 ticketdetails.field.subject=Subject
 ticketdetails.field.message=Message
+ticketdetails.response.required=Enter a response
