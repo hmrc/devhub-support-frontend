@@ -192,4 +192,64 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       }
     }
   }
+
+  "Submit a response" when {
+    "invoke submitTicketResponse" should {
+      "return to the tickets list when response submitted successfully" in new Setup with IsLoggedIn {
+        val ticketResponseRequest = request
+          .withFormUrlEncodedBody(
+            "response" -> "Test response"
+          )
+
+        TicketServiceMock.FetchTicket.succeeds(Some(ticket))
+        TicketServiceMock.CreateResponse.succeeds()
+
+        val result = addToken(underTest.submitTicketResponse(ticketId))(ticketResponseRequest)
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe "/devhub-support/tickets"
+      }
+
+      "return to the same page with validation error when response not populated" in new Setup with IsLoggedIn {
+        TicketServiceMock.FetchTicket.succeeds(Some(ticket))
+        TicketServiceMock.CreateResponse.succeeds()
+
+        val result = addToken(underTest.submitTicketResponse(ticketId))(request)
+
+        status(result) shouldBe OK
+        contentAsString(result) should include("Enter a response")
+      }
+
+      "return 500 if ticket not found" in new Setup with IsLoggedIn {
+        val ticketResponseRequest = request
+          .withFormUrlEncodedBody(
+            "response" -> "Test response"
+          )
+        TicketServiceMock.CreateResponse.notFound()
+
+        val result = addToken(underTest.submitTicketResponse(ticketId))(ticketResponseRequest)
+
+        status(result) shouldBe INTERNAL_SERVER_ERROR
+      }
+
+      "return 500 if submit response failed" in new Setup with IsLoggedIn {
+        val ticketResponseRequest = request
+          .withFormUrlEncodedBody(
+            "response" -> "Test response"
+          )
+        TicketServiceMock.CreateResponse.fails()
+
+        val result = addToken(underTest.submitTicketResponse(ticketId))(ticketResponseRequest)
+
+        status(result) shouldBe INTERNAL_SERVER_ERROR
+      }
+
+      "redirect to logon page if not logged in" in new Setup with NotLoggedIn {
+        val result = addToken(underTest.submitTicketResponse(ticketId))(request)
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some("/developer/login")
+      }
+    }
+  }
 }

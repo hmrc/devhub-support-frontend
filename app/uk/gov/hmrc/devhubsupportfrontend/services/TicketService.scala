@@ -24,7 +24,7 @@ import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.DeskproTicketCloseResult
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.{DeskproTicketCloseResult, DeskproTicketResponseResult}
 import uk.gov.hmrc.devhubsupportfrontend.domain.models._
 
 @Singleton
@@ -44,5 +44,9 @@ class TicketService @Inject() (
 
   def closeTicket(ticketId: Int)(implicit hc: HeaderCarrier): Future[DeskproTicketCloseResult] = {
     deskproConnector.closeTicket(ticketId, hc)
+  }
+
+  def createResponse(ticketId: Int, userEmail: LaxEmailAddress, message: String)(implicit hc: HeaderCarrier): Future[DeskproTicketResponseResult] = {
+    deskproConnector.createResponse(ticketId, userEmail, message, hc)
   }
 }

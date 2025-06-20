@@ -28,7 +28,7 @@ import play.api.{Application => PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.{DeskproTicketCloseFailure, DeskproTicketCloseNotFound, DeskproTicketCloseSuccess}
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{DeskproMessage, DeskproTicket}
 import uk.gov.hmrc.devhubsupportfrontend.stubs.ApiPlatformDeskproStub
 import uk.gov.hmrc.devhubsupportfrontend.utils.WireMockExtensions
@@ -155,6 +155,35 @@ class ApiPlatformDeskproConnectorIntegrationSpec
       val result = await(underTest.closeTicket(ticketId, hc))
 
       result shouldBe DeskproTicketCloseFailure
+    }
+  }
+
+  "createResponse" should {
+    val ticketId: Int = 3432
+    val userEmail     = LaxEmailAddress("bob@example.com")
+
+    "create a ticket response" in new Setup {
+      ApiPlatformDeskproStub.CreateResponse.succeeds(ticketId, userEmail, message)
+
+      val result = await(underTest.createResponse(ticketId, userEmail, message, hc))
+
+      result shouldBe DeskproTicketResponseSuccess
+    }
+
+    "fail when the ticket to respond to is not found" in new Setup {
+      ApiPlatformDeskproStub.CreateResponse.notFound(ticketId)
+
+      val result = await(underTest.createResponse(ticketId, userEmail, message, hc))
+
+      result shouldBe DeskproTicketResponseNotFound
+    }
+
+    "fail when the ticket respond call returns an error" in new Setup {
+      ApiPlatformDeskproStub.CreateResponse.fails(ticketId)
+
+      val result = await(underTest.createResponse(ticketId, userEmail, message, hc))
+
+      result shouldBe DeskproTicketResponseFailure
     }
   }
 
