@@ -124,12 +124,13 @@ class SupportService @Inject() (
       }
     }
 
+    val supportReason = deriveSupportReason()
     ApiPlatformDeskproConnector.CreateTicketRequest(
       fullName = fullName,
       email = email,
-      subject = "HMRC Developer Hub: Support Enquiry",
+      subject = supportReason,
       message = messageContents,
-      supportReason = Some(deriveSupportReason()),
+      supportReason = Some(supportReason),
       apiName = supportFlow.api
     )
   }
