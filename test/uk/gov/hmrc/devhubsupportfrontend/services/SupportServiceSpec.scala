@@ -128,7 +128,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       val createTicketRequest: CreateTicketRequest = CreateTicketRequest(
         fullName = fullName,
         email = email,
-        subject = "HMRC Developer Hub: Support Enquiry",
+        subject = SupportData.FindingAnApi.text,
         message = details,
         supportReason = Some(SupportData.FindingAnApi.text)
       )
@@ -167,7 +167,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       val createTicketRequest = CreateTicketRequest(
         fullName = fullName,
         email = email,
-        subject = "HMRC Developer Hub: Support Enquiry",
+        subject = SupportData.MakingAnApiCall.text,
         message = details,
         apiName = Some(apiName),
         supportReason = Some(SupportData.MakingAnApiCall.text)
@@ -210,7 +210,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       val createTicketRequest = CreateTicketRequest(
         fullName = fullName,
         email = email,
-        subject = "HMRC Developer Hub: Support Enquiry",
+        subject = SupportData.PrivateApiDocumentation.text,
         message = details,
         supportReason = Some(SupportData.PrivateApiDocumentation.text),
         organisation = Some(organisation),
