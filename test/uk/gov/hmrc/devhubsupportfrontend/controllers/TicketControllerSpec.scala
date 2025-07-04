@@ -126,7 +126,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         status(result) shouldBe OK
         contentAsString(result) should include("SDST-2025XON927")
         contentAsString(result) should include("HMRC Developer Hub: Support Enquiry")
-        contentAsString(result) should include("Awaiting user")
+        contentAsString(result) should include("We need your reply")
         contentAsString(result) should include("Test message contents")
       }
 
