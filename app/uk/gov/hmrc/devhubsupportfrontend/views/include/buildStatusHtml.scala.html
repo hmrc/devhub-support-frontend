@@ -16,5 +16,11 @@
 
 @(status: String)  
   @{
-    status.replace('_', ' ').capitalize
+    status.split("\\.").headOption match {
+      case Some("awaiting_agent") => <strong class="govuk-tag govuk-tag--blue">We're working on it</strong>
+      case Some("pending")        => <strong class="govuk-tag govuk-tag--blue">We're working on it</strong>
+      case Some("awaiting_user")  => <strong class="govuk-tag govuk-tag--red">We need your reply</strong>
+      case Some("resolved")       => <strong class="govuk-tag govuk-tag--green">Resolved</strong>
+      case _                      => <strong class="govuk-tag">{status.replace('_', ' ').capitalize}</strong>
+    } 
   }
