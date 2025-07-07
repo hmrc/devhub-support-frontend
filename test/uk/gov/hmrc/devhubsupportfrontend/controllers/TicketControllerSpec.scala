@@ -128,6 +128,17 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         contentAsString(result) should include("HMRC Developer Hub: Support Enquiry")
         contentAsString(result) should include("Awaiting user")
         contentAsString(result) should include("Test message contents")
+        contentAsString(result) should include("Close this support request")
+      }
+
+      "hide the close button when ticket is resolved" in new Setup with IsLoggedIn {
+        TicketServiceMock.FetchTicket.succeeds(Some(ticket.copy(status = "resolved")))
+
+        val result = addToken(underTest.ticketPage(ticketId))(request)
+
+        status(result) shouldBe OK
+        contentAsString(result) should include("SDST-2025XON927")
+        contentAsString(result) should not include ("Close this support request")
       }
 
       "return 404 if ticket not found" in new Setup with IsLoggedIn {
