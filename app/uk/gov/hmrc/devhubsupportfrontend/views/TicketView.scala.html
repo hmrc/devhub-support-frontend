@@ -59,13 +59,15 @@
           )
       ))
 
-      <div class="govuk-button-group">
-          @govukButton(Button(
-              id = Some("closeTicket"),
-              isStartButton = false,
-              content = Text("Close this support request"),
-              href=Some(uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.closeTicket(ticket.id).url)))
-      </div>
+      @if(ticket.status != "resolved") {
+          <div class="govuk-button-group">
+              @govukButton(Button(
+                        id = Some("closeTicket"),
+                        isStartButton = false,
+                        content = Text("Close this support request"),
+                        href=Some(uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.closeTicket(ticket.id).url)))
+          </div>
+      }
 
       @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.submitTicketResponse(ticket.id)) {
           @helper.CSRF.formField
