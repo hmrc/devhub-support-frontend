@@ -53,7 +53,9 @@
           rows = Seq(
             Seq(TableRow(content = Text(messages("ticketdetails.field.reference"))), TableRow(content = Text(ticket.ref))),
             Seq(TableRow(content = Text(messages("ticketdetails.field.createdby"))), TableRow(content = Text(ticket.personEmail.text))),
-            Seq(TableRow(content = Text(messages("ticketdetails.field.createdon"))), TableRow(content = Text(dateFormatter.format(ticket.dateCreated.atOffset(ZoneOffset.UTC).toLocalDateTime)))),
+            Seq(TableRow(content = Text(messages("ticketdetails.field.datecreated"))), TableRow(content = Text(dateFormatter.format(ticket.dateCreated.atOffset(ZoneOffset.UTC).toLocalDateTime)))),
+            Seq(TableRow(content = Text(messages("ticketdetails.field.datelastupdated"))), TableRow(content = Text(dateFormatter.format(ticket.dateLastUpdated.atOffset(ZoneOffset.UTC).toLocalDateTime)))),
+            Seq(TableRow(content = Text(messages("ticketdetails.field.dateresolved"))), TableRow(content = Text(if (ticket.dateResolved.isDefined) {dateFormatter.format(ticket.dateResolved.get.atOffset(ZoneOffset.UTC).toLocalDateTime)} else ""))),
             Seq(TableRow(content = Text(messages("ticketdetails.field.status"))), TableRow(content = HtmlContent(buildStatusHtml(ticket.status)))),
             Seq(TableRow(content = Text(messages("ticketdetails.field.subject"))), TableRow(content = Text(ticket.subject)))
           )
