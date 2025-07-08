@@ -84,8 +84,10 @@ class ApiPlatformDeskproConnectorIntegrationSpec
   "fetchTicket" should {
     val ticketId: Int = 3432
     "return a ticket" in new Setup {
-      val ticketCreatedDate: Instant   = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-01T08:02:02Z"))
-      val dateLastAgentReply: Instant  = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-20T07:24:41Z"))
+      val ticketCreatedDate: Instant = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-01T08:02:02Z"))
+      val dateLastUpdated: Instant   = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-20T07:24:41Z"))
+      val dateResolved: Instant      = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-23T09:27:46Z"))
+
       val message1CreatedDate: Instant = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-01T08:02:02Z"))
       val message2CreatedDate: Instant = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-19T11:54:53Z"))
 
@@ -102,7 +104,8 @@ class ApiPlatformDeskproConnectorIntegrationSpec
         LaxEmailAddress("bob@example.com"),
         "awaiting_user",
         ticketCreatedDate,
-        Some(dateLastAgentReply),
+        dateLastUpdated,
+        Some(dateResolved),
         "HMRC Developer Hub: Support Enquiry",
         List(message1, message2)
       )
@@ -191,9 +194,10 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     val userEmail = LaxEmailAddress("bob@example.com")
 
     "return a ticket" in new Setup {
-      val ticket1CreatedDate: Instant        = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-01T08:02:02Z"))
-      val ticket1DateLastAgentReply: Instant = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-20T07:24:41Z"))
-      val ticket2CreatedDate: Instant        = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2024-09-17T08:11:10Z"))
+      val ticket1CreatedDate: Instant     = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-01T08:02:02Z"))
+      val ticket1DateLastUpdated: Instant = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2025-05-20T07:24:41Z"))
+      val ticket2CreatedDate: Instant     = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2024-09-17T08:11:10Z"))
+      val ticket2DateLastUpdated: Instant = Instant.from(DateTimeFormatter.ISO_INSTANT.parse("2024-11-20T07:27:46Z"))
 
       ApiPlatformDeskproStub.GetTicketsForUser.succeeds(userEmail)
 
@@ -206,7 +210,8 @@ class ApiPlatformDeskproConnectorIntegrationSpec
         LaxEmailAddress("bob@example.com"),
         "awaiting_user",
         ticket1CreatedDate,
-        Some(ticket1DateLastAgentReply),
+        ticket1DateLastUpdated,
+        None,
         "HMRC Developer Hub: Support Enquiry",
         List.empty
       )
@@ -217,6 +222,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
         LaxEmailAddress("bob@example.com"),
         "awaiting_agent",
         ticket2CreatedDate,
+        ticket2DateLastUpdated,
         None,
         "HMRC Developer Hub: Support Enquiry",
         List.empty

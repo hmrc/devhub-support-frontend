@@ -66,7 +66,8 @@ object ApiPlatformDeskproStub {
                           |  "personEmail": "bob@example.com",
                           |  "status": "awaiting_user",
                           |  "dateCreated": "2025-05-01T08:02:02Z",
-                          |  "dateLastAgentReply": "2025-05-20T07:24:41Z",
+                          |  "dateLastUpdated": "2025-05-20T07:24:41Z",
+                          |  "dateResolved": "2025-05-23T09:27:46Z",
                           |  "subject": "HMRC Developer Hub: Support Enquiry",
                           |  "messages": [
                           |    {
@@ -196,7 +197,7 @@ object ApiPlatformDeskproStub {
                           |    "personEmail": "bob@example.com",
                           |    "status": "awaiting_user",
                           |    "dateCreated": "2025-05-01T08:02:02Z",
-                          |    "dateLastAgentReply": "2025-05-20T07:24:41Z",
+                          |    "dateLastUpdated": "2025-05-20T07:24:41Z",
                           |    "subject": "HMRC Developer Hub: Support Enquiry",
                           |    "messages": []
                           |  },
@@ -207,6 +208,7 @@ object ApiPlatformDeskproStub {
                           |    "personEmail": "bob@example.com",
                           |    "status": "awaiting_agent",
                           |    "dateCreated": "2024-09-17T08:11:10Z",
+                          |    "dateLastUpdated": "2024-11-20T07:27:46Z",
                           |    "subject": "HMRC Developer Hub: Support Enquiry",
                           |    "messages": []
                           |  }
