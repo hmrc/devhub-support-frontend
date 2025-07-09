@@ -42,7 +42,8 @@ case class DeskproTicket(
     personEmail: LaxEmailAddress,
     status: String,
     dateCreated: Instant,
-    dateLastAgentReply: Option[Instant],
+    dateLastUpdated: Instant,
+    dateResolved: Option[Instant],
     subject: String,
     messages: List[DeskproMessage]
   )

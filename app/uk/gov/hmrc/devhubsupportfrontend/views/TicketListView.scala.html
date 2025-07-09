@@ -35,7 +35,7 @@
 @(form: Form[FilterForm], loggedInSession: Option[UserSession], tickets: List[DeskproTicket])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @buildTicketLinkHtml(t: DeskproTicket) = {
-  <a href='@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketPage(t.id)' class='govuk-link govuk-link--no-visited-state'>@{t.ref}</a>
+  <a href='@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketPage(t.id)' class='govuk-link govuk-link--no-visited-state'>@{t.subject}<BR>@{t.ref}</a>
 }
 
 @layout(
@@ -67,16 +67,18 @@
     </div>
   }
 
-  @govukTable(Table(
-    head = Some(Seq(
-      HeadCell(content = Text(messages("ticketlist.column.reference"))),
-      HeadCell(content = Text(messages("ticketlist.column.status"))),
-      HeadCell(content = Text(messages("ticketlist.column.subject")))
-    )),
-    rows = tickets.map(ticket => Seq(
-      TableRow(content = HtmlContent(buildTicketLinkHtml(ticket))),
-      TableRow(content = HtmlContent(buildStatusHtml(ticket.status))),
-      TableRow(content = Text(ticket.subject))
+  @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm")) { dateFormatter =>
+    @govukTable(Table(
+      head = Some(Seq(
+        HeadCell(content = Text(messages("ticketlist.column.subject"))),
+        HeadCell(content = Text(messages("ticketlist.column.lastupdated"))),
+        HeadCell(content = Text(messages("ticketlist.column.status")))
+      )),
+      rows = tickets.map(ticket => Seq(
+        TableRow(content = HtmlContent(buildTicketLinkHtml(ticket))),
+        TableRow(content = Text(dateFormatter.format(ticket.dateLastUpdated.atOffset(ZoneOffset.UTC).toLocalDateTime))),
+        TableRow(content = HtmlContent(buildStatusHtml(ticket.status)))
+      ))
     ))
-  ))
+  }  
 }

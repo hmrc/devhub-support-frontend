@@ -44,6 +44,7 @@ class TicketServiceSpec extends AsyncHmrcSpec {
       LaxEmailAddress("bob@example.com"),
       "awaiting_user",
       instant,
+      instant,
       Some(instant),
       "HMRC Developer Hub: Support Enquiry",
       List.empty
