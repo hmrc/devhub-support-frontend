@@ -93,12 +93,12 @@
           @govukButton(
               Button(
                   id = Some("continue"),
-                  content = Text("Submit")
+                  content = if(ticket.status == "resolved") Text("Reopen") else Text("Submit")
               )
           )
       }
       @hmrcTimeline(Timeline(
-        events = ticket.messages.filter(t => t.isAgentNote == false).map(message => 
+        events = ticket.messages.filter(t => !t.isAgentNote).map(message =>
           Event(
             title = messages("ticketdetails.field.message"),
             content = "<p class='govuk-body'>" + message.message + "</p>", 
