@@ -24,6 +24,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.{CharacterCount => CC}
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.TicketResponseForm
 
+@import java.time.ZoneId
 @import java.time.ZoneOffset
 @import java.time.format.DateTimeFormatter
 
@@ -46,15 +47,15 @@
 ) {
   <h1 class="govuk-heading-l">@{ticket.subject} - @{ticket.ref}</h1>
 
-  @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm")) { dateFormatter =>
+  @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm").withZone(ZoneId.systemDefault())) { dateFormatter =>
       @govukTable(Table(
           firstCellIsHeader = true,
           rows = Seq(
             Seq(TableRow(content = Text(messages("ticketdetails.field.status"))), TableRow(content = HtmlContent(buildStatusHtml(ticket.status)))),
             Seq(TableRow(content = Text(messages("ticketdetails.field.createdby"))), TableRow(content = Text(ticket.personEmail.text))),
-            Seq(TableRow(content = Text(messages("ticketdetails.field.datecreated"))), TableRow(content = Text(dateFormatter.format(ticket.dateCreated.atOffset(ZoneOffset.UTC).toLocalDateTime)))),
-            Seq(TableRow(content = Text(messages("ticketdetails.field.datelastupdated"))), TableRow(content = Text(dateFormatter.format(ticket.dateLastUpdated.atOffset(ZoneOffset.UTC).toLocalDateTime)))),
-            Seq(TableRow(content = Text(messages("ticketdetails.field.dateresolved"))), TableRow(content = Text(if (ticket.dateResolved.isDefined) {dateFormatter.format(ticket.dateResolved.get.atOffset(ZoneOffset.UTC).toLocalDateTime)} else "")))
+            Seq(TableRow(content = Text(messages("ticketdetails.field.datecreated"))), TableRow(content = Text(dateFormatter.format(ticket.dateCreated)))),
+            Seq(TableRow(content = Text(messages("ticketdetails.field.datelastupdated"))), TableRow(content = Text(dateFormatter.format(ticket.dateLastUpdated)))),
+            Seq(TableRow(content = Text(messages("ticketdetails.field.dateresolved"))), TableRow(content = Text(if (ticket.dateResolved.isDefined) {dateFormatter.format(ticket.dateResolved.get)} else "")))
           )
       ))
 
@@ -102,7 +103,7 @@
           Event(
             title = messages("ticketdetails.field.message"),
             content = "<p class='govuk-body'>" + message.message + "</p>", 
-            time = dateFormatter.format(message.dateCreated.atOffset(ZoneOffset.UTC).toLocalDateTime)
+            time = dateFormatter.format(message.dateCreated)
           )
         )
       ))
