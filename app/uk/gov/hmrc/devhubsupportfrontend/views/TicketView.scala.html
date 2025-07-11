@@ -47,7 +47,7 @@
 ) {
   <h1 class="govuk-heading-l">@{ticket.subject} - @{ticket.ref}</h1>
 
-  @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm").withZone(ZoneId.systemDefault())) { dateFormatter =>
+  @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm").withZone(ZoneId.of("Europe/London"))) { dateFormatter =>
       @govukTable(Table(
           firstCellIsHeader = true,
           rows = Seq(
