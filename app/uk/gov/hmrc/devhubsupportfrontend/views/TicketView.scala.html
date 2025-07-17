@@ -18,7 +18,7 @@
 
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
-@import uk.gov.hmrc.devhubsupportfrontend.domain.models.DeskproTicket
+@import uk.gov.hmrc.devhubsupportfrontend.domain.models.{DeskproTicket, DeskproMessage}
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.{CharacterCount => CC}
@@ -40,6 +40,10 @@
 
 @(form: Form[TicketResponseForm], loggedInSession: Option[UserSession], ticket: DeskproTicket)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
+@buildHistoryLinkHtml(text: String) = {
+  <a href='#history' class='govuk-link govuk-link--no-visited-state'>@{text}</a>
+}
+
 @layout(
   pageTitle = "Your support request",
   backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
@@ -47,28 +51,35 @@
 ) {
   <h1 class="govuk-heading-l">@{ticket.subject} - @{ticket.ref}</h1>
 
-  @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm").withZone(ZoneId.of("Europe/London"))) { dateFormatter =>
+  @defining(DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mm a").withZone(ZoneId.of("Europe/London"))) { dateFormatter =>
       @govukTable(Table(
           firstCellIsHeader = true,
           rows = Seq(
             Seq(TableRow(content = Text(messages("ticketdetails.field.status"))), TableRow(content = HtmlContent(buildStatusHtml(ticket.status)))),
-            Seq(TableRow(content = Text(messages("ticketdetails.field.createdby"))), TableRow(content = Text(ticket.personEmail.text))),
+            Seq(TableRow(content = Text(messages("ticketdetails.field.datelastupdated"))), TableRow(content = HtmlContent(buildHistoryLinkHtml(dateFormatter.format(ticket.dateLastUpdated))))),
             Seq(TableRow(content = Text(messages("ticketdetails.field.datecreated"))), TableRow(content = Text(dateFormatter.format(ticket.dateCreated)))),
-            Seq(TableRow(content = Text(messages("ticketdetails.field.datelastupdated"))), TableRow(content = Text(dateFormatter.format(ticket.dateLastUpdated)))),
             Seq(TableRow(content = Text(messages("ticketdetails.field.dateresolved"))), TableRow(content = Text(if (ticket.dateResolved.isDefined) {dateFormatter.format(ticket.dateResolved.get)} else "")))
           )
       ))
 
-      @if(ticket.status != "resolved") {
+      @if(ticket.status == "resolved") {
+          <div class="govuk-inset-text">
+              @{messages("ticketdetails.resolvedticketmessage1")}
+              <BR>
+              @{messages("ticketdetails.resolvedticketmessage2")}
+          </div> 
+      } else {
           <div class="govuk-button-group">
               @govukButton(Button(
                         id = Some("closeTicket"),
                         isStartButton = false,
-                        content = Text("Close this support request"),
+                        content = Text(messages("ticketdetails.button.close")),
                         href=Some(uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.closeTicket(ticket.id).url)))
           </div>
       }
 
+      <h2 id="history" class="govuk-heading-l govuk-!-margin-bottom-6 govuk-!-margin-top-9">@{messages("ticketdetails.messagehistory")}</h2>
+       
       @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.submitTicketResponse(ticket.id)) {
           @helper.CSRF.formField
 
@@ -78,15 +89,10 @@
               label = Label(
                   isPageHeading = true,
                   classes = "govuk-label--s",
-                  content = Text("Submit a response")
+                  content = Text(messages("ticketdetails.field.addamessage"))
               ),
               value=form("response").value,
               maxLength = Some(3000),
-              hint = Some(
-                  Hint(
-                      content = Text("Do not include personal or financial information, like your National Insurance number or credit card details.")
-                  )
-              ),
               errorMessage = form.error("response").map(e => ErrorMessage(content = Text(messages(e.message))))
           )
           )
@@ -94,15 +100,15 @@
           @govukButton(
               Button(
                   id = Some("continue"),
-                  content = if(ticket.status == "resolved") Text("Reopen") else Text("Submit")
+                  content = Text(messages("ticketdetails.button.sendmessage"))
               )
           )
       }
       @hmrcTimeline(Timeline(
         events = ticket.messages.filter(t => !t.isAgentNote).map(message =>
           Event(
-            title = messages("ticketdetails.field.message"),
-            content = "<p class='govuk-body'>" + message.message + "</p>", 
+            title = if (ticket.person == message.person) "By HMRC Software Developers Support Team (SDST)" else "By " + loggedInSession.map(_.developer.displayedName).getOrElse("you"),
+            content = "<h3 class='govuk-heading-s govuk-!-margin-bottom-2'>Message</h3><p class='govuk-body'>" + message.message + "</p>", 
             time = dateFormatter.format(message.dateCreated)
           )
         )
