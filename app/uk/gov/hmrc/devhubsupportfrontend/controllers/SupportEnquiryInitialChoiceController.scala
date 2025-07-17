@@ -42,6 +42,16 @@ class SupportEnquiryInitialChoiceController @Inject() (
   ) extends AbstractController(mcc) {
 
   def page(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
+    if (fullyloggedInDeveloper(request).isDefined) {
+      // If user is logged on then redirect to the list of tickets for that user
+      Future.successful(Redirect(routes.TicketController.ticketListPage()))
+    } else {
+      // Else redirect to the create ticket page
+      Future.successful(Redirect(routes.SupportEnquiryInitialChoiceController.startPage()))
+    }
+  }
+
+  def startPage(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
     Future.successful(Ok(supportEnquiryInitialChoiceView(fullyloggedInDeveloper, SupportEnquiryInitialChoiceForm.form)))
   }
 
