@@ -18,15 +18,15 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
-
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
+import uk.gov.hmrc.devhubsupportfrontend.connectors.{ThirdPartyDeveloperConnector, UpscanInitiateConnector, UpscanInitiateRequest}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.UploadId
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services.{UpscanFileReference, UpscanInitiateResponse}
 import uk.gov.hmrc.devhubsupportfrontend.services._
 import uk.gov.hmrc.devhubsupportfrontend.views.html.{TicketListView, TicketView}
 
@@ -60,6 +60,7 @@ class TicketController @Inject() (
     val cookieSigner: CookieSigner,
     val errorHandler: ErrorHandler,
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
+    upscanInitiateConnector: UpscanInitiateConnector,
     ticketService: TicketService,
     ticketListView: TicketListView,
     ticketView: TicketView
@@ -90,10 +91,14 @@ class TicketController @Inject() (
   }
 
   def ticketPage(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
-    ticketService.fetchTicket(ticketId).map {
-      case Some(ticket) if ticket.personEmail == request.userSession.developer.email => Ok(ticketView(ticketResponseForm, Some(request.userSession), ticket))
-      case _                                                                         => NotFound
-    }
+    val successRedirectUrl = "http://localhost:9695/devhub-support/ticket/3949"
+    val errorRedirectUrl   = routes.TicketController.ticketListPage().url
+
+    for {
+      ticket <- ticketService.fetchTicket(ticketId)
+      upscanInitiateResponse <- upscanInitiateConnector.initiate(Some(successRedirectUrl), Some(errorRedirectUrl))
+    } yield Ok(ticketView(ticketResponseForm, Some(request.userSession), ticket.get, upscanInitiateResponse))
+
   }
 
   def closeTicket(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
@@ -110,7 +115,7 @@ class TicketController @Inject() (
 
     def errors(errors: Form[TicketResponseForm]) =
       ticketService.fetchTicket(ticketId).map {
-        case Some(ticket) if ticket.personEmail == request.userSession.developer.email => Ok(ticketView(errors, Some(request.userSession), ticket))
+        case Some(ticket) if ticket.personEmail == request.userSession.developer.email => Ok(ticketView(errors, Some(request.userSession), ticket, UpscanInitiateResponse(UpscanFileReference(""), "", Map.empty)))
         case _                                                                         => NotFound
       }
 

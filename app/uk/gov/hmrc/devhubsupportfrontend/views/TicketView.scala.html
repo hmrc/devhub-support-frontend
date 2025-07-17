@@ -23,6 +23,9 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.{CharacterCount => CC}
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.TicketResponseForm
+@import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services._
+@import play.api.mvc.RequestHeader
+@import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services._
 
 @import java.time.ZoneId
 @import java.time.ZoneOffset
@@ -38,7 +41,7 @@
 )
 
 
-@(form: Form[TicketResponseForm], loggedInSession: Option[UserSession], ticket: DeskproTicket)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(form: Form[TicketResponseForm], loggedInSession: Option[UserSession], ticket: DeskproTicket, upscanInitiateResponse: UpscanInitiateResponse)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @buildHistoryLinkHtml(text: String) = {
   <a href='#history' class='govuk-link govuk-link--no-visited-state'>@{text}</a>
@@ -104,6 +107,36 @@
               )
           )
       }
+
+
+      <form action="@upscanInitiateResponse.postTarget" method="post" enctype="multipart/form-data">
+
+          @for(field <- upscanInitiateResponse.formFields) {
+              <input type="hidden" name="@field._1" value="@field._2"/>
+          }
+
+      <div class="js-visible mt-3">
+
+          <div class="govuk-form-group">
+              <label class="govuk-label" for="file-input">
+                  <span class="">File to upload</span>
+              </label>
+              <input
+              type="file"
+              id="file-input"
+              name="file"
+              class="govuk-file-upload"
+              accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpeg,.jpg,.txt"
+              />
+          </div>
+
+      </div>
+
+      <div class="section">
+          <button id="submit" class="govuk-button"> Upload </button>
+      </div>
+      </form>
+
       @hmrcTimeline(Timeline(
         events = ticket.messages.filter(t => !t.isAgentNote).map(message =>
           Event(
