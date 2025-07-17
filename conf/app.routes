@@ -3,7 +3,8 @@
 ->          /hmrc-frontend                                  hmrcfrontend.Routes
 
 GET         /                                               uk.gov.hmrc.devhubsupportfrontend.controllers.SupportEnquiryInitialChoiceController.page()
-POST        /                                               uk.gov.hmrc.devhubsupportfrontend.controllers.SupportEnquiryInitialChoiceController.submit()
+GET         /start                                          uk.gov.hmrc.devhubsupportfrontend.controllers.SupportEnquiryInitialChoiceController.startPage()
+POST        /start                                          uk.gov.hmrc.devhubsupportfrontend.controllers.SupportEnquiryInitialChoiceController.submit()
 GET         /api/choose-api                                 uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithUsingAnApiController.page()
 POST        /api/choose-api                                 uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithUsingAnApiController.submit()
 GET         /api/private-api                                uk.gov.hmrc.devhubsupportfrontend.controllers.ChooseAPrivateApiController.page()

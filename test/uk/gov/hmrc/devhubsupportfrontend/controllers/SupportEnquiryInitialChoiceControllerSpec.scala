@@ -61,9 +61,25 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
   }
 
   "SupportEnquiryController" when {
+    "invoking landing page" should {
+      "redirect to list of tickets for logged on user" in new Setup {
+        val result = addToken(underTest.page())(request)
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some("/devhub-support/tickets")
+      }
+
+      "redirect to start new ticket for not logged on user" in new Setup {
+        val result = addToken(underTest.page())(FakeRequest())
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some("/devhub-support/start")
+      }
+    }
+
     "invoking page for new support" should {
       "render the new support enquiry initial choice page" in new Setup {
-        val result = addToken(underTest.page())(request)
+        val result = addToken(underTest.startPage())(request)
 
         status(result) shouldBe OK
         val dom = Jsoup.parse(contentAsString(result))
@@ -73,10 +89,9 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
         dom.getElementById(SupportData.SigningIn.id).attr("value") shouldEqual SupportData.SigningIn.id
         dom.getElementById(SupportData.SettingUpApplication.id).attr("value") shouldEqual SupportData.SettingUpApplication.id
       }
-
     }
 
-    "invovking submit" should {
+    "invoking submit" should {
       "redirect to the new help with using an api page when the 'Using an API' option is selected" in new Setup {
         val formRequest = request
           .withFormUrlEncodedBody("initialChoice" -> SupportData.UsingAnApi.id)
