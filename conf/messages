@@ -51,7 +51,6 @@ ticketdetails.field.datelastupdated=Last updated
 ticketdetails.field.dateresolved=Resolved date
 ticketdetails.field.status=Status
 ticketdetails.field.message=Message
-ticketdetails.field.by=By
 ticketdetails.field.addamessage=Add a Message
 ticketdetails.button.close=Close this support request
 ticketdetails.button.sendmessage=Send message

@@ -107,7 +107,7 @@
       @hmrcTimeline(Timeline(
         events = ticket.messages.filter(t => !t.isAgentNote).map(message =>
           Event(
-            title = if (ticket.person == message.person) "By HMRC Software Developers Support Team (SDST)" else "By " + loggedInSession.map(_.developer.displayedName).getOrElse("you"),
+            title = if (ticket.person == message.person) "By " + loggedInSession.map(_.developer.displayedName).getOrElse("you") else "By HMRC Software Developers Support Team (SDST)",
             content = "<h3 class='govuk-heading-s govuk-!-margin-bottom-2'>Message</h3><p class='govuk-body'>" + message.message + "</p>", 
             time = dateFormatter.format(message.dateCreated)
           )
