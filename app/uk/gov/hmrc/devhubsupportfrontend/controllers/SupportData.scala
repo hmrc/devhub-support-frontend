@@ -25,7 +25,7 @@ object SupportData {
 
   case object FindingAnApi extends PrimaryChoice {
     val id   = "finding-an-api"
-    val text = "Finding the API needed to build my software"
+    val text = "Finding an API to build my software"
   }
 
   case object UsingAnApi extends PrimaryChoice {
@@ -40,7 +40,7 @@ object SupportData {
 
   case object SettingUpApplication extends PrimaryChoice {
     val id   = "setting-up-application"
-    val text = "Setting up or managing an application"
+    val text = "Setting up or managing a software application"
   }
 
   case object NoneOfTheAbove extends PrimaryChoice {
