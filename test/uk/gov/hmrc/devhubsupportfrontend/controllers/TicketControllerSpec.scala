@@ -101,7 +101,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       "render the ticket list page" in new Setup with IsLoggedIn {
         TicketServiceMock.GetTicketsForUser.succeeds(List(ticket))
 
-        val result = addToken(underTest.ticketListPage())(request)
+        val result = addToken(underTest.ticketListPage(false))(request)
 
         status(result) shouldBe OK
         contentAsString(result) should include("SDST-2025XON927")
@@ -109,7 +109,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       }
 
       "redirect to logon page if not logged in" in new Setup with NotLoggedIn {
-        val result = addToken(underTest.ticketListPage())(request)
+        val result = addToken(underTest.ticketListPage(false))(request)
 
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe Some("/developer/login")

@@ -37,11 +37,13 @@ emailaddress.error.maxLength.field=Provide an email address with fewer than 320 
 emailaddress.error.maxLength.global=Provide an email address with fewer than 320 characters
 
 ticketlist.title=Your support requests
-ticketlist.subtitle=Developer Hub support
+ticketlist.subtitle=Support
 ticketlist.status.no.choice.field=Please select open or resolved requests to view
-ticketlist.status.open=Open
+ticketlist.status.unresolved=Unresolved
 ticketlist.status.resolved=Resolved
-ticketlist.status.show=Show
+ticketlist.button.create=Create a support request
+ticketlist.table.resolved=Resolved support requests
+ticketlist.table.unresolved=Unresolved support requests
 ticketlist.column.lastupdated=Last updated
 ticketlist.column.status=Status
 ticketlist.column.subject=Subject

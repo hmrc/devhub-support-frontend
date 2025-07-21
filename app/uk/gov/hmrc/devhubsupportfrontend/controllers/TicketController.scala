@@ -69,24 +69,9 @@ class TicketController @Inject() (
 
   import TicketController._
 
-  def ticketListPage(): Action[AnyContent] = loggedInAction { implicit request =>
-    def doSearch(form: FilterForm) = {
-      val getResolvedTickets = (form.status == Some("resolved"))
-      val queryForm          = filterForm.fill(form)
-
-      ticketService.getTicketsForUser(request.userSession.developer.email, getResolvedTickets).map(tickets => Ok(ticketListView(queryForm, Some(request.userSession), tickets)))
-    }
-
-    def handleValidForm(form: FilterForm) = {
-      doSearch(form)
-    }
-
-    def handleInvalidForm(form: Form[FilterForm]) = {
-      val defaultForm = FilterForm()
-      doSearch(defaultForm)
-    }
-
-    filterForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
+  def ticketListPage(resolved: Boolean): Action[AnyContent] = loggedInAction { implicit request =>
+    ticketService.getTicketsForUser(request.userSession.developer.email, resolved)
+      .map(tickets => Ok(ticketListView(resolved, Some(request.userSession), tickets)))
   }
 
   def ticketPage(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>

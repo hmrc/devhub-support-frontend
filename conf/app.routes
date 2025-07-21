@@ -24,7 +24,7 @@ GET         /app                                            uk.gov.hmrc.devhubsu
 POST        /app                                            uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithApplicationsController.submit()
 GET         /app/giving-team-member-access                  uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithApplicationsController.givingTeamMembersAccess()
 
-GET         /tickets                                        uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketListPage()
+GET         /tickets                                        uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketListPage(resolved: Boolean ?=false)
 GET         /ticket/:tid                                    uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketPage(tid: Int)
 GET         /ticket/:tid/close                              uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.closeTicket(tid: Int)
 POST        /ticket/:tid/response                           uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.submitTicketResponse(tid: Int)
