@@ -31,8 +31,7 @@ case class DeskproMessage(
   )
 
 object DeskproMessage {
-  implicit val format: OFormat[DeskproMessage]    = Json.format[DeskproMessage]
-  implicit val ordering: Ordering[DeskproMessage] = Ordering.by[DeskproMessage, Instant](_.dateCreated).reverse
+  implicit val format: OFormat[DeskproMessage] = Json.format[DeskproMessage]
 }
 
 case class DeskproTicket(
