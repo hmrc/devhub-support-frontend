@@ -39,7 +39,7 @@
 @buildTicketLinkHtml(t: DeskproTicket) = {
     <a href='@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketPage(t.id)' class='govuk-link govuk-link--no-visited-state'>@{
         t.subject
-    } <BR>@{
+    } <br>@{
         t.ref
     }</a>
 }
@@ -60,18 +60,18 @@
             <li class='@{
                 s"govuk-tabs__list-item${if(!resolved) " govuk-tabs__list-item--selected" else ""}"
             }'>
-                <a class="govuk-tabs__tab" href=@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketListPage()>@messages("ticketlist.status.unresolved")</a>
+                <a class="govuk-tabs__tab" id="unresolved-tab" href=@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketListPage()>@messages("ticketlist.status.unresolved")</a>
             </li>
             <li class='@{
                 s"govuk-tabs__list-item${if(resolved) " govuk-tabs__list-item--selected" else ""}"
             }'>
-                <a class="govuk-tabs__tab" href=@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketListPage(true)>@messages("ticketlist.status.resolved")</a>
+                <a class="govuk-tabs__tab" id="resolved-tab" href=@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketListPage(true)>@messages("ticketlist.status.resolved")</a>
             </li>
         </ul>
         <div class="govuk-tabs__panel govuk-tabs__panel" id="requests">
         @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm").withZone(ZoneId.of("Europe/London"))) { dateFormatter =>
             @govukTable(Table(
-                caption = if(resolved) Some("Resolved support requests") else Some("Unresolved support requests"),
+                caption = if(resolved) Some(messages("ticketlist.table.resolved")) else Some(messages("ticketlist.table.unresolved")),
                 captionClasses = "govuk-table__caption--m",
                 head = Some(Seq(
                     HeadCell(content = Text(messages("ticketlist.column.subject")), classes = "govuk-!-width-one-half"),
