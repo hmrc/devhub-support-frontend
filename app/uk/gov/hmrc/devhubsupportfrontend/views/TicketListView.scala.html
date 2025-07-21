@@ -22,64 +22,70 @@
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.FilterForm
 @import uk.gov.hmrc.devhubsupportfrontend.domain.models.DeskproTicket
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 
 @import java.time.ZoneId
 @import java.time.ZoneOffset
 @import java.time.format.DateTimeFormatter
 
 @this(
-  layout: Layout,
-  govukTable: GovukTable,
-  govukRadios: GovukRadios
+        layout: Layout,
+        govukTable: GovukTable,
+        govukButton: GovukButton
 )
 
-@(form: Form[FilterForm], loggedInSession: Option[UserSession], tickets: List[DeskproTicket])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(resolved: Boolean, loggedInSession: Option[UserSession], tickets: List[DeskproTicket])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @buildTicketLinkHtml(t: DeskproTicket) = {
-  <a href='@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketPage(t.id)' class='govuk-link govuk-link--no-visited-state'>@{t.subject}<BR>@{t.ref}</a>
+    <a href='@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketPage(t.id)' class='govuk-link govuk-link--no-visited-state'>@{
+        t.subject
+    } <BR>@{
+        t.ref
+    }</a>
 }
 
 @layout(
-  pageTitle = "Your support requests",
-  loggedInSession = loggedInSession,
+    pageTitle = "Your support requests",
+    loggedInSession = loggedInSession,
 ) {
-  <span class="govuk-caption-l">@{messages("ticketlist.subtitle")}</span>
-  <h1 class="govuk-heading-l">@{messages("ticketlist.title")}</h1>
-
-  @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketListPage(), Symbol("class") -> "form") {
-
-    @govukRadios(Radios(
-      name = "status",
-      classes = "govuk-radios--small govuk-radios--inline",
-      items = Seq(
-        RadioItem(
-          content = Text(messages("ticketlist.status.open")),
-          value = Some("open")
-        ),
-        RadioItem(
-          content = Text(messages("ticketlist.status.resolved")),
-          value = Some("resolved")
-        )
-      )
-    ).withFormField(form("status")))
-
-    <div class="govuk-form-group govuk-!-margin-bottom-0">
-      <button id="filterResults" class="govuk-button" type="submit">@{messages("ticketlist.status.show")}</button>
-    </div>
-  }
-
-  @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm").withZone(ZoneId.of("Europe/London"))) { dateFormatter =>
-    @govukTable(Table(
-      head = Some(Seq(
-        HeadCell(content = Text(messages("ticketlist.column.subject"))),
-        HeadCell(content = Text(messages("ticketlist.column.lastupdated"))),
-        HeadCell(content = Text(messages("ticketlist.column.status")))
-      )),
-      rows = tickets.map(ticket => Seq(
-        TableRow(content = HtmlContent(buildTicketLinkHtml(ticket))),
-        TableRow(content = Text(dateFormatter.format(ticket.dateLastUpdated))),
-        TableRow(content = HtmlContent(buildStatusHtml(ticket.status)))
-      ))
+    <span class="govuk-caption-l">@messages("ticketlist.subtitle")</span>
+    <h1 class="govuk-heading-l">@messages("ticketlist.title")</h1>
+    @govukButton(Button(
+        id = Some("create"),
+        content = Text(messages("ticketlist.button.create")),
+        href = Some(uk.gov.hmrc.devhubsupportfrontend.controllers.routes.SupportEnquiryInitialChoiceController.startPage().url)
     ))
-  }  
+    <div class="govuk-tabs">
+        <ul class="govuk-tabs__list" role="tablist">
+            <li class='@{
+                s"govuk-tabs__list-item${if(!resolved) " govuk-tabs__list-item--selected" else ""}"
+            }'>
+                <a class="govuk-tabs__tab" href=@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketListPage()>@messages("ticketlist.status.unresolved")</a>
+            </li>
+            <li class='@{
+                s"govuk-tabs__list-item${if(resolved) " govuk-tabs__list-item--selected" else ""}"
+            }'>
+                <a class="govuk-tabs__tab" href=@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketListPage(true)>@messages("ticketlist.status.resolved")</a>
+            </li>
+        </ul>
+        <div class="govuk-tabs__panel govuk-tabs__panel" id="requests">
+        @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm").withZone(ZoneId.of("Europe/London"))) { dateFormatter =>
+            @govukTable(Table(
+                caption = if(resolved) Some("Resolved support requests") else Some("Unresolved support requests"),
+                captionClasses = "govuk-table__caption--m",
+                head = Some(Seq(
+                    HeadCell(content = Text(messages("ticketlist.column.subject")), classes = "govuk-!-width-one-half"),
+                    HeadCell(content = Text(messages("ticketlist.column.lastupdated"))),
+                    HeadCell(content = Text(messages("ticketlist.column.status")))
+                )),
+                rows = tickets.map(ticket => Seq(
+                    TableRow(content = HtmlContent(buildTicketLinkHtml(ticket))),
+                    TableRow(content = Text(dateFormatter.format(ticket.dateLastUpdated))),
+                    TableRow(content = HtmlContent(buildStatusHtml(ticket.status)))
+                ))
+            ))
+        }
+        </div>
+    </div>
+
 }
