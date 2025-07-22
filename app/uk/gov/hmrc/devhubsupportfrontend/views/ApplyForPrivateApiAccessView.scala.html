@@ -25,10 +25,20 @@
   govukRadios: GovukRadios,
   govukButton : GovukButton,
   govukInput : GovukInput,
-  govukSelect : GovukSelect
+  govukSelect : GovukSelect,
+  govukDetails : GovukDetails
 )
 
 @(loggedInSession: Option[UserSession], chosenApiName: String, form: Form[ApplyForPrivateApiAccessForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+
+@buildApplicationIdHtml() = {
+  <p>You must set up a software application to generate an application ID.</p>
+  <ol class='govuk-list govuk-list--number'>
+    <li>Sign in to the Developer Hub and go to 'Applications'.</li>
+    <li>Select the application you want to use the API for.</li>
+    <li>Your application ID is in the table. It contains letters and numbers.</li>
+  </ol>
+}
 
 @layout(
   pageTitle = "Apply for access to the @{chosenApiName} API",
@@ -36,11 +46,11 @@
   loggedInSession = loggedInSession,
   form = Some(form),
 ) {
-  <span class="govuk-caption-l">Developer Hub support</span>
+  <span class="govuk-caption-l">Support</span>
   <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Apply for access to the @{chosenApiName} API</h1>
 
   <p class="govuk-body">
-    To give you access to the Customs Declaration API documentation, we need the following details: 
+    We need some information about you and your software application.
   </p>
   
   @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.ApplyForPrivateApiAccessController.submit()) {
@@ -72,7 +82,7 @@
         ),
         hint = Some(
           Hint(
-            content = Text("We only use your email to respond to you")
+            content = Text("We’ll only use this to send you emails about your support request.")
           )
         ),
         classes = "govuk-!-width-full",
@@ -89,7 +99,7 @@
         label = Label(
           isPageHeading = true,
           classes = "govuk-label--s",
-          content = Text("Organisation")
+          content = Text("Your business or organisation")
         ),
         classes = "govuk-!-width-full",
         errorMessage = form.error("organisation").map(e => ErrorMessage(content = Text(messages(e.message))))
@@ -110,7 +120,15 @@
         errorMessage = form.error("applicationId").map(e => ErrorMessage(content = Text(messages(e.message))))
       )
     )
-     
+
+    @govukDetails(
+      Details(
+        id = Some("applicationIdDetails"),
+        summary = Text("How to find your application ID"),
+        content = HtmlContent(buildApplicationIdHtml())
+      )
+    )
+
     @govukButton(
       Button(
         id = Some("continue"),
