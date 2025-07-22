@@ -98,13 +98,13 @@ object SupportData {
     val text = "General application details"
   }
 
-  case object ChooseBusinessRates {
-    val id   = "business-rates"
-    val text = "Business Rates 2.0"
+  case object ChooseADifferentAPI {
+    val id   = "different-api"
+    val text = "A different API"
   }
 
   case object ChooseCDS {
     val id   = "customs-declarations"
-    val text = "Customs Declarations"
+    val text = "Customs Declarations Service (CDS)"
   }
 }
