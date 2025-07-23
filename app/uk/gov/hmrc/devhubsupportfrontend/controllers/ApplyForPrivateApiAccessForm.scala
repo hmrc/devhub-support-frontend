@@ -19,7 +19,7 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 import play.api.data.Form
 import play.api.data.Forms._
 
-final case class ApplyForPrivateApiAccessForm(fullName: String, emailAddress: String, organisation: String, applicationId: String)
+final case class ApplyForPrivateApiAccessForm(fullName: String, emailAddress: String, organisation: String, privateApi: String, applicationId: String)
 
 object ApplyForPrivateApiAccessForm extends FormValidation {
   private val prefix = "apply.for.private.access"
@@ -29,6 +29,7 @@ object ApplyForPrivateApiAccessForm extends FormValidation {
       prefix ~> "fullName" ~> requiredLimitedTextValidator(100),
       "emailAddress" ~> emailValidator,
       prefix ~> "organisation" ~> requiredLimitedTextValidator(300),
+      prefix ~> "privateApi" ~> requiredLimitedTextValidator(200),
       prefix ~> "applicationId" ~> requiredLimitedTextValidator(48)
     )(ApplyForPrivateApiAccessForm.apply)(ApplyForPrivateApiAccessForm.unapply)
   )

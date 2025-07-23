@@ -47,7 +47,10 @@ class ApplyForPrivateApiAccessController @Inject() (
 
   def redirectBack(): Result = Redirect(routes.ChooseAPrivateApiController.page())
 
-  def filterValidFlow(flow: SupportFlow): Boolean = flow.privateApi.isDefined
+  def filterValidFlow(flow: SupportFlow): Boolean = flow match {
+    case SupportFlow(_, SupportData.UsingAnApi.id, Some(SupportData.PrivateApiDocumentation.id), _, _, _, _) => true
+    case _                                                                                                   => false
+  }
 
   def form() = ApplyForPrivateApiAccessForm.form
 
@@ -56,7 +59,7 @@ class ApplyForPrivateApiAccessController @Inject() (
   def pageContents(flow: SupportFlow, form: Form[ApplyForPrivateApiAccessForm], extras: Unit)(implicit request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable = {
     applyForPrivateApiAccessView(
       fullyloggedInDeveloper,
-      flow.privateApi.get,
+      flow.privateApi,
       form,
       routes.CheckCdsAccessIsRequiredController.page().url
     )

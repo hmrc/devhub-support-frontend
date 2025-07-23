@@ -29,7 +29,7 @@
   govukDetails : GovukDetails
 )
 
-@(loggedInSession: Option[UserSession], chosenApiName: String, form: Form[ApplyForPrivateApiAccessForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], maybeChosenApiName: Option[String], form: Form[ApplyForPrivateApiAccessForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @buildApplicationIdHtml() = {
   <p>You must set up a software application to generate an application ID.</p>
@@ -40,14 +40,23 @@
   </ol>
 }
 
+@hiddenIfApiGiven() = {
+  @if(maybeChosenApiName.isDefined) { hidden } else { }
+}
+
 @layout(
-  pageTitle = "Apply for access to the @{chosenApiName} API",
+  pageTitle = "Apply for access to a private API",
   backLink = Some(BackLink(backUri)),
   loggedInSession = loggedInSession,
   form = Some(form),
 ) {
   <span class="govuk-caption-l">Support</span>
-  <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Apply for access to the @{chosenApiName} API</h1>
+  @{
+    maybeChosenApiName match {
+      case Some(chosenApiName) => <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Apply for access to the {chosenApiName} API</h1>
+      case _                   => <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Apply for access to a private API</h1>
+    }
+  }
 
   <p class="govuk-body">
     We need some information about you and your software application.
@@ -103,6 +112,21 @@
         ),
         classes = "govuk-!-width-full",
         errorMessage = form.error("organisation").map(e => ErrorMessage(content = Text(messages(e.message))))
+      )
+    )
+
+    @govukInput(
+      Input(
+        id = "privateApi",
+        name = "privateApi",
+        value = form("privateApi").value.orElse(maybeChosenApiName),
+        label = Label(
+          isPageHeading = true,
+          classes = "govuk-label--s" + hiddenIfApiGiven(),
+          content = Text("Which private API do you want to use?")
+        ),
+        classes = "govuk-!-width-full" + hiddenIfApiGiven(),
+        errorMessage = form.error("privateApi").map(e => ErrorMessage(content = Text(messages(e.message))))
       )
     )
 

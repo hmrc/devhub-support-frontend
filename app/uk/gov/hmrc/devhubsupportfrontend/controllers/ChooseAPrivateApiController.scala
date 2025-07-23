@@ -59,8 +59,8 @@ class ChooseAPrivateApiController @Inject() (
       routes.HelpWithUsingAnApiController.page().url
     )
 
-  def choose(choice: String)(flow: SupportFlow) =
-    flow.copy(privateApi = Some(choice))
+  def choose(choice: Option[String])(flow: SupportFlow) =
+    flow.copy(privateApi = choice)
 
   def updateFlowAndRedirect(flowFn: SupportFlow => SupportFlow)(redirectTo: Call)(flow: SupportFlow) = {
     supportService.updateWithDelta(flowFn)(flow).map { newFlow =>
@@ -68,8 +68,8 @@ class ChooseAPrivateApiController @Inject() (
     }
   }
 
-  def chooseADifferentAPI(flow: SupportFlow) = choose(SupportData.ChooseADifferentAPI.text)(flow)
-  def chooseCDS(flow: SupportFlow)           = choose(SupportData.ChooseCDS.text)(flow)
+  def chooseADifferentAPI(flow: SupportFlow) = choose(None)(flow)
+  def chooseCDS(flow: SupportFlow)           = choose(Some(SupportData.ChooseCDS.text))(flow)
 
   def onValidForm(flow: SupportFlow, form: ChooseAPrivateApiForm)(implicit request: MaybeUserRequest[AnyContent]): Future[Result] =
     form.chosenApiName match {
