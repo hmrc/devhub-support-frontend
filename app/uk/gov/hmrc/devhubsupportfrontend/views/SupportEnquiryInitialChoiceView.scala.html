@@ -42,14 +42,20 @@
     <span class="govuk-caption-l">Support</span>
     <h1 class="govuk-heading-l govuk-!-margin-bottom-3">What do you need help with?</h1>
 
-    <p class="govuk-body govuk-!-margin-bottom-4 govuk-!-margin-top-6">We need some information to get your request to the right team as quickly as possible.</p>
-    <p class="govuk-body govuk-!-margin-bottom-4 govuk-!-margin-top-6">The team will reply within 2 UK business days.</p>
+    <p class="govuk-body">We need some information to get your request to the right team as quickly as possible.</p>
+    <p class="govuk-body">The team will reply within 2 UK business days.</p>
 
     @govukRadios(
       Radios(
         fieldset = Some(
           Fieldset(
-            legend = None
+            legend = Some(
+              Legend(
+                content = Text("What do you need help with?"),
+                classes = "govuk-visually-hidden",
+                isPageHeading = true
+              )
+            )
           )
         ),
         errorMessage = if(form("initialChoice").hasErrors) {
