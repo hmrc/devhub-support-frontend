@@ -40,8 +40,12 @@
   </ol>
 }
 
-@hiddenIfApiGiven() = {
-  @if(maybeChosenApiName.isDefined) { hidden } else { }
+@hiddenIfLoggedIn = {
+  @loggedInSession.map(_ => " hidden").getOrElse("")
+}
+
+@hiddenIfApiGiven = {
+  @maybeChosenApiName.map(_ => " hidden").getOrElse("")
 }
 
 @layout(
@@ -71,10 +75,10 @@
         name = "fullName",
         label = Label(
           isPageHeading = true,
-          classes = "govuk-label--s",
+          classes = "govuk-label--s" + hiddenIfLoggedIn,
           content = Text("Full name")
         ),
-        classes = "govuk-!-width-full",
+        classes = "govuk-!-width-full" + hiddenIfLoggedIn,
         value = form("fullName").value.orElse(loggedInSession.map(_.developer.displayedName)),
         errorMessage = form.error("fullName").map(e => ErrorMessage(content = Text(messages(e.message))))
       )
@@ -86,15 +90,16 @@
         name = "emailAddress",
         label = Label(
           isPageHeading = true,
-          classes = "govuk-label--s",
+          classes = "govuk-label--s" + hiddenIfLoggedIn,
           content = Text("Email address")
         ),
         hint = Some(
           Hint(
-            content = Text("We’ll only use this to send you emails about your support request.")
+            content = Text("We’ll only use this to send you emails about your support request."),
+            classes = "govuk-hint" + hiddenIfLoggedIn
           )
         ),
-        classes = "govuk-!-width-full",
+        classes = "govuk-!-width-full" + hiddenIfLoggedIn,
         value = form("emailAddress").value.orElse(loggedInSession.map(_.developer.email.text)),
         errorMessage = form.error("emailAddress").map(e => ErrorMessage(content = Text(messages(e.message))))
       )
@@ -122,10 +127,10 @@
         value = form("privateApi").value.orElse(maybeChosenApiName),
         label = Label(
           isPageHeading = true,
-          classes = "govuk-label--s" + hiddenIfApiGiven(),
+          classes = "govuk-label--s" + hiddenIfApiGiven,
           content = Text("Which private API do you want to use?")
         ),
-        classes = "govuk-!-width-full" + hiddenIfApiGiven(),
+        classes = "govuk-!-width-full" + hiddenIfApiGiven,
         errorMessage = form.error("privateApi").map(e => ErrorMessage(content = Text(messages(e.message))))
       )
     )

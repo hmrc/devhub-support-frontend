@@ -84,6 +84,10 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
         val result = addToken(underTest.page())(request)
 
         status(result) shouldBe OK
+
+        contentAsString(result) should include("Which private API do you want to use?")
+        contentAsString(result) should include("Full name")
+        contentAsString(result) should include("Email address")
       }
 
       "render the previous page when there is no flow" in new Setup {
