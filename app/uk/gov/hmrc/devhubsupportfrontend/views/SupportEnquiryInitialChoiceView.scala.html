@@ -40,20 +40,18 @@
   @helper.form(action = routes.SupportEnquiryInitialChoiceController.submit()) {
     @helper.CSRF.formField
     <span class="govuk-caption-l">Support</span>
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-3">What do you need help with?</h1>
+
+    <p class="govuk-body govuk-!-margin-bottom-4 govuk-!-margin-top-6">We need some information to get your request to the right team as quickly as possible.</p>
+    <p class="govuk-body govuk-!-margin-bottom-4 govuk-!-margin-top-6">The team will reply within 2 UK business days.</p>
+
     @govukRadios(
       Radios(
         fieldset = Some(
           Fieldset(
-            legend = Some(
-              Legend(
-                content = Text("What do you need help with?"),
-                classes = "govuk-fieldset__legend--l",
-                isPageHeading = true
-              )
-            )
+            legend = None
           )
         ),
-        hint = Some(Hint(content = Text("We need some information to get your request to the right team as quickly as possible. The team will reply within 2 UK business days."))),
         errorMessage = if(form("initialChoice").hasErrors) {
           Some(
             ErrorMessage(
