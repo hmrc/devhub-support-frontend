@@ -70,7 +70,14 @@
             value = Some(SupportData.AccessCodes.id),
             hint = None,
             conditionalHtml = None
-          )
+          ),
+            RadioItem(
+                id = Some(SupportData.NoneOfTheAbove.id),
+                content = Text(SupportData.NoneOfTheAbove.text),
+                value = Some(SupportData.NoneOfTheAbove.id),
+                hint = None,
+                conditionalHtml = None
+            )
         )
       )
     )

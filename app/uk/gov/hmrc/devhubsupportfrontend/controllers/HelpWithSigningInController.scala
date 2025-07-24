@@ -73,11 +73,13 @@ class HelpWithSigningInController @Inject() (
 
   def onValidForm(flow: SupportFlow, form: HelpWithSigningInForm)(implicit request: MaybeUserRequest[AnyContent]): Future[Result] = {
     form.choice match {
-      case SupportData.AccessCodes.id => successful(Redirect(routes.HelpWithSigningInController.removeAccessCodesPage()))
-      case _                          =>
+      case SupportData.AccessCodes.id       => successful(Redirect(routes.HelpWithSigningInController.removeAccessCodesPage()))
+      case SupportData.ForgottenPassword.id => successful(Redirect(s"${appConfig.thirdPartyDeveloperFrontendUrl}/developer/forgot-password"))
+      case _                                =>
         supportService.updateWithDelta(choose(form))(flow).map { newFlow =>
           Redirect(routes.SupportDetailsController.supportDetailsPage())
         }
+
     }
   }
 

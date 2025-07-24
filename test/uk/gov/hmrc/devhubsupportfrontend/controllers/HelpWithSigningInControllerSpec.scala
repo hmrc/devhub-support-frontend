@@ -68,6 +68,11 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
       redirectLocation(result).value shouldBe "/devhub-support/details"
     }
 
+    def shouldBeRedirectedToForgotPasswordPage(result: Future[Result]) = {
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).value shouldBe "/developer/forgot-password"
+    }
+
     def shouldBeRedirectedToRemoveAccessCodesPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
       redirectLocation(result).value shouldBe "/devhub-support/signing-in/remove-access-codes"
@@ -121,7 +126,7 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
 
         val result = addToken(underTest.submit())(formRequest)
 
-        shouldBeRedirectedToNextPage(result)
+        shouldBeRedirectedToForgotPasswordPage(result)
       }
 
       "submit new valid request from form for 'Access Codes' choice" in new Setup {
@@ -134,6 +139,18 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
         val result = addToken(underTest.submit())(formRequest)
 
         shouldBeRedirectedToRemoveAccessCodesPage(result)
+      }
+
+      "submit new valid request from form for 'None of these' choice" in new Setup {
+        val formRequest = request.withFormUrlEncodedBody(
+          "choice" -> SupportData.NoneOfTheAbove.id
+        )
+        SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
+        SupportServiceMock.UpdateWithDelta.succeeds()
+
+        val result = addToken(underTest.submit())(formRequest)
+
+        shouldBeRedirectedToNextPage(result)
       }
 
       "submit invalid request returns BAD_REQUEST" in new Setup {
