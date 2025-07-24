@@ -45,7 +45,7 @@ object SupportData {
 
   case object NoneOfTheAbove extends PrimaryChoice {
     val id   = "none-of-the-above"
-    val text = "None of the above"
+    val text = "None of these"
   }
 
   sealed trait ApiSecondaryChoice {
@@ -60,17 +60,17 @@ object SupportData {
 
   case object GettingExamples extends ApiSecondaryChoice {
     val id   = "getting-examples"
-    val text = "Getting examples of payloads or schemas"
+    val text = "Viewing examples of errors, payloads or schemas"
   }
 
   case object ReportingDocumentation extends ApiSecondaryChoice {
     val id   = "reporting-documentation"
-    val text = "Reporting documentation for an API that is inaccurate or missing information"
+    val text = "Reporting inaccurate or missing API information"
   }
 
   case object PrivateApiDocumentation extends ApiSecondaryChoice {
     val id   = "private-api-documentation"
-    val text = "Getting access to documentation for a private API"
+    val text = "Accessing private API documentation"
   }
 
   case object ForgottenPassword extends ApiSecondaryChoice {
