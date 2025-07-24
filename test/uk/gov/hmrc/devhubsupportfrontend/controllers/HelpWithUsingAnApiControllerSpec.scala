@@ -90,7 +90,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
   "HelpWithUsingAnApiController" when {
     "using the delta functions" should {
       "work for chooseMakingCall" in {
-        val form = HelpWithUsingAnApiForm("ignored", apiNameForCall = apiServiceNameText, "ignored", "ignored")
+        val form = HelpWithUsingAnApiForm("ignored", apiNameForCall = Some(apiServiceNameText), None, None)
         val flow = SupportFlow(supportSessionId, "untouched")
 
         val result = HelpWithUsingAnApiController.chooseMakingCall(form)(flow)
@@ -101,7 +101,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
       }
 
       "work for chooseGettingExamples" in {
-        val form = HelpWithUsingAnApiForm("ignored", "ignored", apiNameForExamples = apiServiceNameText, "ignored")
+        val form = HelpWithUsingAnApiForm("ignored", None, apiNameForExamples = Some(apiServiceNameText), None)
         val flow = SupportFlow(supportSessionId, "untouched")
 
         val result = HelpWithUsingAnApiController.chooseGettingExamples(form)(flow)
@@ -112,7 +112,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
       }
 
       "work for chooseReporting" in {
-        val form = HelpWithUsingAnApiForm("ignored", "ignored", "ignored", apiNameForReporting = apiServiceNameText)
+        val form = HelpWithUsingAnApiForm("ignored", None, None, apiNameForReporting = Some(apiServiceNameText))
         val flow = SupportFlow(supportSessionId, "untouched")
 
         val result = HelpWithUsingAnApiController.chooseReporting(form)(flow)
@@ -123,7 +123,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
       }
 
       "work for choosePrivateApi" in {
-        val form = HelpWithUsingAnApiForm("ignored", "ignored", "ignored", "ignored")
+        val form = HelpWithUsingAnApiForm("ignored", None, None, None)
         val flow = SupportFlow(supportSessionId, "untouched")
 
         val result = HelpWithUsingAnApiController.choosePrivateApi(form)(flow)

@@ -38,19 +38,19 @@ object HelpWithUsingAnApiController {
   def chooseMakingCall(form: HelpWithUsingAnApiForm)(flow: SupportFlow) =
     flow.copy(
       subSelection = Some(SupportData.MakingAnApiCall.id),
-      api = Some(form.apiNameForCall)
+      api = form.apiNameForCall
     )
 
   def chooseGettingExamples(form: HelpWithUsingAnApiForm)(flow: SupportFlow) =
     flow.copy(
       subSelection = Some(SupportData.GettingExamples.id),
-      api = Some(form.apiNameForExamples)
+      api = form.apiNameForExamples
     )
 
   def chooseReporting(form: HelpWithUsingAnApiForm)(flow: SupportFlow) =
     flow.copy(
       subSelection = Some(SupportData.ReportingDocumentation.id),
-      api = Some(form.apiNameForReporting)
+      api = form.apiNameForReporting
     )
 
   def choosePrivateApi(form: HelpWithUsingAnApiForm)(flow: SupportFlow) =
@@ -94,9 +94,11 @@ class HelpWithUsingAnApiController @Inject() (
 
   override def otherValidation(flow: SupportFlow, extraData: List[ApiDefinition], form: Form[HelpWithUsingAnApiForm]): Form[HelpWithUsingAnApiForm] = {
     def validate(fieldName: String) = {
-      val formFieldValue = form(fieldName).value.getOrElse("")
-      val matchesApiName = extraData.find(_.serviceName.value == formFieldValue).isDefined
-      if (matchesApiName) form else form.withGlobalError("please.select.a.valid.api")
+      val matchesApiName = form(fieldName).value
+        .filter(_.nonEmpty)
+        .forall(value => extraData.exists(_.serviceName.value == value))
+
+      if (matchesApiName) form else form.withError(fieldName, "please.select.a.valid.api")
     }
 
     form("choice").value match {
