@@ -75,15 +75,15 @@
 
 @findHeading = {
     <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Tell us about the software that you're building</h1>
-    <p class="govuk-body"><a href=@{
+    <p class="govuk-body"><a class="govuk-link" target="_blank" href=@{
         s"${appConfig.apiDocumentationFrontendUrl}/api-documentation/docs/api"
     }>Search our list of APIs (opens in new tab)</a> to find what's available.</p>
     <p class="govuk-body">
         If you cannot find the API you need or are not sure which version to use, complete this form.</p>
     <p class="govuk-body">Tell us about the software application or process you're working on, including the:</p>
     <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
-        <li>tax or scheme that it is related to</li>
-        <li>declaration or return that it sends</li>
+        <li>tax or scheme it relates to</li>
+        <li>declaration or return it will send</li>
         <li>type of tax number or reference it uses</li>
     </ul>
 }
