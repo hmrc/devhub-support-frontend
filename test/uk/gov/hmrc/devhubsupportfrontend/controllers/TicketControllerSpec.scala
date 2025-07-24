@@ -108,6 +108,24 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         contentAsString(result) should include("HMRC Developer Hub: Support Enquiry")
       }
 
+      "show message when unresolved tab selected and not tickets" in new Setup with IsLoggedIn {
+        TicketServiceMock.GetTicketsForUser.succeeds(List())
+
+        val result = addToken(underTest.ticketListPage(false))(request)
+
+        status(result) shouldBe OK
+        contentAsString(result) should include("You do not have any unresolved requests at the moment.")
+      }
+
+      "show message when resolved tab selected and no tickets" in new Setup with IsLoggedIn {
+        TicketServiceMock.GetTicketsForUser.succeeds(List())
+
+        val result = addToken(underTest.ticketListPage(true))(request)
+
+        status(result) shouldBe OK
+        contentAsString(result) should include("You do not have any resolved requests at the moment.")
+      }
+
       "redirect to logon page if not logged in" in new Setup with NotLoggedIn {
         val result = addToken(underTest.ticketListPage(false))(request)
 

@@ -68,23 +68,33 @@
                 <a class="govuk-tabs__tab" id="resolved-tab" href=@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.ticketListPage(true)>@messages("ticketlist.status.resolved")</a>
             </li>
         </ul>
+
         <div class="govuk-tabs__panel govuk-tabs__panel" id="requests">
-        @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm").withZone(ZoneId.of("Europe/London"))) { dateFormatter =>
-            @govukTable(Table(
-                caption = if(resolved) Some(messages("ticketlist.table.resolved")) else Some(messages("ticketlist.table.unresolved")),
-                captionClasses = "govuk-table__caption--m",
-                head = Some(Seq(
-                    HeadCell(content = Text(messages("ticketlist.column.subject")), classes = "govuk-!-width-one-half"),
-                    HeadCell(content = Text(messages("ticketlist.column.lastupdated"))),
-                    HeadCell(content = Text(messages("ticketlist.column.status")))
-                )),
-                rows = tickets.map(ticket => Seq(
-                    TableRow(content = HtmlContent(buildTicketLinkHtml(ticket))),
-                    TableRow(content = Text(dateFormatter.format(ticket.dateLastUpdated))),
-                    TableRow(content = HtmlContent(buildStatusHtml(ticket.status)))
-                ))
-            ))
-        }
+            @if(tickets.isEmpty) {
+                @if(resolved) {
+                    <p class="govuk-body">You do not have any resolved requests at the moment.</p>
+                } else {
+                    <p class="govuk-body">You do not have any unresolved requests at the moment.</p>
+                }
+            } else {
+                @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm").withZone(ZoneId.of("Europe/London"))) { dateFormatter =>
+                    @govukTable(Table(
+                        caption = if(resolved) Some(messages("ticketlist.table.resolved")) else Some(messages("ticketlist.table.unresolved")),
+                        captionClasses = "govuk-table__caption--m",
+                        head = Some(Seq(
+                            HeadCell(content = Text(messages("ticketlist.column.subject")), classes = "govuk-!-width-one-half"),
+                            HeadCell(content = Text(messages("ticketlist.column.lastupdated"))),
+                            HeadCell(content = Text(messages("ticketlist.column.status")))
+                        )),
+                        rows = tickets.map(ticket => Seq(
+                            TableRow(content = HtmlContent(buildTicketLinkHtml(ticket))),
+                            TableRow(content = Text(dateFormatter.format(ticket.dateLastUpdated))),
+                            TableRow(content = HtmlContent(buildStatusHtml(ticket.status)))
+                        ))
+                    ))
+                }
+            }
+
         </div>
     </div>
 
