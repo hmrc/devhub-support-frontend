@@ -80,7 +80,7 @@ object SupportData {
 
   case object AccessCodes extends ApiSecondaryChoice {
     val id   = "access-codes"
-    val text = "I can't get access codes to login"
+    val text = "I cannot receive access codes for 2FA"
   }
 
   case object CompletingTermsOfUseAgreement extends ApiSecondaryChoice {
