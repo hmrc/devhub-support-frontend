@@ -45,7 +45,7 @@ object SupportData {
 
   case object NoneOfTheAbove extends PrimaryChoice {
     val id   = "none-of-the-above"
-    val text = "None of the above"
+    val text = "None of these"
   }
 
   sealed trait ApiSecondaryChoice {
