@@ -25,7 +25,7 @@ object HelpWithApplicationsForm extends FormValidation {
 
   val form: Form[HelpWithApplicationsForm] = Form(
     mapping(
-      "choice" -> oneOf(SupportData.CompletingTermsOfUseAgreement.id, SupportData.GivingTeamMemberAccess.id, SupportData.GeneralApplicationDetails.id)
+      "choice" -> oneOf(SupportData.CompletingTermsOfUseAgreement.id, SupportData.GivingTeamMemberAccess.id, SupportData.NoneOfTheAbove.id)
     )(HelpWithApplicationsForm.apply)(HelpWithApplicationsForm.unapply)
   )
 }

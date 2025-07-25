@@ -136,9 +136,9 @@ class HelpWithApplicationsControllerSpec extends BaseControllerSpec with WithCSR
         redirectLocation(result) shouldBe Some("/devhub-support/app/giving-team-member-access")
       }
 
-      "redirect to the generic support details page when General Application Details is selected" in new Setup {
+      "redirect to the generic support details page when None of these is selected" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody("choice" -> SupportData.GeneralApplicationDetails.id)
+          .withFormUrlEncodedBody("choice" -> SupportData.NoneOfTheAbove.id)
 
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
         SupportServiceMock.UpdateWithDelta.succeeds()

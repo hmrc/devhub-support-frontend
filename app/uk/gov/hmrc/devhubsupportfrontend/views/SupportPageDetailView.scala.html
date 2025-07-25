@@ -223,7 +223,7 @@
             }
             case SupportData.SettingUpApplication.id => supportFlow.subSelection match {
                 case Some(SupportData.CompletingTermsOfUseAgreement.id) => completingTermsOfUseAgreement
-                case Some(SupportData.GeneralApplicationDetails.id) => generalApplicationQuery
+                case Some(SupportData.NoneOfTheAbove.id) => noneOfTheAboveHeading
                 case _ => defaultHeading
             }
             case SupportData.FindingAnApi.id => findHeading
