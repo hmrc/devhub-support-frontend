@@ -21,7 +21,7 @@ import uk.gov.voa.play.form.ConditionalMappings._
 import play.api.data.Form
 import play.api.data.Forms._
 
-import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData.{GettingExamples, MakingAnApiCall, PrivateApiDocumentation, ReportingDocumentation}
+import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData.{GettingExamples, MakingAnApiCall, NoneOfTheAbove, PrivateApiDocumentation, ReportingDocumentation}
 
 final case class HelpWithUsingAnApiForm(choice: String, apiNameForCall: Option[String], apiNameForExamples: Option[String], apiNameForReporting: Option[String])
 
@@ -29,7 +29,7 @@ object HelpWithUsingAnApiForm extends FormValidation {
 
   val form: Form[HelpWithUsingAnApiForm] = Form(
     mapping(
-      "choice"                                -> oneOf(MakingAnApiCall.id, GettingExamples.id, ReportingDocumentation.id, PrivateApiDocumentation.id),
+      "choice"                                -> oneOf(MakingAnApiCall.id, GettingExamples.id, ReportingDocumentation.id, PrivateApiDocumentation.id, NoneOfTheAbove.id),
       MakingAnApiCall.id + "-api-name"        -> mandatoryIf(isEqual("choice", MakingAnApiCall.id), nonEmptyText),
       GettingExamples.id + "-api-name"        -> mandatoryIf(isEqual("choice", GettingExamples.id), nonEmptyText),
       ReportingDocumentation.id + "-api-name" -> mandatoryIf(isEqual("choice", ReportingDocumentation.id), nonEmptyText)

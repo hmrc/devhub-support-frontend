@@ -219,6 +219,7 @@
                 case Some(SupportData.MakingAnApiCall.id) => makingACallHeading
                 case Some(SupportData.GettingExamples.id) => examplesHeading
                 case Some(SupportData.ReportingDocumentation.id) => reportingHeading
+                case Some(SupportData.NoneOfTheAbove.id) => noneOfTheAboveHeading
                 case _ => defaultHeading
             }
             case SupportData.SettingUpApplication.id => supportFlow.subSelection match {
