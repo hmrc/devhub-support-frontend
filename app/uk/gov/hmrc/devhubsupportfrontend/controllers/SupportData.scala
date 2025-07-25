@@ -90,12 +90,12 @@ object SupportData {
 
   case object GivingTeamMemberAccess extends ApiSecondaryChoice {
     val id   = "giving-team-member-access"
-    val text = "Giving a team member access to an application"
+    val text = "Giving a team member access to a software application"
   }
 
   case object GeneralApplicationDetails extends ApiSecondaryChoice {
     val id   = "general-application-details"
-    val text = "General application details"
+    val text = "None of these"
   }
 
   case object ChooseBusinessRates {
