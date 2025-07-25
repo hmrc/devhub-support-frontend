@@ -40,6 +40,8 @@
   hmrcFooter: HmrcFooter,
   hmrcLanguageSelectHelper: HmrcLanguageSelectHelper,
   hmrcScripts: HmrcScripts,
+  autocompleteCss: HmrcAccessibleAutocompleteCss,
+  autocompleteJavascript: HmrcAccessibleAutocompleteJavascript,
   govukBackLink: GovukBackLink,
   govukExitThisPage: GovukExitThisPage,
   defaultMainContent: TwoThirdsMainContent,
@@ -73,9 +75,15 @@
 @headBlock = {
   <link href='@routes.Assets.versioned("stylesheets/main.css")' media="screen" rel="stylesheet" type="text/css" />
   @hmrcTrackingConsentSnippet()
-  @timeoutBlock
+  @autocompleteCss()
+  @if(loggedInSession.isDefined){
+      timeoutBlock
+  }
 }
-
+@scripts = {
+  @hmrcScripts()
+  @autocompleteJavascript()
+}
 @navigation = @{
   StaticNavLinks(appConfig.apiDocumentationFrontendUrl, appConfig.thirdPartyDeveloperFrontendUrl)
     .map(navLink => NavigationItem(
@@ -172,7 +180,7 @@
     pageTitle = Some(s"$pageTitle - HMRC Developer Hub - GOV.UK"),
     headBlock = Some(headBlock),
     headerBlock = Some(headerBlock),
-    scriptsBlock = Some(hmrcScripts()),
+    scriptsBlock = Some(scripts),
     beforeContentBlock = Some(beforeContentBlock),
     footerBlock = Some(footerBlock),
     mainContentLayout = None,

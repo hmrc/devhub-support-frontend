@@ -22,6 +22,7 @@
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithUsingAnApiForm
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
 
 @this(
   layout: Layout,
@@ -34,40 +35,40 @@
 @(loggedInSession: Option[UserSession], form: Form[HelpWithUsingAnApiForm], backUri: String, apis: List[ApiDefinition])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @selectItems = @{
+  Seq(SelectItem(value = None, text = "")).concat(
   apis.map( api =>
     SelectItem(
       value = Some(api.serviceName.value),
       text = api.name
     )
-  ) :+ SelectItem(
-      value = Some("api-not-in-list"),
-      text = "My API isn't in the list"
-  )
+  ))
 }
 
 @apiNameChoiceHtml(section: String) = {
-  @govukSelect(
-    Select(
-      id = section + "-api-name-id",
-      name = section + "-api-name",
-      items = selectItems,
-      label = Label(
-        content = Text("Select an API")
-      ),
-      classes = "govuk-!-width-two-thirds"
-    )
-  )
+  @defining(section + "-api-name") { name =>
+    @govukSelect(
+      Select(
+        id = name,
+        name = name,
+        items = selectItems,
+        value = form(name).value,
+        errorMessage = form.error(name).map(err => ErrorMessage(content = Text(messages(err.message)))),
+        label = Label(content = Text("Start typing the name of the API you're trying to use")),
+        classes = "govuk-!-width-two-thirds"
+      ).asAccessibleAutocomplete()
+      )
+  }
 }
 
 @layout(
-  pageTitle = "Which best describes what you need help with?",
+  pageTitle = "Which option best describes the help you need?",
   backLink = Some(BackLink(backUri)),
   loggedInSession = loggedInSession,
   form = Some(form)
 ) {
   @helper.form(action = routes.HelpWithUsingAnApiController.submit()) {
     @helper.CSRF.formField
-    <span class="govuk-caption-l">Developer Hub support</span>
+    <span class="govuk-caption-l">Support</span>
     @govukRadios(
       Radios(
         fieldset = Some(
@@ -88,13 +89,15 @@
             id = Some(SupportData.MakingAnApiCall.id),
             content = Text(SupportData.MakingAnApiCall.text),
             value = Some(SupportData.MakingAnApiCall.id),
+            checked = form("choice").value.contains(SupportData.MakingAnApiCall.id),
             hint = None,
             conditionalHtml = Some(apiNameChoiceHtml(SupportData.MakingAnApiCall.id))
-          ), 
+          ),
           RadioItem(
             id = Some(SupportData.GettingExamples.id),
             content = Text(SupportData.GettingExamples.text),
             value = Some(SupportData.GettingExamples.id),
+            checked = form("choice").value.contains(SupportData.GettingExamples.id),
             hint = None,
             conditionalHtml = Some(apiNameChoiceHtml(SupportData.GettingExamples.id))
           ),
@@ -102,9 +105,10 @@
             id = Some(SupportData.ReportingDocumentation.id),
             content = Text(SupportData.ReportingDocumentation.text),
             value = Some(SupportData.ReportingDocumentation.id),
+            checked = form("choice").value.contains(SupportData.ReportingDocumentation.id),
             hint = None,
             conditionalHtml = Some(apiNameChoiceHtml(SupportData.ReportingDocumentation.id))
-          ), 
+          ),
           RadioItem(
             id = Some(SupportData.PrivateApiDocumentation.id),
             content = Text(SupportData.PrivateApiDocumentation.text),
