@@ -25,22 +25,45 @@
   govukRadios: GovukRadios,
   govukButton : GovukButton,
   govukInput : GovukInput,
-  govukSelect : GovukSelect
+  govukSelect : GovukSelect,
+  govukDetails : GovukDetails
 )
 
-@(loggedInSession: Option[UserSession], chosenApiName: String, form: Form[ApplyForPrivateApiAccessForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], maybeChosenApiName: Option[String], form: Form[ApplyForPrivateApiAccessForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+
+@buildApplicationIdHtml() = {
+  <p>You must set up a software application to generate an application ID.</p>
+  <ol class='govuk-list govuk-list--number'>
+    <li>Sign in to the Developer Hub and go to 'Applications'.</li>
+    <li>Select the application you want to use the API for.</li>
+    <li>Your application ID is in the table. It contains letters and numbers.</li>
+  </ol>
+}
+
+@hiddenIfLoggedIn = {
+  @loggedInSession.map(_ => " hidden").getOrElse("")
+}
+
+@hiddenIfApiGiven = {
+  @maybeChosenApiName.map(_ => " hidden").getOrElse("")
+}
 
 @layout(
-  pageTitle = "Apply for access to the @{chosenApiName} API",
+  pageTitle = "Apply for access to a private API",
   backLink = Some(BackLink(backUri)),
   loggedInSession = loggedInSession,
   form = Some(form),
 ) {
-  <span class="govuk-caption-l">Developer Hub support</span>
-  <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Apply for access to the @{chosenApiName} API</h1>
+  <span class="govuk-caption-l">Support</span>
+  @{
+    maybeChosenApiName match {
+      case Some(chosenApiName) => <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Apply for access to the {chosenApiName} API</h1>
+      case _                   => <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Apply for access to a private API</h1>
+    }
+  }
 
   <p class="govuk-body">
-    To give you access to the Customs Declaration API documentation, we need the following details: 
+    We need some information about you and your software application.
   </p>
   
   @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.ApplyForPrivateApiAccessController.submit()) {
@@ -52,10 +75,10 @@
         name = "fullName",
         label = Label(
           isPageHeading = true,
-          classes = "govuk-label--s",
+          classes = "govuk-label--s" + hiddenIfLoggedIn,
           content = Text("Full name")
         ),
-        classes = "govuk-!-width-full",
+        classes = "govuk-!-width-full" + hiddenIfLoggedIn,
         value = form("fullName").value.orElse(loggedInSession.map(_.developer.displayedName)),
         errorMessage = form.error("fullName").map(e => ErrorMessage(content = Text(messages(e.message))))
       )
@@ -67,15 +90,16 @@
         name = "emailAddress",
         label = Label(
           isPageHeading = true,
-          classes = "govuk-label--s",
+          classes = "govuk-label--s" + hiddenIfLoggedIn,
           content = Text("Email address")
         ),
         hint = Some(
           Hint(
-            content = Text("We only use your email to respond to you")
+            content = Text("We’ll only use this to send you emails about your support request."),
+            classes = "govuk-hint" + hiddenIfLoggedIn
           )
         ),
-        classes = "govuk-!-width-full",
+        classes = "govuk-!-width-full" + hiddenIfLoggedIn,
         value = form("emailAddress").value.orElse(loggedInSession.map(_.developer.email.text)),
         errorMessage = form.error("emailAddress").map(e => ErrorMessage(content = Text(messages(e.message))))
       )
@@ -89,10 +113,25 @@
         label = Label(
           isPageHeading = true,
           classes = "govuk-label--s",
-          content = Text("Organisation")
+          content = Text("Your business or organisation")
         ),
         classes = "govuk-!-width-full",
         errorMessage = form.error("organisation").map(e => ErrorMessage(content = Text(messages(e.message))))
+      )
+    )
+
+    @govukInput(
+      Input(
+        id = "privateApi",
+        name = "privateApi",
+        value = form("privateApi").value.orElse(maybeChosenApiName),
+        label = Label(
+          isPageHeading = true,
+          classes = "govuk-label--s" + hiddenIfApiGiven,
+          content = Text("Which private API do you want to use?")
+        ),
+        classes = "govuk-!-width-full" + hiddenIfApiGiven,
+        errorMessage = form.error("privateApi").map(e => ErrorMessage(content = Text(messages(e.message))))
       )
     )
 
@@ -110,7 +149,15 @@
         errorMessage = form.error("applicationId").map(e => ErrorMessage(content = Text(messages(e.message))))
       )
     )
-     
+
+    @govukDetails(
+      Details(
+        id = Some("applicationIdDetails"),
+        summary = Text("How to find your application ID"),
+        content = HtmlContent(buildApplicationIdHtml())
+      )
+    )
+
     @govukButton(
       Button(
         id = Some("continue"),

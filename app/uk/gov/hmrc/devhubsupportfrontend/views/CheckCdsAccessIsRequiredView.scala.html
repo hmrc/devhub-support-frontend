@@ -32,21 +32,21 @@
 @(loggedInSession: Option[UserSession], form: Form[CheckCdsAccessIsRequiredForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(
-  pageTitle = "Are you intending to build software to integrate with the Customs Declaration Service(CDS)?",
+  pageTitle = "Do you intend to build software to integrate with the Customs Declarations Service (CDS)?",
   backLink = Some(BackLink(backUri)),
   loggedInSession = loggedInSession,
   form = Some(form)
 ) {
   @helper.form(action = routes.CheckCdsAccessIsRequiredController.submit()) {
     @helper.CSRF.formField
-    <span class="govuk-caption-l">Developer Hub support</span>
+    <span class="govuk-caption-l">Support</span>
     @govukRadios(
       Radios(
         fieldset = Some(
           Fieldset(
             legend = Some(
               Legend(
-                content = Text("Are you intending to build software to integrate with the Customs Declaration Service(CDS)?"),
+                content = Text("Do you intend to build software to integrate with the Customs Declarations Service (CDS)?"),
                 classes = "govuk-fieldset__legend--l",
                 isPageHeading = true
               )
@@ -65,7 +65,7 @@
           ), 
           RadioItem(
             id = Some("no"),
-            content = Text("No, I want to use third-party software"),
+            content = Text("No, I intend to use third-party software"),
             value = Some("no"),
             hint = None,
             conditionalHtml = None

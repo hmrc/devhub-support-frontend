@@ -202,6 +202,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
             fullName,
             email,
             organisation,
+            "my API",
             applicationId
           )
         )

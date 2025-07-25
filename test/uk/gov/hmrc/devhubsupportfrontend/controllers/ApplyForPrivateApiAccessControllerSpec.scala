@@ -52,8 +52,8 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
     )
 
     val supportSessionId = SupportSessionId.random
-    val basicFlow        = SupportFlow(supportSessionId, SupportData.PrivateApiDocumentation.id)
-    val appropriateFlow  = basicFlow.copy(privateApi = Some("xxx"))
+    val basicFlow        = SupportFlow(supportSessionId, SupportData.UsingAnApi.id)
+    val appropriateFlow  = basicFlow.copy(subSelection = Some(SupportData.PrivateApiDocumentation.id), privateApi = Some("xxx"))
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
 
@@ -78,16 +78,20 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
         status(result) shouldBe OK
       }
 
-      "render the previous page when flow has no private api present" in new Setup {
-        SupportServiceMock.GetSupportFlow.succeeds(basicFlow.copy(privateApi = None))
+      "render the page when flow has no private api present" in new Setup {
+        SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow.copy(privateApi = None))
 
         val result = addToken(underTest.page())(request)
 
-        shouldBeRedirectedToPreviousPage(result)
+        status(result) shouldBe OK
+
+        contentAsString(result) should include("Which private API do you want to use?")
+        contentAsString(result) should include("Full name")
+        contentAsString(result) should include("Email address")
       }
 
       "render the previous page when there is no flow" in new Setup {
-        SupportServiceMock.GetSupportFlow.succeeds(basicFlow.copy(privateApi = None))
+        SupportServiceMock.GetSupportFlow.succeeds(basicFlow)
 
         val result = addToken(underTest.page())(request)
 
@@ -101,6 +105,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
           "fullName"      -> "Bob",
           "emailAddress"  -> "bob@example.com",
           "organisation"  -> "org",
+          "privateApi"    -> "my API",
           "applicationId" -> "123456"
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)

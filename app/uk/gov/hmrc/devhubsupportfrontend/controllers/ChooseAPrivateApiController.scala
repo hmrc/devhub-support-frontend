@@ -17,7 +17,6 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import scala.annotation.nowarn
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -60,8 +59,8 @@ class ChooseAPrivateApiController @Inject() (
       routes.HelpWithUsingAnApiController.page().url
     )
 
-  def choose(choice: String)(flow: SupportFlow) =
-    flow.copy(privateApi = Some(choice))
+  def choose(choice: Option[String])(flow: SupportFlow) =
+    flow.copy(privateApi = choice)
 
   def updateFlowAndRedirect(flowFn: SupportFlow => SupportFlow)(redirectTo: Call)(flow: SupportFlow) = {
     supportService.updateWithDelta(flowFn)(flow).map { newFlow =>
@@ -69,17 +68,17 @@ class ChooseAPrivateApiController @Inject() (
     }
   }
 
-  def chooseBusinessRates(flow: SupportFlow) = choose(SupportData.ChooseBusinessRates.text)(flow)
-  def chooseCDS(flow: SupportFlow)           = choose(SupportData.ChooseCDS.text)(flow)
+  def chooseADifferentAPI(flow: SupportFlow) = choose(None)(flow)
+  def chooseCDS(flow: SupportFlow)           = choose(Some(SupportData.ChooseCDS.text))(flow)
 
   def onValidForm(flow: SupportFlow, form: ChooseAPrivateApiForm)(implicit request: MaybeUserRequest[AnyContent]): Future[Result] =
     form.chosenApiName match {
-      case c @ SupportData.ChooseBusinessRates.id => updateFlowAndRedirect(chooseBusinessRates)(routes.ApplyForPrivateApiAccessController.page())(flow)
+      case c @ SupportData.ChooseADifferentAPI.id => updateFlowAndRedirect(chooseADifferentAPI)(routes.ApplyForPrivateApiAccessController.page())(flow)
       case c @ SupportData.ChooseCDS.id           => updateFlowAndRedirect(chooseCDS)(routes.CheckCdsAccessIsRequiredController.page())(flow)
       case _                                      => throw new RuntimeException("Validation failed to eliminate bad data during Form processing")
     }
 
   def form(): Form[ChooseAPrivateApiForm] = ChooseAPrivateApiForm.form
 
-  def extraData()(implicit @nowarn request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
+  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
 }

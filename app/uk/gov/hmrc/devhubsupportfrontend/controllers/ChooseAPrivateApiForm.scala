@@ -25,7 +25,7 @@ object ChooseAPrivateApiForm extends FormValidation {
 
   val form: Form[ChooseAPrivateApiForm] = Form(
     mapping(
-      "apiName" -> oneOf(SupportData.ChooseBusinessRates.id, SupportData.ChooseCDS.id)
+      "apiName" -> oneOf(SupportData.ChooseADifferentAPI.id, SupportData.ChooseCDS.id)
     )(ChooseAPrivateApiForm.apply)(ChooseAPrivateApiForm.unapply)
   )
 }
