@@ -17,7 +17,6 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import scala.annotation.nowarn
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -85,7 +84,7 @@ class HelpWithApplicationsController @Inject() (
   def form(): Form[HelpWithApplicationsForm] = HelpWithApplicationsForm.form
 
   // Typically can be successful(Unit) if nothing is needed (see HelpWithUsingAnApiController for use to get api list)
-  def extraData()(implicit @nowarn request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
+  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
 
   def givingTeamMembersAccess(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
     successful(Ok(
