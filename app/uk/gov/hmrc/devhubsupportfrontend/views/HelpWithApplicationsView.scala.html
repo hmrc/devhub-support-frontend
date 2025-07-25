@@ -33,21 +33,21 @@
 @(loggedInSession: Option[UserSession], form: Form[HelpWithApplicationsForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(
-  pageTitle = "Which option best describes the help you need?",
+  pageTitle = "What do you need help with?",
   backLink = Some(BackLink(backUri)),
   loggedInSession = loggedInSession,
   form = Some(form)
 ) {
   @helper.form(action = routes.HelpWithApplicationsController.submit()) {
     @helper.CSRF.formField
-    <span class="govuk-caption-l">Support</span>
+    <span class="govuk-caption-l">Developer Hub support</span>
     @govukRadios(
       Radios(
         fieldset = Some(
           Fieldset(
             legend = Some(
               Legend(
-                content = Text("Which option best describes the help you need?"),
+                content = Text("Which best describes what you need help with?"),
                 classes = "govuk-fieldset__legend--l",
                 isPageHeading = true
               )
