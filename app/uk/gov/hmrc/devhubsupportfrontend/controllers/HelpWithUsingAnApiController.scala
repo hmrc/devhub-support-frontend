@@ -47,11 +47,12 @@ object HelpWithUsingAnApiController {
       api = form.apiNameForExamples
     )
 
-  def chooseReporting(form: HelpWithUsingAnApiForm)(flow: SupportFlow) =
+  def chooseReporting(form: HelpWithUsingAnApiForm)(flow: SupportFlow)  =
     flow.copy(
       subSelection = Some(SupportData.ReportingDocumentation.id),
       api = form.apiNameForReporting
     )
+  def chooseNone()(flow: SupportFlow)                                   = flow.copy(subSelection = Some(SupportData.NoneOfTheAbove.id))
 
   def choosePrivateApi(form: HelpWithUsingAnApiForm)(flow: SupportFlow) =
     flow.copy(subSelection = Some(SupportData.PrivateApiDocumentation.id))
@@ -114,6 +115,7 @@ class HelpWithUsingAnApiController @Inject() (
       case SupportData.GettingExamples.id         => updateFlowAndRedirect(chooseGettingExamples(form))(routes.SupportDetailsController.supportDetailsPage())(flow)
       case SupportData.ReportingDocumentation.id  => updateFlowAndRedirect(chooseReporting(form))(routes.SupportDetailsController.supportDetailsPage())(flow)
       case SupportData.PrivateApiDocumentation.id => updateFlowAndRedirect(choosePrivateApi(form))(routes.ChooseAPrivateApiController.page())(flow)
+      case SupportData.NoneOfTheAbove.id          => updateFlowAndRedirect(chooseNone())(routes.SupportDetailsController.supportDetailsPage())(flow)
       case _                                      => throw new RuntimeException("Validation failed to eliminate bad data during Form processing")
     }
   }
