@@ -40,7 +40,7 @@
 ) {
   @helper.form(action = routes.ChooseAPrivateApiController.submit()) {
     @helper.CSRF.formField
-    <span class="govuk-caption-l">Developer Hub support</span>
+    <span class="govuk-caption-l">Support</span>
     @govukRadios(
       Radios(
         fieldset = Some(
@@ -58,19 +58,19 @@
         name = "apiName",
         items = Seq(
           RadioItem(
-            id = Some(SupportData.ChooseBusinessRates.id),
-            content = Text(SupportData.ChooseBusinessRates.text),
-            value = Some(SupportData.ChooseBusinessRates.id),
-            hint = None,
-            conditionalHtml = None
-          ), 
-          RadioItem(
             id = Some(SupportData.ChooseCDS.id),
             content = Text(SupportData.ChooseCDS.text),
             value = Some(SupportData.ChooseCDS.id),
             hint = None,
             conditionalHtml = None
-          )
+          ),
+          RadioItem(
+            id = Some(SupportData.ChooseADifferentAPI.id),
+            content = Text(SupportData.ChooseADifferentAPI.text),
+            value = Some(SupportData.ChooseADifferentAPI.id),
+            hint = None,
+            conditionalHtml = None
+          ) 
         )
       )
     )

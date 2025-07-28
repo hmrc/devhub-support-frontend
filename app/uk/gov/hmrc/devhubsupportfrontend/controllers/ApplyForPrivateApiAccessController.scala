@@ -17,7 +17,6 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import scala.annotation.nowarn
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -48,16 +47,19 @@ class ApplyForPrivateApiAccessController @Inject() (
 
   def redirectBack(): Result = Redirect(routes.ChooseAPrivateApiController.page())
 
-  def filterValidFlow(flow: SupportFlow): Boolean = flow.privateApi.isDefined
+  def filterValidFlow(flow: SupportFlow): Boolean = flow match {
+    case SupportFlow(_, SupportData.UsingAnApi.id, Some(SupportData.PrivateApiDocumentation.id), _, _, _, _) => true
+    case _                                                                                                   => false
+  }
 
   def form() = ApplyForPrivateApiAccessForm.form
 
-  def extraData()(implicit @nowarn request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
+  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
 
   def pageContents(flow: SupportFlow, form: Form[ApplyForPrivateApiAccessForm], extras: Unit)(implicit request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable = {
     applyForPrivateApiAccessView(
       fullyloggedInDeveloper,
-      flow.privateApi.get,
+      flow.privateApi,
       form,
       routes.CheckCdsAccessIsRequiredController.page().url
     )
