@@ -17,7 +17,6 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import scala.annotation.nowarn
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -70,7 +69,7 @@ class CheckCdsAccessIsRequiredController @Inject() (
 
   def form() = CheckCdsAccessIsRequiredForm.form
 
-  def extraData()(implicit @nowarn request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
+  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
 
   def cdsAccessIsNotRequiredPage(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
     successful(Ok(

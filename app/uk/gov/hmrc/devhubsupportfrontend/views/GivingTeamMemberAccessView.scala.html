@@ -30,21 +30,26 @@
 @(loggedInSession: Option[UserSession], backUri: String, signInUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(
-  pageTitle = "Adding team members to an application",
+  pageTitle = "Give a team member access to a software application",
   backLink = Some(BackLink(backUri)),
   loggedInSession = loggedInSession,
   form = None
 ) {
-  <span class="govuk-caption-l">Developer Hub support</span>
-  <h1 class="govuk-heading-l">Adding team members to an application</h1>
+  <span class="govuk-caption-l">Support</span>
+  <h1 class="govuk-heading-l">Give a team member access to a software application</h1>
 
   <ul class="govuk-list govuk-list--number govuk-list--spaced">
-    <li><a href="@signInUri">Sign in to your developer hub account</a></li>
-    <li>Click the 'applications' link at the top of the page</li>
-    <li>Click the name of the application you want to add a team member to</li>
-    <li>Click 'Team members'</li>
-    <li>Enter the email address of the team member you would like to add to the application</li>
-    <li>Set their permissions to 'developer' or 'administrator'</li>
-    <li>Your new team member will receive an email confirming they have been added to the application</li>    
+    <li><a href="@signInUri">Sign in</a> to your Developer Hub account.</li>
+    <li>Select the name of the application you want to give access to.</li>
+    <li>Select 'Team members'.</li>
+    <li>Select 'Add a team member'.</li>
+    <li>Enter the email address of the team member.</li>
+    <li>Set their permissions level to 'Developer' or 'Administrator'.</li>
+    <li>Select 'Add team member'.</li>
+    <li>The team member will receive an email to confirm that they've been given access to the software application.</li> 
   </ul>
+
+  <p class="govuk-body">
+    <a href="@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.SupportDetailsController.supportDetailsPage()" class="govuk-link">I still need help</a>
+  </p>
 }

@@ -91,7 +91,7 @@ class SupportService @Inject() (
       supportFlow,
       form.fullName,
       form.emailAddress,
-      s"Private API documentation access request for Application Id[${form.applicationId}] to ${supportFlow.privateApi.getOrElse("?")} API."
+      s"Private API documentation access request for Application Id[${form.applicationId}] to ${form.privateApi} API."
     )
 
     submitTicket(

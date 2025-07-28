@@ -21,6 +21,9 @@ apply.for.private.access.fullname.error.maxLength.field=Enter your full name wit
 apply.for.private.access.organisation.error.required.field=Enter your organisation
 apply.for.private.access.organisation.error.maxLength.field=Enter your organisation with fewer than 300 characters
 
+apply.for.private.access.privateapi.error.required.field=Enter the private API that you want to use
+apply.for.private.access.privateapi.error.maxLength.field=Enter the private API that you want to use with fewer than 200 characters
+
 apply.for.private.access.applicationid.error.required.field=Enter your applicationId
 apply.for.private.access.applicationid.error.maxLength.field=Enter your applicationId with fewer than 48 characters
 

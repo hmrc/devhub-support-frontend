@@ -101,9 +101,9 @@ class ChooseAPrivateApiControllerSpec extends BaseControllerSpec with WithCSRFAd
     }
 
     "invoke submitChoiceOfPrivateApi" should {
-      "submit new valid request from form for business rates choice" in new Setup {
+      "submit new valid request from form for a different API choice" in new Setup {
         val formRequest = request.withFormUrlEncodedBody(
-          "apiName" -> SupportData.ChooseBusinessRates.id
+          "apiName" -> SupportData.ChooseADifferentAPI.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
         SupportServiceMock.UpdateWithDelta.succeeds()
@@ -127,7 +127,7 @@ class ChooseAPrivateApiControllerSpec extends BaseControllerSpec with WithCSRFAd
 
       "submit invalid request returns BAD_REQUEST" in new Setup {
         val formRequest = request.withFormUrlEncodedBody(
-          "bobbins" -> SupportData.ChooseBusinessRates.id
+          "bobbins" -> SupportData.ChooseADifferentAPI.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
 

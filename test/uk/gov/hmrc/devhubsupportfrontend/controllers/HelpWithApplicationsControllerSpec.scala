@@ -80,6 +80,7 @@ class HelpWithApplicationsControllerSpec extends BaseControllerSpec with WithCSR
         val result = addToken(underTest.givingTeamMembersAccess())(request)
 
         status(result) shouldBe OK
+        contentAsString(result) should include("Give a team member access to a software application")
       }
     }
 
