@@ -72,12 +72,12 @@ class HelpWithApplicationsController @Inject() (
 
   def onValidForm(flow: SupportFlow, form: HelpWithApplicationsForm)(implicit request: MaybeUserRequest[AnyContent]): Future[Result] = {
     form.choice match {
-      case SupportData.GivingTeamMemberAccess.id                                                   => successful(Redirect(routes.HelpWithApplicationsController.givingTeamMembersAccess()))
-      case SupportData.CompletingTermsOfUseAgreement.id | SupportData.GeneralApplicationDetails.id =>
-        supportService.updateWithDelta(choose(form))(flow).map { newFlow =>
+      case SupportData.GivingTeamMemberAccess.id                                        => successful(Redirect(routes.HelpWithApplicationsController.givingTeamMembersAccess()))
+      case SupportData.CompletingTermsOfUseAgreement.id | SupportData.NoneOfTheAbove.id =>
+        supportService.updateWithDelta(choose(form))(flow).map { _ =>
           Redirect(routes.SupportDetailsController.supportDetailsPage())
         }
-      case _                                                                                       => throw new RuntimeException("Validation failed to eliminate bad data during Form processing")
+      case _                                                                            => throw new RuntimeException("Validation failed to eliminate bad data during Form processing")
     }
   }
 
