@@ -34,13 +34,14 @@
   backLink = Some(BackLink(backUrl)),
   loggedInSession = loggedInSession
 ) {
-  <span class="govuk-caption-l">Developer Hub support</span>
-  <h1 class="govuk-heading-l">How to remove access codes for signing in</h1>
-  <p class="govuk-body">If you don't have access to the device you setup to get access codes</p>
+  <span class="govuk-caption-l">Support</span>
+  <h1 class="govuk-heading-l">Remove access codes to sign in to the Developer Hub</h1>
+  <p class="govuk-body">You can temporarily remove the need for an access code to sign in to your account.</p>
   <ol class="govuk-list govuk-list--number govuk-list--spaced govuk-!-margin-bottom-8">
-    <li><a href="@loginUrl" class="govuk-link">Sign in to your developer hub account</a></li>
-    <li>When you are asked for an access code, click the "I cannot get an access code" link</li>
-    <li>We will remove access codes for signing in from your account and email you within 2 working days</li>
-    <li>Sign in to your account and add a new way to get access codes</li>
+    <li><a href="@loginUrl" class="govuk-link">Sign in</a> to your Developer Hub account.</li>
+    <li>When you're asked to enter your access code, select 'I cannot get an access code'.</li>
+    <li>We'll remove access codes from your account within 2 UK business days. You'll receive an email as soon as they're removed.</li>
+    <li>Sign in to your Developer Hub account and add a new way to get your access codes to keep your account secure.</li>
   </ol>
+    <p class="govuk-body"><a href="@{appConfig.thirdPartyDeveloperFrontendUrl}" class="govuk-link">Return to the Developer Hub homepage</a></p>
 }
