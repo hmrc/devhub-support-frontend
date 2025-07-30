@@ -58,7 +58,6 @@
             Seq(TableRow(content = Text(messages("ticketdetails.field.status"))), TableRow(content = HtmlContent(buildStatusHtml(ticket.status)))),
             Seq(TableRow(content = Text(messages("ticketdetails.field.datelastupdated"))), TableRow(content = HtmlContent(buildHistoryLinkHtml(dateFormatter.format(ticket.dateLastUpdated))))),
             Seq(TableRow(content = Text(messages("ticketdetails.field.datecreated"))), TableRow(content = Text(dateFormatter.format(ticket.dateCreated)))),
-            Seq(TableRow(content = Text(messages("ticketdetails.field.dateresolved"))), TableRow(content = Text(if (ticket.dateResolved.isDefined) {dateFormatter.format(ticket.dateResolved.get)} else "")))
           )
       ))
 
