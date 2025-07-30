@@ -36,6 +36,8 @@ class TicketServiceSpec extends AsyncHmrcSpec {
     val ticketId: Int = 4232
     val userEmail     = LaxEmailAddress("bob@example.com")
     val message       = "Test message"
+    val status        = "awaiting_agent"
+    val userName      = "Bob Fleming"
 
     val ticket    = DeskproTicket(
       ticketId,
@@ -92,15 +94,25 @@ class TicketServiceSpec extends AsyncHmrcSpec {
     "create a response for a Deskpro ticket" in new Setup {
       ApiPlatformDeskproConnectorMock.CreateResponse.succeeds()
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, userName))
 
       result shouldBe DeskproTicketResponseSuccess
+      ApiPlatformDeskproConnectorMock.CreateResponse.verifyCalledWith(ticketId, userEmail, message)
+    }
+
+    "create a response for a resolved Deskpro ticket" in new Setup {
+      ApiPlatformDeskproConnectorMock.CreateResponse.succeeds()
+
+      val result = await(underTest.createResponse(ticketId, userEmail, message, "resolved", userName))
+
+      result shouldBe DeskproTicketResponseSuccess
+      ApiPlatformDeskproConnectorMock.CreateResponse.verifyCalledWith(ticketId, userEmail, "Test message\nBob Fleming reopened this support request")
     }
 
     "return DeskproTicketResponseNotFound if ticket not found" in new Setup {
       ApiPlatformDeskproConnectorMock.CreateResponse.notFound()
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, userName))
 
       result shouldBe DeskproTicketResponseNotFound
     }
@@ -108,7 +120,7 @@ class TicketServiceSpec extends AsyncHmrcSpec {
     "return DeskproTicketResponseFailure if ticket response failed" in new Setup {
       ApiPlatformDeskproConnectorMock.CreateResponse.fails()
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, userName))
 
       result shouldBe DeskproTicketResponseFailure
     }

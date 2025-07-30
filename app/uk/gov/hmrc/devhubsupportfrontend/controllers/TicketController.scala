@@ -51,7 +51,7 @@ object TicketController {
   val ticketResponseForm: Form[TicketResponseForm] = Form(
     mapping(
       "response" -> optional(text).verifying("ticketdetails.response.required", _.isDefined),
-      "status" -> text
+      "status"   -> text
     )(TicketResponseForm.apply)(TicketResponseForm.unapply)
   )
 }
