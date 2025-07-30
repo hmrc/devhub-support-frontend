@@ -15,7 +15,7 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "http-metrics"                           % "2.9.0",
     "uk.gov.hmrc"             %% "api-platform-api-domain"                % apiDomainVersion,
     "uk.gov.hmrc"             %% "api-platform-tpd-domain"                % tpdDomainVersion,
-    "uk.gov.hmrc" %% "play-conditional-form-mapping-play-30" % "3.3.0"
+    "uk.gov.hmrc"             %% "play-conditional-form-mapping-play-30"  % "3.3.0"
   )
 
   val test = Seq(
