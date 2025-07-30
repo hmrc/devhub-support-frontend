@@ -47,14 +47,13 @@ object HelpWithUsingAnApiController {
       api = form.apiNameForExamples
     )
 
-  def chooseReporting(form: HelpWithUsingAnApiForm)(flow: SupportFlow)  =
+  def chooseReporting(form: HelpWithUsingAnApiForm)(flow: SupportFlow) =
     flow.copy(
       subSelection = Some(SupportData.ReportingDocumentation.id),
       api = form.apiNameForReporting
     )
 
-  def chooseNone()(flow: SupportFlow)                                  = flow.copy(subSelection = Some(SupportData.NoneOfTheAbove.id))
-
+  def chooseNone()(flow: SupportFlow) = flow.copy(subSelection = Some(SupportData.NoneOfTheAbove.id))
 
   def choosePrivateApi(form: HelpWithUsingAnApiForm)(flow: SupportFlow) =
     flow.copy(subSelection = Some(SupportData.PrivateApiDocumentation.id))
