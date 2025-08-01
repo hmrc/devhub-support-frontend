@@ -228,6 +228,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       "return to the tickets list when response submitted successfully" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
           .withFormUrlEncodedBody(
+            "status"   -> "awaiting_agent",
             "response" -> "Test response"
           )
 
@@ -253,6 +254,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       "return 500 if ticket not found" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
           .withFormUrlEncodedBody(
+            "status"   -> "awaiting_agent",
             "response" -> "Test response"
           )
         TicketServiceMock.CreateResponse.notFound()
@@ -265,6 +267,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       "return 500 if submit response failed" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
           .withFormUrlEncodedBody(
+            "status"   -> "awaiting_agent",
             "response" -> "Test response"
           )
         TicketServiceMock.CreateResponse.fails()

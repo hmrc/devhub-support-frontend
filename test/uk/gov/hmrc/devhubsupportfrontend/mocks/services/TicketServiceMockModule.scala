@@ -56,13 +56,13 @@ trait TicketServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
     object CreateResponse {
 
       def succeeds() =
-        when(aMock.createResponse(*, *[LaxEmailAddress], *)(*)).thenReturn(successful(DeskproTicketResponseSuccess))
+        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *)(*)).thenReturn(successful(DeskproTicketResponseSuccess))
 
       def notFound() =
-        when(aMock.createResponse(*, *[LaxEmailAddress], *)(*)).thenReturn(successful(DeskproTicketResponseNotFound))
+        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *)(*)).thenReturn(successful(DeskproTicketResponseNotFound))
 
       def fails() =
-        when(aMock.createResponse(*, *[LaxEmailAddress], *)(*)).thenReturn(successful(DeskproTicketResponseFailure))
+        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *)(*)).thenReturn(successful(DeskproTicketResponseFailure))
     }
 
     object GetTicketsForUser {

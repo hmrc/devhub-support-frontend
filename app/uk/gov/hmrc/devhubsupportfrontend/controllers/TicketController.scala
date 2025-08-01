@@ -44,12 +44,14 @@ object TicketController {
   )
 
   case class TicketResponseForm(
-      response: Option[String]
+      response: Option[String],
+      status: String
     )
 
   val ticketResponseForm: Form[TicketResponseForm] = Form(
     mapping(
-      "response" -> optional(text).verifying("ticketdetails.response.required", _.isDefined)
+      "response" -> optional(text).verifying("ticketdetails.response.required", _.isDefined),
+      "status"   -> text
     )(TicketResponseForm.apply)(TicketResponseForm.unapply)
   )
 }
@@ -100,7 +102,7 @@ class TicketController @Inject() (
       }
 
     def handleValidForm(validForm: TicketResponseForm) = {
-      ticketService.createResponse(ticketId, request.email, validForm.response.get).map {
+      ticketService.createResponse(ticketId, request.email, validForm.response.get, validForm.status, request.displayedName).map {
         case DeskproTicketResponseSuccess  => Redirect(routes.TicketController.ticketListPage().url)
         case DeskproTicketResponseNotFound => InternalServerError
         case DeskproTicketResponseFailure  => InternalServerError

@@ -82,6 +82,8 @@
       @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.submitTicketResponse(ticket.id)) {
           @helper.CSRF.formField
 
+          <input type="hidden" name="status" value="@{ticket.status}">
+
           @govukCharacterCount(CC(
               id = "response",
               name = "response",
