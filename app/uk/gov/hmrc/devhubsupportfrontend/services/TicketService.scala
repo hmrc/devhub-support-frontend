@@ -50,7 +50,7 @@ class TicketService @Inject() (
       : Future[DeskproTicketResponseResult] = {
     def getMessage() = {
       if (status == "resolved") {
-        s"$message\n$userName reopened this support request"
+        s"$message<p><strong>$userName reopened this support request</strong></p>"
       } else {
         message
       }

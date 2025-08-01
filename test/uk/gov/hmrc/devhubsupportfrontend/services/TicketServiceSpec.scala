@@ -106,7 +106,7 @@ class TicketServiceSpec extends AsyncHmrcSpec {
       val result = await(underTest.createResponse(ticketId, userEmail, message, "resolved", userName))
 
       result shouldBe DeskproTicketResponseSuccess
-      ApiPlatformDeskproConnectorMock.CreateResponse.verifyCalledWith(ticketId, userEmail, "Test message\nBob Fleming reopened this support request")
+      ApiPlatformDeskproConnectorMock.CreateResponse.verifyCalledWith(ticketId, userEmail, "Test message<p><strong>Bob Fleming reopened this support request</strong></p>")
     }
 
     "return DeskproTicketResponseNotFound if ticket not found" in new Setup {
