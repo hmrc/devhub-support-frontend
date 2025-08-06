@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 
+@import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
@@ -29,17 +30,37 @@
 
 
 @layout(
-  pageTitle = "Your support request has been received",
+  pageTitle = "Your support request has been submitted",
   loggedInSession = loggedInSession
 ) {
     @govukPanel(Panel(
-        title = Text("Your support request has been received"),
+        title = Text("Your support request has been submitted"),
         content = HtmlContent(s"""Your reference number<br><strong>${supportFlow.referenceNumber.getOrElse("Reference Not Found")}</strong>""")
     ))
+
+    @if(loggedInSession.isDefined) {
+      <div class="govuk-inset-text">
+        <p class="govuk-body">
+          You can now 
+          <a href="@{routes.TicketController.ticketListPage(false)}" class="govuk-link govuk-link--no-visited-state">view and track your support requests</a> 
+          in your Developer Hub account.
+        </p>
+      </div>
+      <p class="govuk-body">We've sent you a confirmation email too.</p>
+    } else {
+      <p class="govuk-body">We've sent you a confirmation email.</p>
+    }
+
     <h2 class="govuk-heading-m">What happens next</h2>
 
+    <p class="govuk-body">Your request will be sent to the right team as quickly as possible.</p>
+    <p class="govuk-body">The team will reply within 2 UK business days.</p>
     <p class="govuk-body">
-        Our Software Developers Support Team (SDST) will email you on <strong>@{supportFlow.emailAddress.getOrElse("")}</strong> within 2 working days.
+      We'll send an email to 
+      <span class="govuk-!-font-weight-bold">@{supportFlow.emailAddress.getOrElse("your email address")}</span> whenever there's an update.
+    </p>
+    <p class="govuk-body">You can now 
+      <a href="@{appConfig.thirdPartyDeveloperFrontendUrl}" class="govuk-link govuk-link--no-visited-state">return to the Developer Hub homepage.</a>
     </p>
 
 }

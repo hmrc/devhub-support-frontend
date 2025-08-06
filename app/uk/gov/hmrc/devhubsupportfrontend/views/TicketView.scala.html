@@ -24,6 +24,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.{CharacterCount => CC}
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.TicketResponseForm
 
+@import java.util.Locale
 @import java.time.ZoneId
 @import java.time.ZoneOffset
 @import java.time.format.DateTimeFormatter
@@ -51,7 +52,7 @@
 ) {
   <h1 class="govuk-heading-l">@{ticket.subject} - @{ticket.ref}</h1>
 
-  @defining(DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mm a").withZone(ZoneId.of("Europe/London"))) { dateFormatter =>
+  @defining(DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mm a").withZone(ZoneId.of("Europe/London")).withLocale(Locale.UK)) { dateFormatter =>
       @govukTable(Table(
           firstCellIsHeader = true,
           rows = Seq(
