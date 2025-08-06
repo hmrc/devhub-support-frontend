@@ -77,7 +77,7 @@
                     <p class="govuk-body">You do not have any unresolved requests at the moment.</p>
                 }
             } else {
-                @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm").withZone(ZoneId.of("Europe/London"))) { dateFormatter =>
+                @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.of("Europe/London"))) { dateFormatter =>
                     @govukTable(Table(
                         caption = if(resolved) Some(messages("ticketlist.table.resolved")) else Some(messages("ticketlist.table.unresolved")),
                         captionClasses = "govuk-table__caption--m",

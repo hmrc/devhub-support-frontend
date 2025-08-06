@@ -34,7 +34,7 @@
 }
 
 .hmrc-timeline__event-content {
-  p {
+  p, h1, h2, h3 {
     @extend .govuk-body;
   }
 }
