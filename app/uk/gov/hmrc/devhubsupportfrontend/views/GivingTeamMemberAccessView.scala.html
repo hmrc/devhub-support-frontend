@@ -39,7 +39,7 @@
   <h1 class="govuk-heading-l">Give a team member access to a software application</h1>
 
   <ul class="govuk-list govuk-list--number govuk-list--spaced">
-    <li><a href="@signInUri">Sign in</a> to your Developer Hub account.</li>
+    <li><a href="@signInUri" class="govuk-link govuk-link--no-visited-state" target="_blank">Sign in</a> to your Developer Hub account.</li>
     <li>Select the name of the application you want to give access to.</li>
     <li>Select 'Team members'.</li>
     <li>Select 'Add a team member'.</li>
@@ -51,5 +51,8 @@
 
   <p class="govuk-body">
     <a href="@uk.gov.hmrc.devhubsupportfrontend.controllers.routes.SupportDetailsController.supportDetailsPage()" class="govuk-link">I still need help</a>
+  </p>
+  <p class="govuk-body">
+    <a href="@{appConfig.thirdPartyDeveloperFrontendUrl}" class="govuk-link govuk-link--no-visited-state">Return to the Developer Hub homepage</a>
   </p>
 }
