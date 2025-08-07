@@ -143,7 +143,8 @@ object ApiPlatformDeskproStub {
         post(urlEqualTo(s"/ticket/$ticketId/response"))
           .withRequestBody(equalToJson(s"""{
                                           |  "userEmail": "$userEmail",
-                                          |  "message": "$message"
+                                          |  "message": "$message",
+                                          |  "status": "awaiting_agent"
                                           |}""".stripMargin))
           .willReturn(
             aResponse()

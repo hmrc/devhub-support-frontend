@@ -67,14 +67,6 @@
               <br>
               @{messages("ticketdetails.resolvedticketmessage2")}
           </div> 
-      } else {
-          <div class="govuk-button-group">
-              @govukButton(Button(
-                        id = Some("closeTicket"),
-                        isStartButton = false,
-                        content = Text(messages("ticketdetails.button.close")),
-                        href=Some(uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.closeTicket(ticket.id).url)))
-          </div>
       }
 
       <h2 id="history" class="govuk-heading-l govuk-!-margin-bottom-6 govuk-!-margin-top-9">@{messages("ticketdetails.messagehistory")}</h2>
@@ -101,9 +93,23 @@
           @govukButton(
               Button(
                   id = Some("continue"),
+                  name = Some("action"),
+                  preventDoubleClick = Some(true),
+                  value = Some("send"),
                   content = Text(messages("ticketdetails.button.sendmessage"))
               )
           )
+          @if(ticket.status != "resolved") {
+              @govukButton(
+                  Button(
+                      id = Some("close"),
+                      name = Some("action"),
+                      value = Some("close"),
+                      preventDoubleClick = Some(true),
+                      classes = "govuk-button govuk-button--secondary",
+                      content = Text(messages("ticketdetails.button.close"))
+                  ))
+          }
       }
       @hmrcTimeline(Timeline(
         events = ticket.messages.filter(t => !t.isAgentNote).map(message =>
