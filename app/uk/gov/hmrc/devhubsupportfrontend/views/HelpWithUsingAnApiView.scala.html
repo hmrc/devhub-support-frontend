@@ -38,7 +38,7 @@
   Seq(SelectItem(value = None, text = "")).concat(
   apis.map( api =>
     SelectItem(
-      value = Some(api.serviceName.value),
+      value = Some(api.name),
       text = api.name
     )
   ))

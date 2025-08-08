@@ -38,8 +38,8 @@ import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
 import uk.gov.hmrc.devhubsupportfrontend.views.html.HelpWithUsingAnApiView
 
 class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
-  val supportSessionId   = SupportSessionId.random
-  val apiServiceNameText = ApiDefinitionData.apiDefinition.serviceName.value
+  val supportSessionId = SupportSessionId.random
+  val apiName          = ApiDefinitionData.apiDefinition.name
 
   trait Setup extends SupportServiceMockModule with ThirdPartyDeveloperConnectorMockModule with UserBuilder with LocalUserIdTracker {
     val helpWithUsingAnApiView = app.injector.instanceOf[HelpWithUsingAnApiView]
@@ -90,36 +90,36 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
   "HelpWithUsingAnApiController" when {
     "using the delta functions" should {
       "work for chooseMakingCall" in {
-        val form = HelpWithUsingAnApiForm("ignored", apiNameForCall = Some(apiServiceNameText), None, None)
+        val form = HelpWithUsingAnApiForm("ignored", apiNameForCall = Some(apiName), None, None)
         val flow = SupportFlow(supportSessionId, "untouched")
 
         val result = HelpWithUsingAnApiController.chooseMakingCall(form)(flow)
 
         result.entrySelection shouldBe "untouched"
         result.subSelection.value shouldBe SupportData.MakingAnApiCall.id
-        result.api.value shouldBe apiServiceNameText
+        result.api.value shouldBe apiName
       }
 
       "work for chooseGettingExamples" in {
-        val form = HelpWithUsingAnApiForm("ignored", None, apiNameForExamples = Some(apiServiceNameText), None)
+        val form = HelpWithUsingAnApiForm("ignored", None, apiNameForExamples = Some(apiName), None)
         val flow = SupportFlow(supportSessionId, "untouched")
 
         val result = HelpWithUsingAnApiController.chooseGettingExamples(form)(flow)
 
         result.entrySelection shouldBe "untouched"
         result.subSelection.value shouldBe SupportData.GettingExamples.id
-        result.api.value shouldBe apiServiceNameText
+        result.api.value shouldBe apiName
       }
 
       "work for chooseReporting" in {
-        val form = HelpWithUsingAnApiForm("ignored", None, None, apiNameForReporting = Some(apiServiceNameText))
+        val form = HelpWithUsingAnApiForm("ignored", None, None, apiNameForReporting = Some(apiName))
         val flow = SupportFlow(supportSessionId, "untouched")
 
         val result = HelpWithUsingAnApiController.chooseReporting(form)(flow)
 
         result.entrySelection shouldBe "untouched"
         result.subSelection.value shouldBe SupportData.ReportingDocumentation.id
-        result.api.value shouldBe apiServiceNameText
+        result.api.value shouldBe apiName
       }
 
       "work for choosePrivateApi" in {
@@ -172,7 +172,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
         val formRequest = request
           .withFormUrlEncodedBody(
             "choice"                                            -> SupportData.MakingAnApiCall.id,
-            SupportData.MakingAnApiCall.id + "-api-name"        -> apiServiceNameText,
+            SupportData.MakingAnApiCall.id + "-api-name"        -> apiName,
             SupportData.GettingExamples.id + "-api-name"        -> "ignored",
             SupportData.ReportingDocumentation.id + "-api-name" -> "ignored"
           )
@@ -190,7 +190,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
           .withFormUrlEncodedBody(
             "choice"                                            -> SupportData.GettingExamples.id,
             SupportData.MakingAnApiCall.id + "-api-name"        -> "ignored",
-            SupportData.GettingExamples.id + "-api-name"        -> apiServiceNameText,
+            SupportData.GettingExamples.id + "-api-name"        -> apiName,
             SupportData.ReportingDocumentation.id + "-api-name" -> "ignored"
           )
 
@@ -207,7 +207,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
             "choice"                                            -> SupportData.ReportingDocumentation.id,
             SupportData.MakingAnApiCall.id + "-api-name"        -> "ignored",
             SupportData.GettingExamples.id + "-api-name"        -> "ignored",
-            SupportData.ReportingDocumentation.id + "-api-name" -> apiServiceNameText
+            SupportData.ReportingDocumentation.id + "-api-name" -> apiName
           )
 
         val result = addToken(underTest.submit())(formRequest)
@@ -247,7 +247,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
           "choice"                                            -> SupportData.ReportingDocumentation.id,
           SupportData.MakingAnApiCall.id + "-api-name"        -> "ignored",
           SupportData.GettingExamples.id + "-api-name"        -> "ignored",
-          SupportData.ReportingDocumentation.id + "-api-name" -> apiServiceNameText
+          SupportData.ReportingDocumentation.id + "-api-name" -> apiName
         )
 
         SupportServiceMock.GetSupportFlow.succeeds(basicFlow)

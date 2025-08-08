@@ -98,7 +98,7 @@ class HelpWithUsingAnApiController @Inject() (
     def validate(fieldName: String) = {
       val matchesApiName = form(fieldName).value
         .filter(_.nonEmpty)
-        .forall(value => extraData.exists(_.serviceName.value == value))
+        .forall(value => extraData.exists(_.name == value))
 
       if (matchesApiName) form else form.withError(fieldName, "please.select.a.valid.api")
     }
