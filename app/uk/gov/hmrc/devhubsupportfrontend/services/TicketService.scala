@@ -24,7 +24,7 @@ import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.{DeskproTicketCloseResult, DeskproTicketResponseResult}
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.DeskproTicketResponseResult
 import uk.gov.hmrc.devhubsupportfrontend.domain.models._
 
 @Singleton
@@ -42,19 +42,17 @@ class TicketService @Inject() (
     deskproConnector.fetchTicket(ticketId, hc)
   }
 
-  def closeTicket(ticketId: Int)(implicit hc: HeaderCarrier): Future[DeskproTicketCloseResult] = {
-    deskproConnector.closeTicket(ticketId, hc)
-  }
-
-  def createResponse(ticketId: Int, userEmail: LaxEmailAddress, message: String, status: String, userName: String)(implicit hc: HeaderCarrier)
+  def createResponse(ticketId: Int, userEmail: LaxEmailAddress, message: String, status: String, userName: String, newStatus: String)(implicit hc: HeaderCarrier)
       : Future[DeskproTicketResponseResult] = {
     def getMessage() = {
       if (status == "resolved") {
         s"$message<p><strong>$userName reopened this support request</strong></p>"
+      } else if (newStatus == "resolved") {
+        s"$message<p><strong>$userName marked this support request as resolved</strong></p>"
       } else {
         message
       }
     }
-    deskproConnector.createResponse(ticketId, userEmail, getMessage(), hc)
+    deskproConnector.createResponse(ticketId, userEmail, getMessage(), newStatus, hc)
   }
 }

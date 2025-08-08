@@ -41,28 +41,16 @@ trait TicketServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
     }
 
-    object CloseTicket {
-
-      def succeeds() =
-        when(aMock.closeTicket(*)(*)).thenReturn(successful(DeskproTicketCloseSuccess))
-
-      def notFound() =
-        when(aMock.closeTicket(*)(*)).thenReturn(successful(DeskproTicketCloseNotFound))
-
-      def fails() =
-        when(aMock.closeTicket(*)(*)).thenReturn(successful(DeskproTicketCloseFailure))
-    }
-
     object CreateResponse {
 
       def succeeds() =
-        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *)(*)).thenReturn(successful(DeskproTicketResponseSuccess))
+        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *, *)(*)).thenReturn(successful(DeskproTicketResponseSuccess))
 
       def notFound() =
-        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *)(*)).thenReturn(successful(DeskproTicketResponseNotFound))
+        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *, *)(*)).thenReturn(successful(DeskproTicketResponseNotFound))
 
       def fails() =
-        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *)(*)).thenReturn(successful(DeskproTicketResponseFailure))
+        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *, *)(*)).thenReturn(successful(DeskproTicketResponseFailure))
     }
 
     object GetTicketsForUser {

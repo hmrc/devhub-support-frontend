@@ -38,6 +38,7 @@ class TicketServiceSpec extends AsyncHmrcSpec {
     val message       = "Test message"
     val status        = "awaiting_agent"
     val userName      = "Bob Fleming"
+    val newStatus     = "awaiting_agent"
 
     val ticket    = DeskproTicket(
       ticketId,
@@ -64,37 +65,11 @@ class TicketServiceSpec extends AsyncHmrcSpec {
     }
   }
 
-  "closeTicket" should {
-    "close a Deskpro ticket" in new Setup {
-      ApiPlatformDeskproConnectorMock.CloseTicket.succeeds()
-
-      val result = await(underTest.closeTicket(ticketId))
-
-      result shouldBe DeskproTicketCloseSuccess
-    }
-
-    "return DeskproTicketCloseNotFound if ticket not found" in new Setup {
-      ApiPlatformDeskproConnectorMock.CloseTicket.notFound()
-
-      val result = await(underTest.closeTicket(ticketId))
-
-      result shouldBe DeskproTicketCloseNotFound
-    }
-
-    "return DeskproTicketCloseFailure if ticket close failed" in new Setup {
-      ApiPlatformDeskproConnectorMock.CloseTicket.fails()
-
-      val result = await(underTest.closeTicket(ticketId))
-
-      result shouldBe DeskproTicketCloseFailure
-    }
-  }
-
   "createResponse" should {
     "create a response for a Deskpro ticket" in new Setup {
       ApiPlatformDeskproConnectorMock.CreateResponse.succeeds()
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, status, userName))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, userName, newStatus))
 
       result shouldBe DeskproTicketResponseSuccess
       ApiPlatformDeskproConnectorMock.CreateResponse.verifyCalledWith(ticketId, userEmail, message)
@@ -103,16 +78,25 @@ class TicketServiceSpec extends AsyncHmrcSpec {
     "create a response for a resolved Deskpro ticket" in new Setup {
       ApiPlatformDeskproConnectorMock.CreateResponse.succeeds()
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, "resolved", userName))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, "resolved", userName, newStatus))
 
       result shouldBe DeskproTicketResponseSuccess
       ApiPlatformDeskproConnectorMock.CreateResponse.verifyCalledWith(ticketId, userEmail, "Test message<p><strong>Bob Fleming reopened this support request</strong></p>")
     }
 
+    "create a response for resolving Deskpro ticket" in new Setup {
+      ApiPlatformDeskproConnectorMock.CreateResponse.succeeds()
+
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, userName, "resolved"))
+
+      result shouldBe DeskproTicketResponseSuccess
+      ApiPlatformDeskproConnectorMock.CreateResponse.verifyCalledWith(ticketId, userEmail, "Test message<p><strong>Bob Fleming marked this support request as resolved</strong></p>")
+    }
+
     "return DeskproTicketResponseNotFound if ticket not found" in new Setup {
       ApiPlatformDeskproConnectorMock.CreateResponse.notFound()
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, status, userName))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, userName, newStatus))
 
       result shouldBe DeskproTicketResponseNotFound
     }
@@ -120,7 +104,7 @@ class TicketServiceSpec extends AsyncHmrcSpec {
     "return DeskproTicketResponseFailure if ticket response failed" in new Setup {
       ApiPlatformDeskproConnectorMock.CreateResponse.fails()
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, status, userName))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, userName, newStatus))
 
       result shouldBe DeskproTicketResponseFailure
     }

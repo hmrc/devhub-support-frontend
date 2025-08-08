@@ -147,7 +147,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         contentAsString(result) should include("HMRC Developer Hub: Support Enquiry")
         contentAsString(result) should include("We need your reply")
         contentAsString(result) should include("Test message contents")
-        contentAsString(result) should include("Close this support request")
+        contentAsString(result) should include("Mark as resolved")
       }
 
       "hide the close button when ticket is resolved" in new Setup with IsLoggedIn {
@@ -157,7 +157,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
         status(result) shouldBe OK
         contentAsString(result) should include("SDST-2025XON927")
-        contentAsString(result) should not include ("Close this support request")
+        contentAsString(result) should not include ("Mark as resolved")
       }
 
       "return 404 if ticket not found" in new Setup with IsLoggedIn {
@@ -186,49 +186,13 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     }
   }
 
-  "Close a ticket" when {
-    "invoke closeTicket" should {
-      "return to the tickets list when ticket closed successfully" in new Setup with IsLoggedIn {
-        TicketServiceMock.CloseTicket.succeeds()
-
-        val result = addToken(underTest.closeTicket(ticketId))(request)
-
-        status(result) shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe "/devhub-support/tickets"
-
-      }
-
-      "return 500 if ticket not found" in new Setup with IsLoggedIn {
-        TicketServiceMock.CloseTicket.notFound()
-
-        val result = addToken(underTest.closeTicket(ticketId))(request)
-
-        status(result) shouldBe INTERNAL_SERVER_ERROR
-      }
-
-      "return 500 if ticket close failed" in new Setup with IsLoggedIn {
-        TicketServiceMock.CloseTicket.fails()
-
-        val result = addToken(underTest.closeTicket(ticketId))(request)
-
-        status(result) shouldBe INTERNAL_SERVER_ERROR
-      }
-
-      "redirect to logon page if not logged in" in new Setup with NotLoggedIn {
-        val result = addToken(underTest.closeTicket(ticketId))(request)
-
-        status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some("/developer/login")
-      }
-    }
-  }
-
   "Submit a response" when {
     "invoke submitTicketResponse" should {
       "return to the tickets list when response submitted successfully" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
           .withFormUrlEncodedBody(
             "status"   -> "awaiting_agent",
+            "action"   -> "send",
             "response" -> "Test response"
           )
 
@@ -255,6 +219,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         val ticketResponseRequest = request
           .withFormUrlEncodedBody(
             "status"   -> "awaiting_agent",
+            "action"   -> "send",
             "response" -> "Test response"
           )
         TicketServiceMock.CreateResponse.notFound()
@@ -268,6 +233,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         val ticketResponseRequest = request
           .withFormUrlEncodedBody(
             "status"   -> "awaiting_agent",
+            "action"   -> "send",
             "response" -> "Test response"
           )
         TicketServiceMock.CreateResponse.fails()
