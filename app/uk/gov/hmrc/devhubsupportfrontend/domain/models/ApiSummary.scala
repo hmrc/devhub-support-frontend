@@ -41,7 +41,7 @@ object ApiSummary {
   def fromXmlApi(xmlApi: XmlApi) = {
     ApiSummary(
       xmlApi.serviceName,
-      xmlApi.name,
+      s"${xmlApi.name} - XML",
       xmlApi.context
     )
   }

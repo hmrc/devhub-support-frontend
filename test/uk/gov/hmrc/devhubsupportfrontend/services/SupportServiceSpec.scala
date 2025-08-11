@@ -58,7 +58,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
 
   val xmlApiSummary = ApiSummary(
     ServiceName("Xml Api service"),
-    xmlApiName,
+    s"$xmlApiName - XML",
     ApiContext("Xml Api context")
   )
 
