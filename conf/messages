@@ -59,6 +59,7 @@ ticketdetails.field.message=Message
 ticketdetails.field.addamessage=Add a message
 ticketdetails.button.close=Close this support request
 ticketdetails.button.sendmessage=Send message
+ticketdetails.button.close=Mark as resolved
 ticketdetails.messagehistory=Message history
 ticketdetails.response.required=Enter a response
 ticketdetails.resolvedticketmessage1=This support request has been resolved.
