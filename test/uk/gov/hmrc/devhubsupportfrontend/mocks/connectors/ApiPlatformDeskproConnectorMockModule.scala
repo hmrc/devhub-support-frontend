@@ -67,19 +67,19 @@ trait ApiPlatformDeskproConnectorMockModule extends MockitoSugar with ArgumentMa
     object CreateResponse {
 
       def succeeds() = {
-        when(aMock.createResponse(*, *[LaxEmailAddress], *, *)).thenReturn(Future.successful(DeskproTicketResponseSuccess))
+        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *)).thenReturn(Future.successful(DeskproTicketResponseSuccess))
       }
 
       def notFound() = {
-        when(aMock.createResponse(*, *[LaxEmailAddress], *, *)).thenReturn(Future.successful(DeskproTicketResponseNotFound))
+        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *)).thenReturn(Future.successful(DeskproTicketResponseNotFound))
       }
 
       def fails() = {
-        when(aMock.createResponse(*, *[LaxEmailAddress], *, *)).thenReturn(Future.successful(DeskproTicketResponseFailure))
+        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *)).thenReturn(Future.successful(DeskproTicketResponseFailure))
       }
 
       def verifyCalledWith(ticketId: Int, email: LaxEmailAddress, message: String) = {
-        verify(aMock).createResponse(eqTo(ticketId), eqTo(email), eqTo(message), *)
+        verify(aMock).createResponse(eqTo(ticketId), eqTo(email), eqTo(message), *, *)
       }
     }
 
