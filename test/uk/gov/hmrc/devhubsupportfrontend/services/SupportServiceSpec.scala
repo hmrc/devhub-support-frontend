@@ -20,14 +20,15 @@ import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models._
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApiContext, ApiContextData, UserId}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.CreateTicketRequest
+import uk.gov.hmrc.devhubsupportfrontend.connectors.XmlApi
 import uk.gov.hmrc.devhubsupportfrontend.controllers.{ApplyForPrivateApiAccessForm, SupportData, SupportDetailsForm}
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
-import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ApiPlatformDeskproConnectorMockModule, ApmConnectorMockModule}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{ApiSummary, SupportFlow, SupportSessionId}
+import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ApiPlatformDeskproConnectorMockModule, ApmConnectorMockModule, XmlServicesConnectorMockModule}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.repositories.SupportFlowRepositoryMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.AuditServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec
@@ -39,11 +40,41 @@ class SupportServiceSpec extends AsyncHmrcSpec {
   val savedFlow     = SupportFlow(sessionId, entryPoint)
   val defaultFlow   = SupportFlow(sessionId, "unknown")
   val mockAppConfig = mock[AppConfig]
+  val apiName       = "Test API defintion name"
+  val xmlApiName    = "Test XML API definition name"
+
+  val apiSummary = ApiSummary(
+    ServiceNameData.serviceName,
+    apiName,
+    ApiContextData.one
+  )
+
+  val xmlApi = XmlApi(
+    xmlApiName,
+    ServiceName("Xml Api service"),
+    ApiContext("Xml Api context"),
+    "xml api description"
+  )
+
+  val xmlApiSummary = ApiSummary(
+    ServiceName("Xml Api service"),
+    xmlApiName,
+    ApiContext("Xml Api context")
+  )
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  trait Setup extends ApmConnectorMockModule with SupportFlowRepositoryMockModule with ApiPlatformDeskproConnectorMockModule with AuditServiceMockModule {
-    val underTest = new SupportService(ApmConnectorMock.aMock, ApiPlatformDeskproConnectorMock.aMock, SupportFlowRepositoryMock.aMock, mockAppConfig, AuditServiceMock.aMock)
+  trait Setup extends ApmConnectorMockModule with SupportFlowRepositoryMockModule with ApiPlatformDeskproConnectorMockModule with AuditServiceMockModule
+      with XmlServicesConnectorMockModule {
+
+    val underTest = new SupportService(
+      ApmConnectorMock.aMock,
+      ApiPlatformDeskproConnectorMock.aMock,
+      XmlServicesConnectorMock.aMock,
+      SupportFlowRepositoryMock.aMock,
+      mockAppConfig,
+      AuditServiceMock.aMock
+    )
     SupportFlowRepositoryMock.SaveFlow.thenReturnSuccess
   }
 
@@ -70,21 +101,29 @@ class SupportServiceSpec extends AsyncHmrcSpec {
     }
   }
 
-  "fetchAllPublicApis" should {
+  "fetchAllApis" should {
     "fetch all apis visible to the user when the user is NOT logged in" in new Setup {
       val apiList: List[ApiDefinition] = List(ApiDefinitionData.apiDefinition)
       ApmConnectorMock.FetchApiDefinitionsVisibleToUser.willReturn(apiList)
-      val result                       = await(underTest.fetchAllPublicApis(None))
-      result shouldBe apiList
+      val xmlApiList: List[XmlApi]     = List(xmlApi)
+      XmlServicesConnectorMock.FetchAllXmlApis.willReturn(xmlApiList)
+
+      val result = await(underTest.fetchAllApis(None))
+
+      result shouldBe List(apiSummary, xmlApiSummary)
       verify(ApmConnectorMock.aMock).fetchApiDefinitionsVisibleToUser(None)
     }
 
     "fetch all apis visible to the user when the user is logged in" in new Setup {
       val apiList: List[ApiDefinition]   = List(ApiDefinitionData.apiDefinition)
       ApmConnectorMock.FetchApiDefinitionsVisibleToUser.willReturn(apiList)
+      val xmlApiList: List[XmlApi]       = List(xmlApi)
+      XmlServicesConnectorMock.FetchAllXmlApis.willReturn(xmlApiList)
       private val loggedInUserId: UserId = UserId(UUID.randomUUID())
-      val result                         = await(underTest.fetchAllPublicApis(Some(loggedInUserId)))
-      result shouldBe apiList
+
+      val result = await(underTest.fetchAllApis(Some(loggedInUserId)))
+
+      result shouldBe List(apiSummary, xmlApiSummary)
       verify(ApmConnectorMock.aMock).fetchApiDefinitionsVisibleToUser(Some(loggedInUserId))
     }
   }

@@ -23,13 +23,12 @@ import play.api.data.Form
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{AnyContent, Call, MessagesControllerComponents, Result}
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
 
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
 import uk.gov.hmrc.devhubsupportfrontend.controllers.security.SupportCookie
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{ApiSummary, SupportFlow}
 import uk.gov.hmrc.devhubsupportfrontend.services.SupportService
 import uk.gov.hmrc.devhubsupportfrontend.views.html.HelpWithUsingAnApiView
 
@@ -69,7 +68,7 @@ class HelpWithUsingAnApiController @Inject() (
     helpWithUsingAnApiView: HelpWithUsingAnApiView
   )(implicit val ec: ExecutionContext,
     val appConfig: AppConfig
-  ) extends AbstractSupportFlowController[HelpWithUsingAnApiForm, List[ApiDefinition]](mcc, supportService) with SupportCookie {
+  ) extends AbstractSupportFlowController[HelpWithUsingAnApiForm, List[ApiSummary]](mcc, supportService) with SupportCookie {
 
   import HelpWithUsingAnApiController._
 
@@ -80,7 +79,7 @@ class HelpWithUsingAnApiController @Inject() (
     case _                                                        => false
   }
 
-  def pageContents(flow: SupportFlow, form: Form[HelpWithUsingAnApiForm], extras: List[ApiDefinition])(implicit request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable =
+  def pageContents(flow: SupportFlow, form: Form[HelpWithUsingAnApiForm], extras: List[ApiSummary])(implicit request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable =
     helpWithUsingAnApiView(
       fullyloggedInDeveloper,
       form,
@@ -94,7 +93,7 @@ class HelpWithUsingAnApiController @Inject() (
     }
   }
 
-  override def otherValidation(flow: SupportFlow, extraData: List[ApiDefinition], form: Form[HelpWithUsingAnApiForm]): Form[HelpWithUsingAnApiForm] = {
+  override def otherValidation(flow: SupportFlow, extraData: List[ApiSummary], form: Form[HelpWithUsingAnApiForm]): Form[HelpWithUsingAnApiForm] = {
     def validate(fieldName: String) = {
       val matchesApiName = form(fieldName).value
         .filter(_.nonEmpty)
@@ -123,6 +122,6 @@ class HelpWithUsingAnApiController @Inject() (
 
   def form(): Form[HelpWithUsingAnApiForm] = HelpWithUsingAnApiForm.form
 
-  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[List[ApiDefinition]] = supportService.fetchAllPublicApis(request.userSession.map(_.developer.userId))
+  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[List[ApiSummary]] = supportService.fetchAllApis(request.userSession.map(_.developer.userId))
 
 }
