@@ -112,11 +112,11 @@ class SupportService @Inject() (
         case (SupportData.UsingAnApi.id, Some(SupportData.GettingExamples.id))                         => SupportData.GettingExamples.text
         case (SupportData.UsingAnApi.id, Some(SupportData.ReportingDocumentation.id))                  => SupportData.ReportingDocumentation.text
         case (SupportData.UsingAnApi.id, Some(SupportData.PrivateApiDocumentation.id))                 => SupportData.PrivateApiDocumentation.text
+        case (SupportData.UsingAnApi.id, _)                                                            => SupportData.UsingAnApi.text
         case (SupportData.PrivateApiDocumentation.id, _)                                               => SupportData.PrivateApiDocumentation.text // TODO - fix
         case (SupportData.SigningIn.id, _)                                                             => SupportData.SigningIn.text
         case (SupportData.SettingUpApplication.id, Some(SupportData.CompletingTermsOfUseAgreement.id)) => SupportData.CompletingTermsOfUseAgreement.text
         case (SupportData.SettingUpApplication.id, Some(SupportData.GivingTeamMemberAccess.id))        => SupportData.GivingTeamMemberAccess.text
-        case (SupportData.SettingUpApplication.id, Some(SupportData.GeneralApplicationDetails.id))     => SupportData.GeneralApplicationDetails.text
         case (SupportData.SettingUpApplication.id, _)                                                  => SupportData.SettingUpApplication.text
         case (SupportData.ReportingDocumentation.id, _)                                                => SupportData.ReportingDocumentation.text
         case (SupportData.NoneOfTheAbove.id, _)                                                        => "General Issue"
