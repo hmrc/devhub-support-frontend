@@ -19,13 +19,12 @@ package uk.gov.hmrc.devhubsupportfrontend.services
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.services.{ApplicationLogger, EitherTHelper}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApiPlatformDeskproConnector, ApmConnector}
+import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApiPlatformDeskproConnector, ApmConnector, XmlServicesConnector}
 import uk.gov.hmrc.devhubsupportfrontend.controllers._
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, _}
 import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
@@ -34,6 +33,7 @@ import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
 class SupportService @Inject() (
     val apmConnector: ApmConnector,
     deskproConnector: ApiPlatformDeskproConnector,
+    xmlServicesConnector: XmlServicesConnector,
     flowRepository: SupportFlowRepository,
     config: AppConfig,
     auditService: AuditService
@@ -65,8 +65,13 @@ class SupportService @Inject() (
     flowRepository.saveFlow(SupportFlow(sessionId, entrypoint, None))
   }
 
-  def fetchAllPublicApis(userId: Option[UserId])(implicit hc: HeaderCarrier): Future[List[ApiDefinition]] = {
-    apmConnector.fetchApiDefinitionsVisibleToUser(userId)
+  def fetchAllApis(userId: Option[UserId])(implicit hc: HeaderCarrier): Future[List[ApiSummary]] = {
+    for {
+      restfulApiDefs     <- apmConnector.fetchApiDefinitionsVisibleToUser(userId)
+      restfulApiSummaries = restfulApiDefs.map(api => ApiSummary.fromApiDefinition(api))
+      xmlApis            <- xmlServicesConnector.fetchAllXmlApis()
+      xmlApiSummaries     = xmlApis.map(api => ApiSummary.fromXmlApi(api)).toList
+    } yield restfulApiSummaries ++ xmlApiSummaries
   }
 
   def submitTicket(supportFlow: SupportFlow, form: SupportDetailsForm)(implicit hc: HeaderCarrier): Future[SupportFlow] = {

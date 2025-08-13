@@ -25,12 +25,13 @@ import org.jsoup.nodes.Document
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinitionData
+import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ServiceNameData
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApiContextData
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{ApiSummary, SupportFlow, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
@@ -39,7 +40,7 @@ import uk.gov.hmrc.devhubsupportfrontend.views.html.HelpWithUsingAnApiView
 
 class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
   val supportSessionId = SupportSessionId.random
-  val apiName          = ApiDefinitionData.apiDefinition.name
+  val apiName          = "Test API definition name"
 
   trait Setup extends SupportServiceMockModule with ThirdPartyDeveloperConnectorMockModule with UserBuilder with LocalUserIdTracker {
     val helpWithUsingAnApiView = app.injector.instanceOf[HelpWithUsingAnApiView]
@@ -68,8 +69,14 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
     def apiListShouldBeVisible(block: String)(implicit dom: Document) =
       dom.getElementById("conditional-" + block).classNames should not(contain("govuk-radios__conditional--hidden"))
 
+    val apiSummary = ApiSummary(
+      ServiceNameData.serviceName,
+      apiName,
+      ApiContextData.one
+    )
+
     // Always find apis
-    SupportServiceMock.FetchAllPublicApis.succeeds(List(ApiDefinitionData.apiDefinition))
+    SupportServiceMock.FetchAllApis.succeeds(List(apiSummary))
 
     def shouldBeRedirectedToPreviousPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER

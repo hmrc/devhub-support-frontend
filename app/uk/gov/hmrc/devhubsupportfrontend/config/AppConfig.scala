@@ -33,6 +33,8 @@ class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config)
 
   val thirdPartyDeveloperUrl: String = baseUrl("third-party-developer")
 
+  val xmlServicesUrl: String = baseUrl("api-platform-xml-services")
+
   private val platformFrontendHost: Option[String] = config.getOptional[String]("platform.frontend.host")
   lazy val accessibilityStatementUrl               = platformFrontendHost.getOrElse("http://localhost:12346")
 

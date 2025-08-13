@@ -22,11 +22,12 @@ import org.jsoup.Jsoup
 
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinitionData
+import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ServiceNameData
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApiContextData
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{ApiSummary, SupportFlow, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
@@ -40,6 +41,7 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
 
     val supportSessionId = SupportSessionId.random
     val appropriateFlow  = SupportFlow(supportSessionId, SupportData.SigningIn.id)
+    val apiName          = "Test API definition name"
 
     lazy val request = FakeRequest()
       .withSupport(underTest)(supportSessionId)
@@ -56,7 +58,13 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
 
-    SupportServiceMock.FetchAllPublicApis.succeeds(List(ApiDefinitionData.apiDefinition))
+    val apiSummary = ApiSummary(
+      ServiceNameData.serviceName,
+      apiName,
+      ApiContextData.one
+    )
+
+    SupportServiceMock.FetchAllApis.succeeds(List(apiSummary))
 
   }
 
