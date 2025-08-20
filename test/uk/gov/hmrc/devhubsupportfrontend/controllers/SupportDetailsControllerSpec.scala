@@ -111,6 +111,23 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         redirectLocation(result) shouldBe Some("/devhub-support/confirmation")
       }
 
+      "submit request with name, email and 3000 characters including \r\n details returns success" in new Setup {
+        val request = FakeRequest()
+          .withSession(sessionParams: _*)
+          .withFormUrlEncodedBody(
+            "fullName"     -> "Peter Smith",
+            "emailAddress" -> "peter@example.com",
+            "details"      -> "A\r\n"*1500
+          )
+        SupportServiceMock.GetSupportFlow.succeeds()
+        SupportServiceMock.SubmitTicket.succeeds()
+
+        val result = addToken(underTest.submitSupportDetails())(request)
+
+        status(result) shouldBe 303
+        redirectLocation(result) shouldBe Some("/devhub-support/confirmation")
+      }
+
       "submit request with name, email and invalid details returns BAD_REQUEST" in new Setup {
         val request = FakeRequest()
           .withSession(sessionParams: _*)
