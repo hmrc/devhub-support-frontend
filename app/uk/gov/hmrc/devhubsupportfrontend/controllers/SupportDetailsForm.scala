@@ -29,7 +29,7 @@ object SupportDetailsForm extends FormValidation {
     (
       fieldName -> default(text, "")
         .verifying(s"$messagePrefix.error.required.field", s => !s.isBlank())
-        .verifying(s"$messagePrefix.error.maxLength.field", s => s.trim.replace("\r\n","\n").length <= 3000)
+        .verifying(s"$messagePrefix.error.maxLength.field", s => s.trim.replace("\r\n", "\n").length <= 3000)
         .verifying(s"$messagePrefix.error.spam.field", s => spambotCommentRegex.findFirstMatchIn(s).isEmpty)
     )
   }

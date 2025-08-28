@@ -117,7 +117,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
           .withFormUrlEncodedBody(
             "fullName"     -> "Peter Smith",
             "emailAddress" -> "peter@example.com",
-            "details"      -> "A\r\n"*1500
+            "details"      -> "A\r\n" * 1500
           )
         SupportServiceMock.GetSupportFlow.succeeds()
         SupportServiceMock.SubmitTicket.succeeds()
