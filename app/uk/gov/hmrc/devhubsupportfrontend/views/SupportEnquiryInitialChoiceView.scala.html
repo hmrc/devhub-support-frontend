@@ -31,6 +31,23 @@
 
 @(loggedInSession: Option[UserSession], form: Form[SupportEnquiryInitialChoiceForm])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
+@signingInRadioItem = @{
+  if(!loggedInSession.isDefined) {
+    Seq(
+      RadioItem(
+        id = Some(SupportData.SigningIn.id),
+        content = Text(SupportData.SigningIn.text),
+        value = Some(SupportData.SigningIn.id),
+        hint = Some(
+          Hint(
+            content = Text("Forgotten passwords, access codes and 2-factor authentication (2FA) ")
+          )
+        )
+      )
+    )
+  } else { Seq.empty } 
+}
+
 @layout(
   pageTitle = "What do you need help with?",
   crumbs = Seq(Crumb.home),
@@ -86,17 +103,16 @@
                 content = Text("API access, calls, documentation and guides, examples, payloads or schemas")
               )
             )
-          ),
-          RadioItem(
-            id = Some(SupportData.SigningIn.id),
-            content = Text(SupportData.SigningIn.text),
-            value = Some(SupportData.SigningIn.id),
-            hint = Some(
-              Hint(
-                content = Text("Forgotten passwords, access codes and 2-factor authentication (2FA) ")
-              )
-            )
-          ), 
+          )
+        )
+        
+        ++
+         
+        signingInRadioItem
+
+        ++
+
+        Seq(
           RadioItem(
             id = Some(SupportData.SettingUpApplication.id),
             content = Text(SupportData.SettingUpApplication.text),

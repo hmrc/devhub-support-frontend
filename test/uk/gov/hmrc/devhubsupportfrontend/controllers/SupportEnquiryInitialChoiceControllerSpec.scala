@@ -86,8 +86,20 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
     }
 
     "invoking page for new support" should {
-      "render the new support enquiry initial choice page" in new Setup {
+      "render the new support enquiry initial choice page when logged on" in new Setup {
         val result = addToken(underTest.startPage())(request)
+
+        status(result) shouldBe OK
+        val dom = Jsoup.parse(contentAsString(result))
+
+        dom.getElementById(SupportData.FindingAnApi.id).attr("value") shouldEqual SupportData.FindingAnApi.id
+        dom.getElementById(SupportData.UsingAnApi.id).attr("value") shouldEqual SupportData.UsingAnApi.id
+        dom.getElementById(SupportData.SigningIn.id) shouldEqual null // Option not shown when logged on
+        dom.getElementById(SupportData.SettingUpApplication.id).attr("value") shouldEqual SupportData.SettingUpApplication.id
+      }
+
+      "render the new support enquiry initial choice page when not logged on" in new Setup {
+        val result = addToken(underTest.startPage())(FakeRequest())
 
         status(result) shouldBe OK
         val dom = Jsoup.parse(contentAsString(result))
