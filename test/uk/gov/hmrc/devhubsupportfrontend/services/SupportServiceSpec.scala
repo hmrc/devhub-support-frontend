@@ -169,7 +169,8 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         email = email,
         subject = SupportData.FindingAnApi.text,
         message = details,
-        supportReason = Some(SupportData.FindingAnApi.text)
+        supportReason = Some(SupportData.FindingAnApi.text),
+        reasonKey = Some(SupportData.FindingAnApi.id)
       )
       val auditAction                              = CreateTicketAuditAction(createTicketRequest)
 
@@ -209,7 +210,8 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         subject = SupportData.MakingAnApiCall.text,
         message = details,
         apiName = Some(apiName),
-        supportReason = Some(SupportData.MakingAnApiCall.text)
+        supportReason = Some(SupportData.MakingAnApiCall.text),
+        reasonKey = Some(SupportData.MakingAnApiCall.id)
       )
       val auditAction         = CreateTicketAuditAction(createTicketRequest)
 
@@ -253,6 +255,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         subject = SupportData.PrivateApiDocumentation.text,
         message = details,
         supportReason = Some(SupportData.PrivateApiDocumentation.text),
+        reasonKey = Some(SupportData.PrivateApiDocumentation.id),
         organisation = Some(organisation),
         applicationId = Some(applicationId)
       )

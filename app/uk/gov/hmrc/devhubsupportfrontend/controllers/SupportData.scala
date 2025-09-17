@@ -18,10 +18,12 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 object SupportData {
 
-  sealed trait PrimaryChoice {
+  abstract sealed trait SupportDataChoice {
     def id: String
     def text: String
   }
+
+  sealed trait PrimaryChoice extends SupportDataChoice {}
 
   case object FindingAnApi extends PrimaryChoice {
     val id   = "finding-an-api"
@@ -44,14 +46,11 @@ object SupportData {
   }
 
   case object NoneOfTheAbove extends PrimaryChoice {
-    val id   = "none-of-the-above"
-    val text = "None of these"
+    val id   = "general-issue"
+    val text = "General Issue"
   }
 
-  sealed trait ApiSecondaryChoice {
-    def id: String
-    def text: String
-  }
+  sealed trait ApiSecondaryChoice extends SupportDataChoice {}
 
   case object MakingAnApiCall extends ApiSecondaryChoice {
     val id   = "making-an-api-call"

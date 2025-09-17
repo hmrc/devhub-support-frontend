@@ -46,6 +46,7 @@ object ApiPlatformDeskproConnector {
       applicationId: Option[String] = None,
       organisation: Option[String] = None,
       supportReason: Option[String] = None,
+      reasonKey: Option[String] = None,
       teamMemberEmail: Option[String] = None
     )
 
