@@ -23,6 +23,11 @@ object SupportData {
     def text: String
   }
 
+  case object GeneralIssue extends SupportDataChoice {
+    val id   = "general-issue"
+    val text = "General Issue"
+  }
+
   sealed trait PrimaryChoice extends SupportDataChoice {}
 
   case object FindingAnApi extends PrimaryChoice {
@@ -46,8 +51,8 @@ object SupportData {
   }
 
   case object NoneOfTheAbove extends PrimaryChoice {
-    val id   = "general-issue"
-    val text = "General Issue"
+    val id   = "none-of-the-above"
+    val text = "None of these"
   }
 
   sealed trait ApiSecondaryChoice extends SupportDataChoice {}
