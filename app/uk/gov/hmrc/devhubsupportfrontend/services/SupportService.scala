@@ -25,6 +25,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApiPlatformDeskproConnector, ApmConnector, XmlServicesConnector}
+import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData.SupportDataChoice
 import uk.gov.hmrc.devhubsupportfrontend.controllers._
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, _}
 import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
@@ -110,21 +111,21 @@ class SupportService @Inject() (
 
   private def buildTicket(supportFlow: SupportFlow, fullName: String, email: String, messageContents: String): ApiPlatformDeskproConnector.CreateTicketRequest = {
     // Entry point is currently the value of the text on the radio button but may not always be so.
-    def deriveSupportReason(): String = {
+    def deriveSupportReason(): SupportDataChoice = {
       (supportFlow.entrySelection, supportFlow.subSelection) match {
-        case (SupportData.FindingAnApi.id, _)                                                          => SupportData.FindingAnApi.text
-        case (SupportData.UsingAnApi.id, Some(SupportData.MakingAnApiCall.id))                         => SupportData.MakingAnApiCall.text
-        case (SupportData.UsingAnApi.id, Some(SupportData.GettingExamples.id))                         => SupportData.GettingExamples.text
-        case (SupportData.UsingAnApi.id, Some(SupportData.ReportingDocumentation.id))                  => SupportData.ReportingDocumentation.text
-        case (SupportData.UsingAnApi.id, Some(SupportData.PrivateApiDocumentation.id))                 => SupportData.PrivateApiDocumentation.text
-        case (SupportData.UsingAnApi.id, _)                                                            => SupportData.UsingAnApi.text
-        case (SupportData.PrivateApiDocumentation.id, _)                                               => SupportData.PrivateApiDocumentation.text // TODO - fix
-        case (SupportData.SigningIn.id, _)                                                             => SupportData.SigningIn.text
-        case (SupportData.SettingUpApplication.id, Some(SupportData.CompletingTermsOfUseAgreement.id)) => SupportData.CompletingTermsOfUseAgreement.text
-        case (SupportData.SettingUpApplication.id, Some(SupportData.GivingTeamMemberAccess.id))        => SupportData.GivingTeamMemberAccess.text
-        case (SupportData.SettingUpApplication.id, _)                                                  => SupportData.SettingUpApplication.text
-        case (SupportData.ReportingDocumentation.id, _)                                                => SupportData.ReportingDocumentation.text
-        case (SupportData.NoneOfTheAbove.id, _)                                                        => "General Issue"
+        case (SupportData.FindingAnApi.id, _)                                                          => SupportData.FindingAnApi
+        case (SupportData.UsingAnApi.id, Some(SupportData.MakingAnApiCall.id))                         => SupportData.MakingAnApiCall
+        case (SupportData.UsingAnApi.id, Some(SupportData.GettingExamples.id))                         => SupportData.GettingExamples
+        case (SupportData.UsingAnApi.id, Some(SupportData.ReportingDocumentation.id))                  => SupportData.ReportingDocumentation
+        case (SupportData.UsingAnApi.id, Some(SupportData.PrivateApiDocumentation.id))                 => SupportData.PrivateApiDocumentation
+        case (SupportData.UsingAnApi.id, _)                                                            => SupportData.UsingAnApi
+        case (SupportData.PrivateApiDocumentation.id, _)                                               => SupportData.PrivateApiDocumentation
+        case (SupportData.SigningIn.id, _)                                                             => SupportData.SigningIn
+        case (SupportData.SettingUpApplication.id, Some(SupportData.CompletingTermsOfUseAgreement.id)) => SupportData.CompletingTermsOfUseAgreement
+        case (SupportData.SettingUpApplication.id, Some(SupportData.GivingTeamMemberAccess.id))        => SupportData.GivingTeamMemberAccess
+        case (SupportData.SettingUpApplication.id, _)                                                  => SupportData.SettingUpApplication
+        case (SupportData.ReportingDocumentation.id, _)                                                => SupportData.ReportingDocumentation
+        case (SupportData.NoneOfTheAbove.id, _)                                                        => SupportData.GeneralIssue
         case _                                                                                         => throw new RuntimeException("SupportFlow state cannot support ticket creation")
       }
     }
@@ -133,9 +134,10 @@ class SupportService @Inject() (
     ApiPlatformDeskproConnector.CreateTicketRequest(
       fullName = fullName,
       email = email,
-      subject = supportReason,
+      subject = supportReason.text,
       message = messageContents,
-      supportReason = Some(supportReason),
+      supportReason = Some(supportReason.text),
+      reasonKey = Some(supportReason.id),
       apiName = supportFlow.api
     )
   }
