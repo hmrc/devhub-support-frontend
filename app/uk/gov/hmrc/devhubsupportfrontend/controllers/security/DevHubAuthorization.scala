@@ -45,11 +45,11 @@ trait DevHubAuthorization extends FrontendHeaderCarrierProvider with CookieEncod
 
   def maybeAtLeastPartLoggedInEnablingMfa(body: MaybeUserRequest[AnyContent] => Future[Result])(implicit ec: ExecutionContext): Action[AnyContent] =
     Action.async { implicit request: MessagesRequest[AnyContent] =>
-      def getMaybeUserRequest(maybeDeveloperSession: Option[UserSession]): Future[Result] = {
-        if (appConfig.mustBeLoggedIn && maybeDeveloperSession.isEmpty) {
+      def getMaybeUserRequest(maybeUserSession: Option[UserSession]): Future[Result] = {
+        if (appConfig.enforceLogin && maybeUserSession.isEmpty) {
           Future.successful(Redirect(routes.LoggedInRestrictionController.page()))
         } else {
-          body(new MaybeUserRequest(maybeDeveloperSession, request))
+          body(new MaybeUserRequest(maybeUserSession, request))
         }
       }
       loadSession.flatMap(maybeDeveloperSession => getMaybeUserRequest(maybeDeveloperSession))

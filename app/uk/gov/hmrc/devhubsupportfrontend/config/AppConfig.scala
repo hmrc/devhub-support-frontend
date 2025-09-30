@@ -54,7 +54,7 @@ class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config)
 
   val supportSessionTimeout: Duration = config.underlying.getDuration("supportsession.timeout")
 
-  val mustBeLoggedIn: Boolean = getConfigDefaulted("toggle.must-be-logged-in", false)
+  val enforceLogin: Boolean = getConfigDefaulted("enforce-login", false)
 
   private def getConfigDefaulted[A](key: String, default: => A)(implicit loader: ConfigLoader[A]): A = config.getOptional[A](key)(loader).getOrElse(default)
 }
