@@ -26,18 +26,16 @@
 @()(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(
-  pageTitle = "You must be logged in to create a support request"
+  pageTitle = "Sign in to the Developer Hub to create a support request"
 ) {
-    <h2 class="govuk-heading-l">You must be logged in to the Developer Hub to create a support request</h2>
-
-    <p class="govuk-body">Please log on to the Developer Hub first.</p>
+    <h2 class="govuk-heading-l">Sign in to the Developer Hub to create a support request</h2>
 
     <p class="govuk-body">
-      If your query is related to logging in, then please email HMRC Software Developers Support Team (SDST) at
+      If you have a query about signing in, email the support team at 
       <a class="govuk-link" href="mailto:softwaredevelopersupport@@service.hmrc.gov.uk">softwaredevelopersupport@@service.hmrc.gov.uk</a>.
     </p>
 
     <p class="govuk-body"> 
-      <a href="@{appConfig.logInUrl}" class="govuk-link govuk-link--no-visited-state">Log in to the Developer Hub</a>
+      <a href="@{appConfig.logInUrl}" id="login" class="govuk-button">Sign in</a>
     </p>
 }

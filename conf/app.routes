@@ -28,6 +28,6 @@ GET         /tickets                                        uk.gov.hmrc.devhubsu
 GET         /ticket/:tid                                    uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketPage(tid: Int)
 POST        /ticket/:tid/response                           uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.submitTicketResponse(tid: Int)
 
-GET         /loginRestriction                               uk.gov.hmrc.devhubsupportfrontend.controllers.LoggedInRestrictionController.page()
+GET         /login-restriction                              uk.gov.hmrc.devhubsupportfrontend.controllers.LoggedInRestrictionController.page()
 
 GET         /assets/*file                                   controllers.Assets.versioned(path = "/public", file: Asset)

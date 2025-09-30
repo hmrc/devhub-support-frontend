@@ -24,7 +24,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
-import uk.gov.hmrc.devhubsupportfrontend.views.html.MustBeLoggedInNoticeView
+import uk.gov.hmrc.devhubsupportfrontend.views.html.EnforceLoginNoticeView
 
 @Singleton
 class LoggedInRestrictionController @Inject() (
@@ -32,13 +32,13 @@ class LoggedInRestrictionController @Inject() (
     val cookieSigner: CookieSigner,
     val errorHandler: ErrorHandler,
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
-    mustBeLoggedInNoticeView: MustBeLoggedInNoticeView
+    enforceLoginNoticeView: EnforceLoginNoticeView
   )(implicit val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends BaseController(mcc) {
 
   def page(): Action[AnyContent] = Action.async {
     implicit request =>
-      Future.successful(Ok(mustBeLoggedInNoticeView()))
+      Future.successful(Ok(enforceLoginNoticeView()))
   }
 }
