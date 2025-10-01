@@ -92,6 +92,14 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe Some("/devhub-support/login-restriction")
       }
+
+      "redirect to list of tickets page when force login config is set and user is logged in" in new Setup {
+        when(appConfig.enforceLogin).thenReturn(true)
+        val result = addToken(underTest.page())(request)
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some("/devhub-support/tickets")
+      }
     }
 
     "invoking page for new support" should {
