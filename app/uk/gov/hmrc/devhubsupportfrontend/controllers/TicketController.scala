@@ -28,7 +28,7 @@ import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.services._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.{TicketListView, TicketView}
+import uk.gov.hmrc.devhubsupportfrontend.views.html._
 
 object TicketController {
 
@@ -66,7 +66,8 @@ class TicketController @Inject() (
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     ticketService: TicketService,
     ticketListView: TicketListView,
-    ticketView: TicketView
+    ticketView: TicketView,
+    ticketViewWithAttachments: TicketViewWithAttachments
   )(implicit val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
@@ -81,6 +82,13 @@ class TicketController @Inject() (
   def ticketPage(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
     ticketService.fetchTicket(ticketId).map {
       case Some(ticket) if ticket.personEmail == request.userSession.developer.email => Ok(ticketView(ticketResponseForm, Some(request.userSession), ticket))
+      case _                                                                         => NotFound
+    }
+  }
+
+  def ticketPageWithAttachments(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
+    ticketService.fetchTicket(ticketId).map {
+      case Some(ticket) if ticket.personEmail == request.userSession.developer.email => Ok(ticketViewWithAttachments(ticketResponseForm, Some(request.userSession), ticket))
       case _                                                                         => NotFound
     }
   }

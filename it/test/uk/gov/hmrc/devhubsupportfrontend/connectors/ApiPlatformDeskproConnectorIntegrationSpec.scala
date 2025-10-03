@@ -29,7 +29,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.{DeskproMessage, DeskproTicket}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{DeskproAttachment, DeskproMessage, DeskproTicket}
 import uk.gov.hmrc.devhubsupportfrontend.stubs.ApiPlatformDeskproStub
 import uk.gov.hmrc.devhubsupportfrontend.utils.WireMockExtensions
 
@@ -96,8 +96,16 @@ class ApiPlatformDeskproConnectorIntegrationSpec
 
       val result = await(underTest.fetchTicket(ticketId, hc))
 
-      val message1       = DeskproMessage(3467, ticketId, 33, message1CreatedDate, false, "Hi. What API do I need to get next weeks lottery numbers?")
-      val message2       = DeskproMessage(3698, ticketId, 61, message2CreatedDate, false, "Reply message from agent. What else gets filled in?")
+      val message1       = DeskproMessage(
+        3467,
+        ticketId,
+        33,
+        message1CreatedDate,
+        false,
+        "Hi. What API do I need to get next weeks lottery numbers?",
+        List(DeskproAttachment("file.name", "https://example.com"))
+      )
+      val message2       = DeskproMessage(3698, ticketId, 61, message2CreatedDate, false, "Reply message from agent. What else gets filled in?", List.empty)
       val expectedTicket = DeskproTicket(
         ticketId,
         "SDST-2025XON927",

@@ -21,13 +21,20 @@ import java.time.Instant
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 
+case class DeskproAttachment(filename: String, url: String)
+
+object DeskproAttachment {
+  implicit val format: OFormat[DeskproAttachment] = Json.format[DeskproAttachment]
+}
+
 case class DeskproMessage(
     id: Int,
     ticketId: Int,
     person: Int,
     dateCreated: Instant,
     isAgentNote: Boolean,
-    message: String
+    message: String,
+    attachments: List[DeskproAttachment]
   )
 
 object DeskproMessage {
