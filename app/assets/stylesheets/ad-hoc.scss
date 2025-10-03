@@ -37,4 +37,8 @@
   p, h1, h2, h3 {
     @extend .govuk-body;
   }
+  ul {
+    @extend .govuk-list--bullet;
+    @extend .govuk-list;
+  }
 }
