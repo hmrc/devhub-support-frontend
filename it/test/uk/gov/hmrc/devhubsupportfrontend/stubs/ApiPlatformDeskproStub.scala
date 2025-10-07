@@ -76,7 +76,8 @@ object ApiPlatformDeskproStub {
                           |      "person": 33,
                           |      "dateCreated": "2025-05-01T08:02:02Z",
                           |      "isAgentNote": false,
-                          |      "message": "Hi. What API do I need to get next weeks lottery numbers?"
+                          |      "message": "Hi. What API do I need to get next weeks lottery numbers?",
+                          |      "attachments": [{"filename":"file.name","url":"https://example.com"}]
                           |    },
                           |    {
                           |      "id": 3698,
@@ -84,7 +85,8 @@ object ApiPlatformDeskproStub {
                           |      "person": 61,
                           |      "dateCreated": "2025-05-19T11:54:53Z",
                           |      "isAgentNote": false,
-                          |      "message": "Reply message from agent. What else gets filled in?"
+                          |      "message": "Reply message from agent. What else gets filled in?",
+                          |      "attachments": []
                           |    }
                           |  ]
                           |}""".stripMargin)

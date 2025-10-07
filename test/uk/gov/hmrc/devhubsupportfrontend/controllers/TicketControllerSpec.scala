@@ -26,18 +26,19 @@ import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.{DeskproMessage, DeskproTicket, SupportSessionId}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{DeskproAttachment, DeskproMessage, DeskproTicket, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.TicketServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.{TicketListView, TicketView}
+import uk.gov.hmrc.devhubsupportfrontend.views.html._
 
 class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
   trait Setup extends TicketServiceMockModule with ThirdPartyDeveloperConnectorMockModule with UserBuilder with LocalUserIdTracker {
-    val ticketListView = app.injector.instanceOf[TicketListView]
-    val ticketView     = app.injector.instanceOf[TicketView]
+    val ticketListView            = app.injector.instanceOf[TicketListView]
+    val ticketView                = app.injector.instanceOf[TicketView]
+    val ticketViewWithAttachments = app.injector.instanceOf[TicketViewWithAttachments]
 
     val underTest = new TicketController(
       mcc,
@@ -46,7 +47,8 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       ThirdPartyDeveloperConnectorMock.aMock,
       TicketServiceMock.aMock,
       ticketListView,
-      ticketView
+      ticketView,
+      ticketViewWithAttachments
     )
 
     val ticketId: Int = 4232
@@ -57,7 +59,8 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       33,
       instant,
       false,
-      "Test message contents"
+      "Test message contents",
+      List(DeskproAttachment("file.name", "https://example.com"))
     )
 
     val ticket = DeskproTicket(
@@ -148,6 +151,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         contentAsString(result) should include("We need your reply")
         contentAsString(result) should include("Test message contents")
         contentAsString(result) should include("Mark as resolved")
+        contentAsString(result) should not include ("file.name")
       }
 
       "hide the close button when ticket is resolved" in new Setup with IsLoggedIn {
@@ -179,6 +183,58 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       "redirect to logon page if not logged in" in new Setup with NotLoggedIn {
         val result = addToken(underTest.ticketPage(ticketId))(request)
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some("/developer/login")
+      }
+    }
+  }
+
+  "Show a ticket with attachments" when {
+    "invoke ticketPageWithAttachments" should {
+      "render the ticket page showing attachments" in new Setup with IsLoggedIn {
+        TicketServiceMock.FetchTicket.succeeds(Some(ticket))
+
+        val result = addToken(underTest.ticketPageWithAttachments(ticketId))(request)
+
+        status(result) shouldBe OK
+        contentAsString(result) should include("SDST-2025XON927")
+        contentAsString(result) should include("HMRC Developer Hub: Support Enquiry")
+        contentAsString(result) should include("We need your reply")
+        contentAsString(result) should include("Test message contents")
+        contentAsString(result) should include("Mark as resolved")
+        contentAsString(result) should include("file.name")
+      }
+
+      "hide the close button when ticket is resolved" in new Setup with IsLoggedIn {
+        TicketServiceMock.FetchTicket.succeeds(Some(ticket.copy(status = "resolved")))
+
+        val result = addToken(underTest.ticketPageWithAttachments(ticketId))(request)
+
+        status(result) shouldBe OK
+        contentAsString(result) should include("SDST-2025XON927")
+        contentAsString(result) should not include ("Mark as resolved")
+      }
+
+      "return 404 if ticket not found" in new Setup with IsLoggedIn {
+        TicketServiceMock.FetchTicket.succeeds(None)
+
+        val result = addToken(underTest.ticketPageWithAttachments(ticketId))(request)
+
+        status(result) shouldBe NOT_FOUND
+      }
+
+      "return 404 if user email is different from person email in ticket" in new Setup with IsLoggedIn {
+        val ticketDiffPersonEmail = ticket.copy(personEmail = LaxEmailAddress("bob@example.com"))
+        TicketServiceMock.FetchTicket.succeeds(Some(ticketDiffPersonEmail))
+
+        val result = addToken(underTest.ticketPageWithAttachments(ticketId))(request)
+
+        status(result) shouldBe NOT_FOUND
+      }
+
+      "redirect to logon page if not logged in" in new Setup with NotLoggedIn {
+        val result = addToken(underTest.ticketPageWithAttachments(ticketId))(request)
 
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe Some("/developer/login")
