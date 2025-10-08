@@ -23,6 +23,7 @@ GET         /confirmation                                   uk.gov.hmrc.devhubsu
 GET         /app                                            uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithApplicationsController.page()
 POST        /app                                            uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithApplicationsController.submit()
 GET         /app/giving-team-member-access                  uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithApplicationsController.givingTeamMembersAccess()
+GET         /flow/:flowId                                   uk.gov.hmrc.devhubsupportfrontend.controllers.GoToSupportFlowController.goToFlow(flowId: String)
 
 GET         /tickets                                        uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketListPage(resolved: Boolean ?=false)
 GET         /ticket/:tid                                    uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketPage(tid: Int)
