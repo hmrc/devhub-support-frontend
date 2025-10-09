@@ -49,6 +49,7 @@ class ApplyForPrivateApiAccessController @Inject() (
 
   def filterValidFlow(flow: SupportFlow): Boolean = flow match {
     case SupportFlow(_, SupportData.UsingAnApi.id, Some(SupportData.PrivateApiDocumentation.id), _, _, _, _) => true
+    case SupportFlow(_, SupportData.PrivateApiDocumentation.id, None, _, _, _, _)                            => true
     case _                                                                                                   => false
   }
 
