@@ -66,6 +66,7 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
 
     SupportServiceMock.FetchAllApis.succeeds(List(apiSummary))
 
+    when(appConfig.enforceLogin).thenReturn(false)
   }
 
   "SupportEnquiryController" when {
@@ -82,6 +83,22 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
 
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe Some("/devhub-support/start")
+      }
+
+      "redirect to enforce login notice page when force login config is set and user not logged in" in new Setup {
+        when(appConfig.enforceLogin).thenReturn(true)
+        val result = addToken(underTest.page())(FakeRequest())
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some("/devhub-support/login-restriction")
+      }
+
+      "redirect to list of tickets page when force login config is set and user is logged in" in new Setup {
+        when(appConfig.enforceLogin).thenReturn(true)
+        val result = addToken(underTest.page())(request)
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some("/devhub-support/tickets")
       }
     }
 
