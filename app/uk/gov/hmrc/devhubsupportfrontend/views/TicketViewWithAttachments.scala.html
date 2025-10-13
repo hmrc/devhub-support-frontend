@@ -23,6 +23,9 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.{CharacterCount => CC}
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.TicketResponseForm
+@import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services._
+@import play.api.mvc.RequestHeader
+@import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services._
 
 @import java.util.Locale
 @import java.time.ZoneId
@@ -39,7 +42,7 @@
 )
 
 
-@(form: Form[TicketResponseForm], loggedInSession: Option[UserSession], ticket: DeskproTicket)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(form: Form[TicketResponseForm], loggedInSession: Option[UserSession], ticket: DeskproTicket, upscanInitiateResponse: UpscanInitiateResponse)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @buildHistoryLinkHtml(text: String) = {
   <a href='#history' class='govuk-link govuk-link--no-visited-state'>@{text}</a>
@@ -72,10 +75,11 @@
 
       <h2 id="history" class="govuk-heading-l govuk-!-margin-bottom-6 govuk-!-margin-top-9">@{messages("ticketdetails.messagehistory")}</h2>
        
-      @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.submitTicketResponse(ticket.id)) {
+      @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.submitTicketResponseWithAttachments(ticket.id)) {
           @helper.CSRF.formField
 
           <input type="hidden" name="status" value="@{ticket.status}">
+          <input type="hidden" name="fileReference" value="@{form("fileReference").value}">
 
           @govukCharacterCount(CC(
               id = "response",
@@ -112,6 +116,34 @@
                   ))
           }
       }
+
+
+      <form action="@upscanInitiateResponse.postTarget" method="post" enctype="multipart/form-data">
+
+          @for(field <- upscanInitiateResponse.formFields) {
+              <input type="hidden" name="@field._1" value="@field._2"/>
+          }
+
+      <div class="js-visible mt-3">
+          <div class="govuk-form-group">
+              <label class="govuk-label" for="file-input">
+                  <span class="">File to upload</span>
+              </label>
+              <input
+              type="file"
+              id="file-input"
+              name="file"
+              class="govuk-file-upload"
+              accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpeg,.jpg,.txt"
+              />
+          </div>
+      </div>
+
+      <div class="section">
+          <button id="submit" class="govuk-button"> Upload </button>
+      </div>
+      </form>
+
       @hmrcTimeline(Timeline(
         events = ticket.messages.filter(t => !t.isAgentNote).map(message =>
           Event(

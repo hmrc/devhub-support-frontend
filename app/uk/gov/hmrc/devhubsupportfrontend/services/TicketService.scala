@@ -42,8 +42,16 @@ class TicketService @Inject() (
     deskproConnector.fetchTicket(ticketId, hc)
   }
 
-  def createResponse(ticketId: Int, userEmail: LaxEmailAddress, message: String, status: String, userName: String, newStatus: String)(implicit hc: HeaderCarrier)
-      : Future[DeskproTicketResponseResult] = {
+  def createResponse(
+      ticketId: Int,
+      userEmail: LaxEmailAddress,
+      message: String,
+      status: String,
+      userName: String,
+      newStatus: String,
+      fileReference: Option[String] = None
+    )(implicit hc: HeaderCarrier
+    ): Future[DeskproTicketResponseResult] = {
     def getMessage() = {
       if (status == "resolved") {
         s"$message<p><strong>$userName reopened this support request</strong></p>"
@@ -53,6 +61,6 @@ class TicketService @Inject() (
         message
       }
     }
-    deskproConnector.createResponse(ticketId, userEmail, getMessage(), newStatus, hc)
+    deskproConnector.createResponse(ticketId, userEmail, getMessage(), newStatus, fileReference, hc)
   }
 }

@@ -27,7 +27,7 @@ import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{DeskproAttachment, DeskproMessage, DeskproTicket, SupportSessionId}
-import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
+import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ThirdPartyDeveloperConnectorMockModule, UpscanInitiateConnectorMockModule}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.TicketServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
@@ -35,7 +35,7 @@ import uk.gov.hmrc.devhubsupportfrontend.views.html._
 
 class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
-  trait Setup extends TicketServiceMockModule with ThirdPartyDeveloperConnectorMockModule with UserBuilder with LocalUserIdTracker {
+  trait Setup extends TicketServiceMockModule with ThirdPartyDeveloperConnectorMockModule with UpscanInitiateConnectorMockModule with UserBuilder with LocalUserIdTracker {
     val ticketListView            = app.injector.instanceOf[TicketListView]
     val ticketView                = app.injector.instanceOf[TicketView]
     val ticketViewWithAttachments = app.injector.instanceOf[TicketViewWithAttachments]
@@ -45,6 +45,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       cookieSigner,
       mock[ErrorHandler],
       ThirdPartyDeveloperConnectorMock.aMock,
+      UpscanInitiateConnectorMock.aMock,
       TicketServiceMock.aMock,
       ticketListView,
       ticketView,
@@ -52,6 +53,8 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     )
 
     val ticketId: Int = 4232
+
+    val key = "key1"
 
     val message = DeskproMessage(
       3467,
@@ -78,6 +81,12 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
     val sessionParams: Seq[(String, String)] = Seq("csrfToken" -> app.injector.instanceOf[TokenProvider].generateToken)
     val supportSessionId                     = SupportSessionId.random
+
+    val statusOpen          = "open"
+    val statusAwaitingAgent = "awaiting_agent"
+    val actionSend          = "send"
+    val response            = "Test response"
+    val fileReference       = "abc-123"
   }
 
   trait IsLoggedIn {
@@ -194,6 +203,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     "invoke ticketPageWithAttachments" should {
       "render the ticket page showing attachments" in new Setup with IsLoggedIn {
         TicketServiceMock.FetchTicket.succeeds(Some(ticket))
+        UpscanInitiateConnectorMock.Initiate.succeeds()
 
         val result = addToken(underTest.ticketPageWithAttachments(ticketId))(request)
 
@@ -208,6 +218,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       "hide the close button when ticket is resolved" in new Setup with IsLoggedIn {
         TicketServiceMock.FetchTicket.succeeds(Some(ticket.copy(status = "resolved")))
+        UpscanInitiateConnectorMock.Initiate.succeeds()
 
         val result = addToken(underTest.ticketPageWithAttachments(ticketId))(request)
 
@@ -216,8 +227,20 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         contentAsString(result) should not include ("Mark as resolved")
       }
 
+      "populate the hidden fileReference with the upscan key set in the request param" in new Setup with IsLoggedIn {
+        TicketServiceMock.FetchTicket.succeeds(Some(ticket))
+        UpscanInitiateConnectorMock.Initiate.succeeds()
+
+        val upscanKey = "abc-123"
+        val result    = addToken(underTest.ticketPageWithAttachments(ticketId, Some(upscanKey)))(request)
+
+        status(result) shouldBe OK
+        contentAsString(result) should include("name=\"fileReference\" value=\"abc-123\"")
+      }
+
       "return 404 if ticket not found" in new Setup with IsLoggedIn {
         TicketServiceMock.FetchTicket.succeeds(None)
+        UpscanInitiateConnectorMock.Initiate.succeeds()
 
         val result = addToken(underTest.ticketPageWithAttachments(ticketId))(request)
 
@@ -227,6 +250,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       "return 404 if user email is different from person email in ticket" in new Setup with IsLoggedIn {
         val ticketDiffPersonEmail = ticket.copy(personEmail = LaxEmailAddress("bob@example.com"))
         TicketServiceMock.FetchTicket.succeeds(Some(ticketDiffPersonEmail))
+        UpscanInitiateConnectorMock.Initiate.succeeds()
 
         val result = addToken(underTest.ticketPageWithAttachments(ticketId))(request)
 
@@ -247,9 +271,9 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       "return to the tickets list when response submitted successfully" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
           .withFormUrlEncodedBody(
-            "status"   -> "awaiting_agent",
-            "action"   -> "send",
-            "response" -> "Test response"
+            "status"   -> statusOpen,
+            "action"   -> actionSend,
+            "response" -> response
           )
 
         TicketServiceMock.FetchTicket.succeeds(Some(ticket))
@@ -259,6 +283,14 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
         status(result) shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe "/devhub-support/tickets"
+
+        TicketServiceMock.CreateResponse.verifyCalledWith(
+          ticketId = ticketId,
+          message = response,
+          status = statusOpen,
+          newStatus = statusAwaitingAgent,
+          fileReference = None
+        )
       }
 
       "return to the same page with validation error when response not populated" in new Setup with IsLoggedIn {
@@ -274,29 +306,45 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       "return 500 if ticket not found" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
           .withFormUrlEncodedBody(
-            "status"   -> "awaiting_agent",
-            "action"   -> "send",
-            "response" -> "Test response"
+            "status"   -> statusOpen,
+            "action"   -> actionSend,
+            "response" -> response
           )
         TicketServiceMock.CreateResponse.notFound()
 
         val result = addToken(underTest.submitTicketResponse(ticketId))(ticketResponseRequest)
 
         status(result) shouldBe INTERNAL_SERVER_ERROR
+
+        TicketServiceMock.CreateResponse.verifyCalledWith(
+          ticketId = ticketId,
+          message = response,
+          status = statusOpen,
+          newStatus = statusAwaitingAgent,
+          fileReference = None
+        )
       }
 
       "return 500 if submit response failed" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
           .withFormUrlEncodedBody(
-            "status"   -> "awaiting_agent",
-            "action"   -> "send",
-            "response" -> "Test response"
+            "status"   -> statusOpen,
+            "action"   -> actionSend,
+            "response" -> response
           )
         TicketServiceMock.CreateResponse.fails()
 
         val result = addToken(underTest.submitTicketResponse(ticketId))(ticketResponseRequest)
 
         status(result) shouldBe INTERNAL_SERVER_ERROR
+
+        TicketServiceMock.CreateResponse.verifyCalledWith(
+          ticketId = ticketId,
+          message = response,
+          status = statusOpen,
+          newStatus = statusAwaitingAgent,
+          fileReference = None
+        )
       }
 
       "redirect to logon page if not logged in" in new Setup with NotLoggedIn {
@@ -304,6 +352,35 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe Some("/developer/login")
+      }
+    }
+  }
+
+  "Submit a response with attachments" when {
+    "invoke submitTicketResponseWithAttachments" should {
+      "pass the fileReference to the ticket service" in new Setup with IsLoggedIn {
+        val ticketResponseRequest = request
+          .withFormUrlEncodedBody(
+            "status"        -> statusOpen,
+            "action"        -> actionSend,
+            "response"      -> response,
+            "fileReference" -> fileReference
+          )
+
+        TicketServiceMock.CreateResponse.succeeds()
+
+        val result = addToken(underTest.submitTicketResponseWithAttachments(ticketId))(ticketResponseRequest)
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe "/devhub-support/tickets"
+
+        TicketServiceMock.CreateResponse.verifyCalledWith(
+          ticketId = ticketId,
+          message = response,
+          status = statusOpen,
+          newStatus = statusAwaitingAgent,
+          fileReference = Some(fileReference)
+        )
       }
     }
   }

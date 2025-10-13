@@ -23,7 +23,7 @@ import play.api.{ConfigLoader, Configuration}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config) {
+class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig) extends ServicesConfig(config) {
 
   val welshLanguageSupportEnabled: Boolean = getConfigDefaulted("features.welsh-language-support", false)
 
@@ -56,5 +56,12 @@ class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config)
 
   val enforceLogin: Boolean = getConfigDefaulted("enforce-login", false)
 
+  lazy val initiateV2Url            = servicesConfig.baseUrl("upscan-initiate") + "/upscan/v2/initiate"
+  lazy val uploadRedirectTargetBase = loadConfig("upload-redirect-target-base")
+  lazy val callbackEndpointTarget   = loadConfig("upscan.callback-endpoint")
+
   private def getConfigDefaulted[A](key: String, default: => A)(implicit loader: ConfigLoader[A]): A = config.getOptional[A](key)(loader).getOrElse(default)
+
+  private def loadConfig(key: String) =
+    config.getOptional[String](key).getOrElse(throw new RuntimeException(s"Missing configuration key: $key"))
 }

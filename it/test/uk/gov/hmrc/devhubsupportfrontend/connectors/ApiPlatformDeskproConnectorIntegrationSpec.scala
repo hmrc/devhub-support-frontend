@@ -57,6 +57,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     val email         = "bob@example.com"
     val subject       = "Test"
     val message       = "Message"
+    val fileReference = "fileRef"
     val deskproTicket = ApiPlatformDeskproConnector.CreateTicketRequest(fullName, email, subject, message)
     val status        = "awaiting_agent"
   }
@@ -177,7 +178,15 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     "create a ticket response" in new Setup {
       ApiPlatformDeskproStub.CreateResponse.succeeds(ticketId, userEmail, message)
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, status, hc))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, None, hc))
+
+      result shouldBe DeskproTicketResponseSuccess
+    }
+
+    "create a ticket response with attachmend file reference" in new Setup {
+      ApiPlatformDeskproStub.CreateResponse.succeedsWithFileReference(ticketId, userEmail, message, fileReference)
+
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, Some(fileReference), hc))
 
       result shouldBe DeskproTicketResponseSuccess
     }
@@ -185,7 +194,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     "fail when the ticket to respond to is not found" in new Setup {
       ApiPlatformDeskproStub.CreateResponse.notFound(ticketId)
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, status, hc))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, Some(fileReference), hc))
 
       result shouldBe DeskproTicketResponseNotFound
     }
@@ -193,7 +202,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     "fail when the ticket respond call returns an error" in new Setup {
       ApiPlatformDeskproStub.CreateResponse.fails(ticketId)
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, status, hc))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, Some(fileReference), hc))
 
       result shouldBe DeskproTicketResponseFailure
     }

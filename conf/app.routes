@@ -27,8 +27,9 @@ GET         /flow/:flowId                                   uk.gov.hmrc.devhubsu
 
 GET         /tickets                                        uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketListPage(resolved: Boolean ?=false)
 GET         /ticket/:tid                                    uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketPage(tid: Int)
-GET         /ticket/:tid/withAttachments                    uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketPageWithAttachments(tid: Int)
+GET         /ticket/:tid/withAttachments                    uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketPageWithAttachments(tid: Int, key: Option[String])
 POST        /ticket/:tid/response                           uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.submitTicketResponse(tid: Int)
+POST        /ticket/:tid/responseWithAttachments            uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.submitTicketResponseWithAttachments(tid: Int)
 
 GET         /login-restriction                              uk.gov.hmrc.devhubsupportfrontend.controllers.LoggedInRestrictionController.page()
 
