@@ -123,7 +123,7 @@ class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlat
   def createResponse(ticketId: Int, userEmail: LaxEmailAddress, message: String, status: String, fileReference: Option[String], hc: HeaderCarrier)
       : Future[DeskproTicketResponseResult] = metrics.record(api) {
     implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
-    val ticketResponseJson = Json.toJson(CreateTicketResponseRequest(userEmail, message, status, fileReference))
+    val ticketResponseJson                    = Json.toJson(CreateTicketResponseRequest(userEmail, message, status, fileReference))
     logger.debug(s"CreateTicketResponseRequest json: $ticketResponseJson")
     http.post(url"${config.serviceBaseUrl}/ticket/$ticketId/response")
       .withBody(ticketResponseJson)
