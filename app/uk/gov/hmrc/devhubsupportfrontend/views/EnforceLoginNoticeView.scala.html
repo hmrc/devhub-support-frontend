@@ -1,0 +1,41 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+
+@import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
+
+@this(
+  layout: Layout
+)
+
+@()(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+
+@layout(
+  pageTitle = "Sign in to the Developer Hub to create a support request"
+) {
+    <h2 class="govuk-heading-l">Sign in to the Developer Hub to create a support request</h2>
+
+    <p class="govuk-body">
+      If you have a query about signing in, email the support team at 
+      <a class="govuk-link" href="mailto:softwaredevelopersupport@@service.hmrc.gov.uk">softwaredevelopersupport@@service.hmrc.gov.uk</a>.
+    </p>
+
+    <p class="govuk-body"> 
+      <a href="@{appConfig.logInUrl}" id="login" class="govuk-button">Sign in</a>
+    </p>
+}

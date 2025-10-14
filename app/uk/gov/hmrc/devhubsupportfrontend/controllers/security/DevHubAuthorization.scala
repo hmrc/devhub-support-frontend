@@ -27,8 +27,8 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvi
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
-import uk.gov.hmrc.devhubsupportfrontend.controllers.BaseController
 import uk.gov.hmrc.devhubsupportfrontend.controllers.models.{MaybeUserRequest, UserRequest}
+import uk.gov.hmrc.devhubsupportfrontend.controllers.{BaseController, _}
 
 trait DevHubAuthorization extends FrontendHeaderCarrierProvider with CookieEncoding {
   self: BaseController =>
@@ -43,9 +43,17 @@ trait DevHubAuthorization extends FrontendHeaderCarrierProvider with CookieEncod
     val onlyTrueIfLoggedInFilter: DeveloperSessionFilter.Type = _.loggedInState == LoggedInState.LOGGED_IN
   }
 
-  def maybeAtLeastPartLoggedInEnablingMfa(body: MaybeUserRequest[AnyContent] => Future[Result])(implicit ec: ExecutionContext): Action[AnyContent] = Action.async {
-    implicit request: MessagesRequest[AnyContent] => loadSession.flatMap(maybeDeveloperSession => body(new MaybeUserRequest(maybeDeveloperSession, request)))
-  }
+  def maybeAtLeastPartLoggedInEnablingMfa(body: MaybeUserRequest[AnyContent] => Future[Result])(implicit ec: ExecutionContext): Action[AnyContent] =
+    Action.async { implicit request: MessagesRequest[AnyContent] =>
+      def getMaybeUserRequest(maybeUserSession: Option[UserSession]): Future[Result] = {
+        if (appConfig.enforceLogin && maybeUserSession.isEmpty) {
+          Future.successful(Redirect(routes.LoggedInRestrictionController.page()))
+        } else {
+          body(new MaybeUserRequest(maybeUserSession, request))
+        }
+      }
+      loadSession.flatMap(maybeDeveloperSession => getMaybeUserRequest(maybeDeveloperSession))
+    }
 
   def loggedInActionRefiner(filter: DeveloperSessionFilter.Type = DeveloperSessionFilter.onlyTrueIfLoggedInFilter): ActionRefiner[MessagesRequest, UserRequest] =
     new ActionRefiner[MessagesRequest, UserRequest] {
