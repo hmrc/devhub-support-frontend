@@ -26,7 +26,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
+import uk.gov.hmrc.devhubsupportfrontend.connectors.{ThirdPartyDeveloperConnector, UpscanInitiateConnector}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services.{UpscanFileReference, UpscanInitiateResponse}
 import uk.gov.hmrc.devhubsupportfrontend.services._
 import uk.gov.hmrc.devhubsupportfrontend.views.html._
 
@@ -46,14 +47,16 @@ object TicketController {
   case class TicketResponseForm(
       response: Option[String],
       status: String,
-      action: String
+      action: String,
+      fileReference: Option[String]
     )
 
   val ticketResponseForm: Form[TicketResponseForm] = Form(
     mapping(
-      "response" -> optional(text).verifying("ticketdetails.response.required", _.isDefined),
-      "status"   -> nonEmptyText,
-      "action"   -> nonEmptyText
+      "response"      -> optional(text).verifying("ticketdetails.response.required", _.isDefined),
+      "status"        -> nonEmptyText,
+      "action"        -> nonEmptyText,
+      "fileReference" -> optional(text)
     )(TicketResponseForm.apply)(TicketResponseForm.unapply)
   )
 }
@@ -64,6 +67,7 @@ class TicketController @Inject() (
     val cookieSigner: CookieSigner,
     val errorHandler: ErrorHandler,
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
+    upscanInitiateConnector: UpscanInitiateConnector,
     ticketService: TicketService,
     ticketListView: TicketListView,
     ticketView: TicketView,
@@ -86,10 +90,21 @@ class TicketController @Inject() (
     }
   }
 
-  def ticketPageWithAttachments(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
-    ticketService.fetchTicket(ticketId).map {
-      case Some(ticket) if ticket.personEmail == request.userSession.developer.email => Ok(ticketViewWithAttachments(ticketResponseForm, Some(request.userSession), ticket))
-      case _                                                                         => NotFound
+  def ticketPageWithAttachments(ticketId: Int, key: Option[String] = None): Action[AnyContent] = loggedInAction { implicit request =>
+    val successRedirectUrl = s"http://localhost:9695/devhub-support/ticket/$ticketId/withAttachments"
+    val errorRedirectUrl   = routes.TicketController.ticketListPage().url
+
+    val ticketResponseFormWithFileRef = ticketResponseForm.fill(TicketResponseForm(None, "open", "", key))
+    val userEmail                     = request.userSession.developer.email
+
+    for {
+      maybeTicket            <- ticketService.fetchTicket(ticketId)
+      upscanInitiateResponse <- upscanInitiateConnector.initiate(Some(successRedirectUrl), Some(errorRedirectUrl))
+    } yield (maybeTicket, upscanInitiateResponse) match {
+      case (Some(ticket), upscan) if ticket.personEmail == userEmail =>
+        Ok(ticketViewWithAttachments(ticketResponseFormWithFileRef, Some(request.userSession), ticket, upscan))
+      case _                                                         =>
+        NotFound
     }
   }
 
@@ -118,4 +133,31 @@ class TicketController @Inject() (
 
     requestForm.fold(errors, handleValidForm)
   }
+
+  def submitTicketResponseWithAttachments(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
+    val requestForm: Form[TicketResponseForm] = ticketResponseForm.bindFromRequest()
+
+    def errors(errors: Form[TicketResponseForm]) =
+      ticketService.fetchTicket(ticketId).map {
+        case Some(ticket) if ticket.personEmail == request.userSession.developer.email =>
+          Ok(ticketViewWithAttachments(errors, Some(request.userSession), ticket, UpscanInitiateResponse(UpscanFileReference(""), "", Map.empty)))
+        case _                                                                         => NotFound
+      }
+
+    def handleValidForm(validForm: TicketResponseForm) = {
+      val newStatus = validForm.action match {
+        case "send"  => "awaiting_agent"
+        case "close" => "resolved"
+      }
+
+      ticketService.createResponse(ticketId, request.email, validForm.response.get, validForm.status, request.displayedName, newStatus, validForm.fileReference).map {
+        case DeskproTicketResponseSuccess  => Redirect(routes.TicketController.ticketListPage().url)
+        case DeskproTicketResponseNotFound => InternalServerError
+        case DeskproTicketResponseFailure  => InternalServerError
+      }
+    }
+
+    requestForm.fold(errors, handleValidForm)
+  }
+
 }

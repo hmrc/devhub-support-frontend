@@ -155,6 +155,22 @@ object ApiPlatformDeskproStub {
       )
     }
 
+    def succeedsWithFileReference(ticketId: Int, userEmail: LaxEmailAddress, message: String, fileReference: String): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/ticket/$ticketId/response"))
+          .withRequestBody(equalToJson(s"""{
+                                          |  "userEmail": "$userEmail",
+                                          |  "message": "$message",
+                                          |  "status": "awaiting_agent",
+                                          |  "fileReference": "$fileReference"
+                                          |}""".stripMargin))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+          )
+      )
+    }
+
     def notFound(ticketId: Int): StubMapping = {
       stubFor(
         post(urlEqualTo(s"/ticket/$ticketId/response"))
