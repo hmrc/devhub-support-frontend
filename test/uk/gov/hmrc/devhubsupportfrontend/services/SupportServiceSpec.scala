@@ -159,7 +159,8 @@ class SupportServiceSpec extends AsyncHmrcSpec {
             fullName,
             email,
             organisation = None,
-            teamMemberEmailAddress = None
+            teamMemberEmailAddress = None,
+            url = None
           )
         )
       )
@@ -199,7 +200,8 @@ class SupportServiceSpec extends AsyncHmrcSpec {
             fullName,
             email,
             organisation = None,
-            teamMemberEmailAddress = None
+            teamMemberEmailAddress = None,
+            url = None
           )
         )
       )
@@ -244,7 +246,8 @@ class SupportServiceSpec extends AsyncHmrcSpec {
             email,
             organisation,
             "my API",
-            applicationId
+            applicationId,
+            None
           )
         )
       )

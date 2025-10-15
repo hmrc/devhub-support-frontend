@@ -19,7 +19,14 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 import play.api.data.Forms._
 import play.api.data.{Form, Mapping}
 
-final case class SupportDetailsForm(details: String, fullName: String, emailAddress: String, organisation: Option[String], teamMemberEmailAddress: Option[String], url: Option[String])
+final case class SupportDetailsForm(
+    details: String,
+    fullName: String,
+    emailAddress: String,
+    organisation: Option[String],
+    teamMemberEmailAddress: Option[String],
+    url: Option[String]
+  )
 
 object SupportDetailsForm extends FormValidation {
   private val formPrefix: String = "supportdetails"
@@ -41,7 +48,7 @@ object SupportDetailsForm extends FormValidation {
       formPrefix ~> "emailAddress" ~> emailValidator,
       "organisation" -> optional(text),
       formPrefix ~> "teamMemberEmailAddress" ~> optionalEmailValidator,
-      "url" -> optional(text)
+      "url"          -> optional(text)
     )(SupportDetailsForm.apply)(SupportDetailsForm.unapply)
   )
 }

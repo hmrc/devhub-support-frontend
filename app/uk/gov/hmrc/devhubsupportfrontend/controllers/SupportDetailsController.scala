@@ -18,9 +18,11 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+
 import play.api.data.Form
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
@@ -70,11 +72,12 @@ class SupportDetailsController @Inject() (
 
     def handleValidForm(sessionId: SupportSessionId, flow: SupportFlow)(form: SupportDetailsForm): Future[Result] = {
       if (form.url.isDefined && fullyloggedInDeveloper.map(user => !user.loggedInState.isLoggedIn).getOrElse(true)) {
+        logger.warn(s"Honeypot field triggered via generic 'Tell us about your query' support form")
         Future.successful(withSupportCookie(Ok(supportPageConfirmationForHoneyPotFieldView(fullyloggedInDeveloper)), sessionId))
       } else {
-      supportService.submitTicket(flow, form).map(_ =>
-        withSupportCookie(Redirect(routes.SupportDetailsController.supportConfirmationPage()), sessionId)
-      )
+        supportService.submitTicket(flow, form).map(_ =>
+          withSupportCookie(Redirect(routes.SupportDetailsController.supportConfirmationPage()), sessionId)
+        )
       }
     }
 
