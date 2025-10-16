@@ -64,5 +64,3 @@ ticketdetails.messagehistory=Message history
 ticketdetails.response.required=Enter a response
 ticketdetails.resolvedticketmessage1=This support request has been resolved.
 ticketdetails.resolvedticketmessage2=You can reopen it by sending a new message.
-
-honeypot.field=Honey pot field
