@@ -27,7 +27,7 @@ import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.services._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.{SupportPageConfirmationView, SupportPageDetailView}
+import uk.gov.hmrc.devhubsupportfrontend.views.html.{SupportPageConfirmationForHoneyPotFieldView, SupportPageConfirmationView, SupportPageDetailView}
 
 @Singleton
 class SupportDetailsController @Inject() (
@@ -37,7 +37,8 @@ class SupportDetailsController @Inject() (
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     supportService: SupportService,
     supportPageDetailView: SupportPageDetailView,
-    supportPageConfirmationView: SupportPageConfirmationView
+    supportPageConfirmationView: SupportPageConfirmationView,
+    supportPageConfirmationForHoneyPotFieldView: SupportPageConfirmationForHoneyPotFieldView
   )(implicit val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
@@ -70,9 +71,14 @@ class SupportDetailsController @Inject() (
     }
 
     def handleValidForm(sessionId: SupportSessionId, flow: SupportFlow)(form: SupportDetailsForm): Future[Result] = {
-      supportService.submitTicket(flow, form).map(_ =>
-        withSupportCookie(Redirect(routes.SupportDetailsController.supportConfirmationPage()), sessionId)
-      )
+      if (form.url.isDefined && fullyloggedInDeveloper.map(user => !user.loggedInState.isLoggedIn).getOrElse(true)) {
+        logger.warn(s"Honeypot field triggered via generic 'Tell us about your query' support form")
+        Future.successful(withSupportCookie(Ok(supportPageConfirmationForHoneyPotFieldView(fullyloggedInDeveloper)), sessionId))
+      } else {
+        supportService.submitTicket(flow, form).map(_ =>
+          withSupportCookie(Redirect(routes.SupportDetailsController.supportConfirmationPage()), sessionId)
+        )
+      }
     }
 
     def handleInvalidForm(flow: SupportFlow)(formWithErrors: Form[SupportDetailsForm]): Future[Result] = {

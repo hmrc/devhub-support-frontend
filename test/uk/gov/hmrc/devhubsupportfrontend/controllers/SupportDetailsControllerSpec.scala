@@ -31,13 +31,14 @@ import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithSupportSession._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.{SupportPageConfirmationView, SupportPageDetailView}
+import uk.gov.hmrc.devhubsupportfrontend.views.html.{SupportPageConfirmationForHoneyPotFieldView, SupportPageConfirmationView, SupportPageDetailView}
 
 class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
   trait Setup extends SupportServiceMockModule with ThirdPartyDeveloperConnectorMockModule with UserBuilder with LocalUserIdTracker {
-    val supportPageDetailView       = app.injector.instanceOf[SupportPageDetailView]
-    val supportPageConfirmationView = app.injector.instanceOf[SupportPageConfirmationView]
+    val supportPageDetailView                       = app.injector.instanceOf[SupportPageDetailView]
+    val supportPageConfirmationView                 = app.injector.instanceOf[SupportPageConfirmationView]
+    val supportPageConfirmationForHoneyPotFieldView = app.injector.instanceOf[SupportPageConfirmationForHoneyPotFieldView]
 
     val underTest = new SupportDetailsController(
       mcc,
@@ -46,7 +47,8 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
       ThirdPartyDeveloperConnectorMock.aMock,
       SupportServiceMock.aMock,
       supportPageDetailView,
-      supportPageConfirmationView
+      supportPageConfirmationView,
+      supportPageConfirmationForHoneyPotFieldView
     )
 
     val sessionParams: Seq[(String, String)] = Seq("csrfToken" -> app.injector.instanceOf[TokenProvider].generateToken)
@@ -90,6 +92,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         val result = addToken(underTest.supportDetailsPage())(request)
 
         status(result) shouldBe OK
+        contentAsString(result) should include("Your website")
       }
     }
 
@@ -109,6 +112,43 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
 
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/devhub-support/confirmation")
+      }
+
+      "create support ticket when request with name, email, comments and url (honeypot field) on form and user is logged in" in new Setup with IsLoggedIn {
+        val newRequest = request
+          .withSession(sessionParams: _*)
+          .withFormUrlEncodedBody(
+            "fullName"     -> "Peter Smith",
+            "emailAddress" -> "peter@example.com",
+            "details"      -> "A+++, good seller, would buy again, this is a long comment",
+            "url"          -> "It's a trap"
+          )
+        SupportServiceMock.GetSupportFlow.succeeds()
+        SupportServiceMock.SubmitTicket.succeeds()
+
+        val result = addToken(underTest.submitSupportDetails())(newRequest)
+
+        status(result) shouldBe 303
+        redirectLocation(result) shouldBe Some("/devhub-support/confirmation")
+      }
+
+      "not create support ticket but show dummy confirmation page when url (honeypot field) on form and user is not logged in" in new Setup {
+        val request = FakeRequest()
+          .withSession(sessionParams: _*)
+          .withFormUrlEncodedBody(
+            "fullName"     -> "Peter Smith",
+            "emailAddress" -> "peter@example.com",
+            "details"      -> "A+++, good seller, would buy again, this is a long comment",
+            "url"          -> "It's a trap"
+          )
+        SupportServiceMock.GetSupportFlow.succeeds()
+
+        val result = addToken(underTest.submitSupportDetails())(request)
+
+        status(result) shouldBe OK
+        contentAsString(result) should include("We've sent you a confirmation email")
+        contentAsString(result) should include("Your request will be sent to the right team as quickly as possible")
+        contentAsString(result) should include("We'll send an email to your email address whenever there's an update")
       }
 
       "submit request with name, email and 3000 characters including \r\n details returns success" in new Setup {

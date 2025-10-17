@@ -31,7 +31,7 @@ import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
 import uk.gov.hmrc.devhubsupportfrontend.controllers.security.SupportCookie
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
 import uk.gov.hmrc.devhubsupportfrontend.services.SupportService
-import uk.gov.hmrc.devhubsupportfrontend.views.html.ApplyForPrivateApiAccessView
+import uk.gov.hmrc.devhubsupportfrontend.views.html.{ApplyForPrivateApiAccessView, SupportPageConfirmationForHoneyPotFieldView}
 
 @Singleton
 class ApplyForPrivateApiAccessController @Inject() (
@@ -40,7 +40,8 @@ class ApplyForPrivateApiAccessController @Inject() (
     val cookieSigner: CookieSigner,
     val errorHandler: ErrorHandler,
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
-    applyForPrivateApiAccessView: ApplyForPrivateApiAccessView
+    applyForPrivateApiAccessView: ApplyForPrivateApiAccessView,
+    supportPageConfirmationForHoneyPotFieldView: SupportPageConfirmationForHoneyPotFieldView
   )(implicit val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractSupportFlowController[ApplyForPrivateApiAccessForm, Unit](mcc, supportService) with SupportCookie {
@@ -67,8 +68,13 @@ class ApplyForPrivateApiAccessController @Inject() (
   }
 
   def onValidForm(flow: SupportFlow, form: ApplyForPrivateApiAccessForm)(implicit request: MaybeUserRequest[AnyContent]): Future[Result] = {
-    supportService.submitTicket(flow, form).map { _ =>
-      Redirect(routes.SupportDetailsController.supportConfirmationPage())
+    if (form.url.isDefined && fullyloggedInDeveloper.map(user => !user.loggedInState.isLoggedIn).getOrElse(true)) {
+      logger.warn(s"Honeypot field triggered via 'Apply for access to a private API' support form")
+      Future.successful(Ok(supportPageConfirmationForHoneyPotFieldView(fullyloggedInDeveloper)))
+    } else {
+      supportService.submitTicket(flow, form).map { _ =>
+        Redirect(routes.SupportDetailsController.supportConfirmationPage())
+      }
     }
   }
 }
