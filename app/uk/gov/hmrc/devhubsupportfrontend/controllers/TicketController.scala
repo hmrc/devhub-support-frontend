@@ -91,8 +91,8 @@ class TicketController @Inject() (
   }
 
   def ticketPageWithAttachments(ticketId: Int, key: Option[String] = None): Action[AnyContent] = loggedInAction { implicit request =>
-    val successRedirectUrl = routes.TicketController.ticketPageWithAttachments(ticketId, None).absoluteURL()
-    val errorRedirectUrl   = routes.TicketController.ticketPageWithAttachments(ticketId, None).absoluteURL()
+    val successRedirectUrl = appConfig.thirdPartyDeveloperFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
+    val errorRedirectUrl   = appConfig.thirdPartyDeveloperFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
 
     val ticketResponseFormWithFileRef = ticketResponseForm.fill(TicketResponseForm(None, "open", "", key))
     val userEmail                     = request.userSession.developer.email
