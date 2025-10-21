@@ -31,16 +31,13 @@ import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperCon
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.ApplyForPrivateApiAccessView
+import uk.gov.hmrc.devhubsupportfrontend.views.html.{ApplyForPrivateApiAccessView, SupportPageConfirmationForHoneyPotFieldView}
 
 class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
   trait Setup extends SupportServiceMockModule with ThirdPartyDeveloperConnectorMockModule with UserBuilder with LocalUserIdTracker {
-    val applyForPrivateApiAccessView = app.injector.instanceOf[ApplyForPrivateApiAccessView]
-
-    lazy val request = FakeRequest()
-      .withSupport(underTest)(supportSessionId)
-      .withUser(underTest)(sessionId)
+    val applyForPrivateApiAccessView                = app.injector.instanceOf[ApplyForPrivateApiAccessView]
+    val supportPageConfirmationForHoneyPotFieldView = app.injector.instanceOf[SupportPageConfirmationForHoneyPotFieldView]
 
     val underTest = new ApplyForPrivateApiAccessController(
       mcc,
@@ -48,14 +45,13 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
       cookieSigner,
       mock[ErrorHandler],
       ThirdPartyDeveloperConnectorMock.aMock,
-      applyForPrivateApiAccessView
+      applyForPrivateApiAccessView,
+      supportPageConfirmationForHoneyPotFieldView
     )
 
     val supportSessionId = SupportSessionId.random
     val basicFlow        = SupportFlow(supportSessionId, SupportData.UsingAnApi.id)
     val appropriateFlow  = basicFlow.copy(subSelection = Some(SupportData.PrivateApiDocumentation.id), privateApi = Some("xxx"))
-
-    ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
 
     def shouldBeRedirectedToPreviousPage(result: Future[Result]) = {
       status(result) shouldBe SEE_OTHER
@@ -68,17 +64,36 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
     }
   }
 
+  trait IsLoggedIn {
+    self: Setup =>
+
+    lazy val request = FakeRequest()
+      .withSupport(underTest)(supportSessionId)
+      .withUser(underTest)(sessionId)
+
+    ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
+  }
+
+  trait NotLoggedIn {
+    self: Setup =>
+
+    lazy val request = FakeRequest()
+
+    ThirdPartyDeveloperConnectorMock.FetchSession.fails()
+  }
+
   "ApplyForPrivateApiAccessController" when {
     "invoke page" should {
-      "render the page when flow has private api present" in new Setup {
+      "render the page when flow has private api present" in new Setup with IsLoggedIn {
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
 
         val result = addToken(underTest.page())(request)
 
         status(result) shouldBe OK
+        contentAsString(result) should include("Your website")
       }
 
-      "render the page when flow has no private api present" in new Setup {
+      "render the page when flow has no private api present" in new Setup with IsLoggedIn {
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow.copy(privateApi = None))
 
         val result = addToken(underTest.page())(request)
@@ -88,9 +103,10 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
         contentAsString(result) should include("Which private API do you want to use?")
         contentAsString(result) should include("Full name")
         contentAsString(result) should include("Email address")
+        contentAsString(result) should include("Your website")
       }
 
-      "render the previous page when there is no flow" in new Setup {
+      "render the previous page when there is no flow" in new Setup with IsLoggedIn {
         SupportServiceMock.GetSupportFlow.succeeds(basicFlow)
 
         val result = addToken(underTest.page())(request)
@@ -100,7 +116,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
     }
 
     "invoke submit" should {
-      "submit new valid request from form" in new Setup {
+      "submit new valid request from form" in new Setup with IsLoggedIn {
         val formRequest = request.withFormUrlEncodedBody(
           "fullName"      -> "Bob",
           "emailAddress"  -> "bob@example.com",
@@ -116,7 +132,44 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
         shouldBeRedirectedToConfirmationPage(result)
       }
 
-      "submit invalid request returns BAD_REQUEST" in new Setup {
+      "create new support ticket when valid request with url (honeypot field) on form and user is logged in" in new Setup with IsLoggedIn {
+        val formRequest = request.withFormUrlEncodedBody(
+          "fullName"      -> "Bob",
+          "emailAddress"  -> "bob@example.com",
+          "organisation"  -> "org",
+          "privateApi"    -> "my API",
+          "applicationId" -> "123456",
+          "url"           -> "It's a trap"
+        )
+        SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
+        SupportServiceMock.SubmitTicket.succeeds()
+
+        val result = addToken(underTest.submit())(formRequest)
+
+        shouldBeRedirectedToConfirmationPage(result)
+      }
+
+      "not create new ticket but show dummy confirmation page when url (honeypot field) on form and user not logged in" in new Setup with NotLoggedIn {
+        val newRequest = request
+          .withFormUrlEncodedBody(
+            "fullName"      -> "Bob",
+            "emailAddress"  -> "bob@example.com",
+            "organisation"  -> "org",
+            "privateApi"    -> "my API",
+            "applicationId" -> "123456",
+            "url"           -> "It's a trap"
+          )
+        SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
+
+        val result = addToken(underTest.submit())(newRequest)
+
+        status(result) shouldBe OK
+        contentAsString(result) should include("We've sent you a confirmation email")
+        contentAsString(result) should include("Your request will be sent to the right team as quickly as possible")
+        contentAsString(result) should include("We'll send an email to your email address whenever there's an update")
+      }
+
+      "submit invalid request returns BAD_REQUEST" in new Setup with IsLoggedIn {
         val formRequest = request.withFormUrlEncodedBody(
           "fullName"      -> "Bob",
           "emailAddress"  -> "bob@example.com",
@@ -129,7 +182,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
         status(result) shouldBe BAD_REQUEST
       }
 
-      "submit valid request but no session" in new Setup {
+      "submit valid request but no session" in new Setup with IsLoggedIn {
         val formRequest = request.withFormUrlEncodedBody(
           "fullName"      -> "Bob",
           "emailAddress"  -> "bob@example.com",
