@@ -15,6 +15,7 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import views.html.helper.CSPNonce
 
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.include._
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
@@ -48,6 +49,10 @@
   <a href='#history' class='govuk-link govuk-link--no-visited-state'>@{text}</a>
 }
 
+@additionalScripts = {
+  <script @CSPNonce.attr src='@routes.Assets.versioned("javascripts/upscan-upload.js")'></script>
+}
+
 @layout(
   pageTitle = "Your support request",
   backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
@@ -79,7 +84,7 @@
           @helper.CSRF.formField
 
           <input type="hidden" name="status" value="@{ticket.status}">
-          <input type="hidden" name="fileReference" value="@{form("fileReference").value}">
+          <input type="hidden" name="fileReferences" value="@{form("fileReferences").value.getOrElse("")}">
 
           @govukCharacterCount(CC(
               id = "response",
@@ -118,31 +123,42 @@
       }
 
 
-      <form action="@upscanInitiateResponse.postTarget" method="post" enctype="multipart/form-data">
+      <div class="upload-section">
+          <h3 class="govuk-heading-m">Add a file</h3>
+          <p class="govuk-body">You can upload supporting documents such as screenshots, log files, or other relevant files.</p>
+          
+          <form action="@upscanInitiateResponse.postTarget" method="post" enctype="multipart/form-data" id="upscan-form">
 
-          @for(field <- upscanInitiateResponse.formFields) {
-              <input type="hidden" name="@field._1" value="@field._2"/>
-          }
+              @for(field <- upscanInitiateResponse.formFields) {
+                  <input type="hidden" name="@field._1" value="@field._2"/>
+              }
 
-      <div class="js-visible mt-3">
-          <div class="govuk-form-group">
-              <label class="govuk-label" for="file-input">
-                  <span class="">File to upload</span>
-              </label>
-              <input
-              type="file"
-              id="file-input"
-              name="file"
-              class="govuk-file-upload"
-              accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpeg,.jpg,.txt"
-              />
-          </div>
+              <div class="govuk-form-group">
+                  <label class="govuk-label" for="file-input">
+                      Choose file
+                  </label>
+                  <div class="govuk-hint">
+                      File types: PDF, DOC, DOCX, XLS, XLSX, PNG, JPEG, JPG, TXT. Maximum file size: 10MB.
+                  </div>
+                  <input
+                  type="file"
+                  id="file-input"
+                  name="file"
+                  class="govuk-file-upload"
+                  accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpeg,.jpg,.txt"
+                  />
+              </div>
+
+              <div class="govuk-button-group">
+                  <button id="submit" type="submit" class="govuk-button govuk-button--secondary">
+                      Upload file
+                  </button>
+                  <noscript>
+                      <p class="govuk-body-s">Note: File upload will redirect you to this page with your file attached.</p>
+                  </noscript>
+              </div>
+          </form>
       </div>
-
-      <div class="section">
-          <button id="submit" class="govuk-button"> Upload </button>
-      </div>
-      </form>
 
       @hmrcTimeline(Timeline(
         events = ticket.messages.filter(t => !t.isAgentNote).map(message =>
@@ -154,4 +170,6 @@
         )
       ))
   }
+
+  @additionalScripts
 }

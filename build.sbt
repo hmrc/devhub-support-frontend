@@ -52,6 +52,7 @@ lazy val microservice = Project("devhub-support-frontend", file("."))
 
 lazy val it = project
   .enablePlugins(PlayScala)
+  .configs(IntegrationTest)
   .dependsOn(microservice % "test->test")
   .settings(DefaultBuildSettings.itSettings())
   .settings(libraryDependencies ++= AppDependencies.it)

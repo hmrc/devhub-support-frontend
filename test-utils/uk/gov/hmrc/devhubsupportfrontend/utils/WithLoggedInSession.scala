@@ -31,7 +31,7 @@ object WithLoggedInSession {
     }
 
     def withSupport(implicit cookieEncoding: CookieEncoding): SupportSessionId => FakeRequest[A] = { id =>
-      fakeRequest.withCookies(cookieEncoding.createUserCookie(id))
+      fakeRequest.withCookies(cookieEncoding.createSupportCookie(id))
     }
   }
 }

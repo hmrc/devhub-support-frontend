@@ -162,7 +162,7 @@ object ApiPlatformDeskproStub {
                                           |  "userEmail": "$userEmail",
                                           |  "message": "$message",
                                           |  "status": "awaiting_agent",
-                                          |  "fileReference": "$fileReference"
+                                          |  "fileReferences": ["$fileReference"]
                                           |}""".stripMargin))
           .willReturn(
             aResponse()

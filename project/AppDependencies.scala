@@ -26,5 +26,14 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "api-platform-test-tpd-domain"           % tpdDomainVersion
   ).map(_ % "test")
 
-  val it = Seq.empty
+  val it = Seq(
+    "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.1" % "it",
+    "org.seleniumhq.selenium" %  "selenium-java"     % "4.21.0" % "it",
+    "org.scalatestplus"      %% "selenium-4-21"      % "3.2.19.0" % "it",
+    "com.github.tomakehurst" %  "wiremock-jre8"      % "2.35.2" % "it",
+    "uk.gov.hmrc"            %% "api-platform-test-api-domain" % apiDomainVersion % "it",
+    "uk.gov.hmrc"            %% "api-platform-test-tpd-domain" % tpdDomainVersion % "it",
+    "org.mockito"            %  "mockito-core"       % "5.14.2" % "it",
+    "org.scalatestplus"      %% "mockito-4-11"       % "3.2.18.0" % "it"
+  )
 }
