@@ -68,9 +68,9 @@ class ApiPlatformDeskproConnectorIntegrationSpec
 
       ApiPlatformDeskproStub.CreateTicket.succeeds(ticketReference)
 
-      val result: String = await(underTest.createTicket(deskproTicket, hc))
+      val result = await(underTest.createTicket(deskproTicket, hc))
 
-      result shouldBe ticketReference
+      result shouldBe Some(ticketReference)
     }
 
     "fail when the ticket creation call returns an error" in new Setup {

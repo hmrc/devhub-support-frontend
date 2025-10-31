@@ -50,7 +50,7 @@ object ApiPlatformDeskproConnector {
       teamMemberEmail: Option[String] = None
     )
 
-  case class CreateTicketResponse(ref: String)
+  case class CreateTicketResponse(ref: Option[String])
 
   case class CreateTicketResponseRequest(userEmail: LaxEmailAddress, message: String, status: String, fileReference: Option[String] = None)
 
@@ -80,7 +80,7 @@ class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlat
 
   val api = API("api-platform-deskpro")
 
-  def createTicket(createRequest: CreateTicketRequest, hc: HeaderCarrier): Future[String] = metrics.record(api) {
+  def createTicket(createRequest: CreateTicketRequest, hc: HeaderCarrier): Future[Option[String]] = metrics.record(api) {
     implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
     http.post(url"${config.serviceBaseUrl}/ticket")
       .withBody(Json.toJson(createRequest))

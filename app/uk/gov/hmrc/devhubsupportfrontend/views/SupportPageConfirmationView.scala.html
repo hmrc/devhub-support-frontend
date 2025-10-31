@@ -35,7 +35,7 @@
 ) {
     @govukPanel(Panel(
         title = Text("Your support request has been submitted"),
-        content = HtmlContent(s"""Your reference number<br><strong>${supportFlow.referenceNumber.getOrElse("Reference Not Found")}</strong>""")
+        content = supportFlow.referenceNumber.map(ref => HtmlContent(s"""Your reference number<br><strong>${ref}</strong>""")).getOrElse(HtmlContent(""))
     ))
 
     @if(loggedInSession.isDefined) {
