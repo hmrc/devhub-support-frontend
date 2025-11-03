@@ -79,7 +79,9 @@
           @helper.CSRF.formField
 
           <input type="hidden" name="status" value="@{ticket.status}">
-          <input type="hidden" name="fileReference" value="@{form("fileReference").value}">
+          @for(index <- form("fileReferences").indexes) {
+            <input type="hidden" name="fileReferences[@{index}]" value="@{form(s"fileReferences[$index]").value.getOrElse("")}">
+          }
 
           @govukCharacterCount(CC(
               id = "response",
@@ -117,6 +119,18 @@
           }
       }
 
+      @if(form("fileReferences").indexes.nonEmpty) {
+        <div class="govuk-inset-text">
+          <h3 class="govuk-heading-s">Attached files:</h3>
+          <ul class="govuk-list govuk-list--bullet">
+            @for(index <- form("fileReferences").indexes) {
+              @form(s"fileReferences[$index]").value.filter(_.nonEmpty).map { fileRef =>
+                <li>@fileRef</li>
+              }
+            }
+          </ul>
+        </div>
+      }
 
       <form action="@upscanInitiateResponse.postTarget" method="post" enctype="multipart/form-data">
 

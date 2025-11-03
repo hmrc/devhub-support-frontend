@@ -52,7 +52,7 @@ object ApiPlatformDeskproConnector {
 
   case class CreateTicketResponse(ref: String)
 
-  case class CreateTicketResponseRequest(userEmail: LaxEmailAddress, message: String, status: String, fileReference: Option[String] = None)
+  case class CreateTicketResponseRequest(userEmail: LaxEmailAddress, message: String, status: String, fileReferences: List[String] = List.empty)
 
   sealed trait DeskproTicketCloseResult
   object DeskproTicketCloseSuccess  extends DeskproTicketCloseResult
@@ -120,10 +120,10 @@ class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlat
       )
   }
 
-  def createResponse(ticketId: Int, userEmail: LaxEmailAddress, message: String, status: String, fileReference: Option[String], hc: HeaderCarrier)
+  def createResponse(ticketId: Int, userEmail: LaxEmailAddress, message: String, status: String, fileReferences: List[String], hc: HeaderCarrier)
       : Future[DeskproTicketResponseResult] = metrics.record(api) {
     implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
-    val ticketResponseJson                    = Json.toJson(CreateTicketResponseRequest(userEmail, message, status, fileReference))
+    val ticketResponseJson                    = Json.toJson(CreateTicketResponseRequest(userEmail, message, status, fileReferences))
     logger.debug(s"CreateTicketResponseRequest json: $ticketResponseJson")
     http.post(url"${config.serviceBaseUrl}/ticket/$ticketId/response")
       .withBody(ticketResponseJson)
