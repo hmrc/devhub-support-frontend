@@ -146,7 +146,7 @@ class SupportService @Inject() (
     for {
       ticketReference <- deskproConnector.createTicket(ticket, hc)
       _                = auditService.explicitAudit(CreateTicketAuditAction(ticket))
-      flow            <- flowRepository.saveFlow(supportFlow.copy(referenceNumber = Some(ticketReference), emailAddress = Some(ticket.email)))
+      flow            <- flowRepository.saveFlow(supportFlow.copy(referenceNumber = ticketReference, emailAddress = Some(ticket.email)))
     } yield flow
   }
 }
