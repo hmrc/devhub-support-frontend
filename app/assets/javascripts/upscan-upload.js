@@ -29,24 +29,38 @@
 
             var xhr = new XMLHttpRequest();
             
-            xhr.addEventListener('load', function() {
-                if (xhr.status === 303) {
-                    var location = xhr.getResponseHeader('Location');
-                    if (location) {
-                        var keyMatch = location.match(/[?&]key=([^&]+)/);
-                        if (keyMatch && keyMatch[1]) {
-                            var fileKey = decodeURIComponent(keyMatch[1]);
-                            
-                            var currentRefs = fileReferencesField.value;
-                            var newRefs = currentRefs ? currentRefs + ',' + fileKey : fileKey;
-                            fileReferencesField.value = newRefs;
-                            
-                            fileInput.value = '';
+            xhr.addEventListener('readystatechange', function() {
+                if (xhr.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
+                    if (xhr.status === 303) {
+                        var location = xhr.getResponseHeader('Location');
+                        if (location) {
+                            var keyMatch = location.match(/[?&]key=([^&]+)/);
+                            if (keyMatch && keyMatch[1]) {
+                                var fileKey = decodeURIComponent(keyMatch[1]);
+                                
+                                var currentRefs = fileReferencesField.value;
+                                var newRefs = currentRefs ? currentRefs + ',' + fileKey : fileKey;
+                                fileReferencesField.value = newRefs;
+                                
+                                fileInput.value = '';
+                            } else {
+                                console.error('Upscan upload: Key parameter not found in redirect URL');
+                                alert('File upload failed: Unable to extract file reference');
+                            }
+                        } else {
+                            console.error('Upscan upload: Location header missing from redirect response');
+                            alert('File upload failed: Invalid server response');
                         }
+                        // Abort the request to prevent following the redirect
+                        xhr.abort();
+                    } else if (xhr.status >= 400) {
+                        console.error('Upscan upload: Unexpected status code', xhr.status);
+                        alert('File upload failed: Server error (status ' + xhr.status + ')');
+                        xhr.abort();
                     }
                 }
             });
-            
+
             xhr.open('POST', upscanForm.action, true);
             xhr.send(formData);
         });
