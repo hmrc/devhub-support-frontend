@@ -49,7 +49,7 @@ class TicketService @Inject() (
       status: String,
       userName: String,
       newStatus: String,
-      fileReference: Option[String] = None
+      fileReferences: List[String] = Nil
     )(implicit hc: HeaderCarrier
     ): Future[DeskproTicketResponseResult] = {
     def getMessage() = {
@@ -61,6 +61,6 @@ class TicketService @Inject() (
         message
       }
     }
-    deskproConnector.createResponse(ticketId, userEmail, getMessage(), newStatus, fileReference, hc)
+    deskproConnector.createResponse(ticketId, userEmail, getMessage(), newStatus, fileReferences, hc)
   }
 }

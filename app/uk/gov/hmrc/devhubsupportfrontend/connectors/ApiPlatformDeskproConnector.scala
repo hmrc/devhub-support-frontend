@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.http.Status.{NOT_FOUND, OK}
-import play.api.libs.json.{Format, Json, OFormat}
+import play.api.libs.json.{Format, Json, OWrites}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -52,7 +52,7 @@ object ApiPlatformDeskproConnector {
 
   case class CreateTicketResponse(ref: Option[String])
 
-  case class CreateTicketResponseRequest(userEmail: LaxEmailAddress, message: String, status: String, fileReference: Option[String] = None)
+  case class CreateTicketResponseRequest(userEmail: LaxEmailAddress, message: String, status: String, fileReferences: List[String] = Nil)
 
   sealed trait DeskproTicketCloseResult
   object DeskproTicketCloseSuccess  extends DeskproTicketCloseResult
@@ -66,10 +66,18 @@ object ApiPlatformDeskproConnector {
 
   case class GetTicketsByEmailRequest(email: LaxEmailAddress, status: Option[String] = None)
 
-  implicit val createTicketRequestFormat: Format[CreateTicketRequest]            = Json.format[CreateTicketRequest]
-  implicit val createTicketResponseFormat: Format[CreateTicketResponse]          = Json.format[CreateTicketResponse]
-  implicit val getTicketsByEmailRequest: Format[GetTicketsByEmailRequest]        = Json.format[GetTicketsByEmailRequest]
-  implicit val createTicketResponseRequest: OFormat[CreateTicketResponseRequest] = Json.format[CreateTicketResponseRequest]
+  implicit val createTicketRequestFormat: Format[CreateTicketRequest]     = Json.format[CreateTicketRequest]
+  implicit val createTicketResponseFormat: Format[CreateTicketResponse]   = Json.format[CreateTicketResponse]
+  implicit val getTicketsByEmailRequest: Format[GetTicketsByEmailRequest] = Json.format[GetTicketsByEmailRequest]
+
+  implicit val createTicketResponseRequest: OWrites[CreateTicketResponseRequest] = OWrites { req =>
+    val base = Json.obj(
+      "userEmail" -> req.userEmail,
+      "message"   -> req.message,
+      "status"    -> req.status
+    )
+    if (req.fileReferences.nonEmpty) base + ("fileReferences" -> Json.toJson(req.fileReferences)) else base
+  }
 }
 
 @Singleton
@@ -120,26 +128,27 @@ class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlat
       )
   }
 
-  def createResponse(ticketId: Int, userEmail: LaxEmailAddress, message: String, status: String, fileReference: Option[String], hc: HeaderCarrier)
-      : Future[DeskproTicketResponseResult] = metrics.record(api) {
-    implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
-    val ticketResponseJson                    = Json.toJson(CreateTicketResponseRequest(userEmail, message, status, fileReference))
-    logger.debug(s"CreateTicketResponseRequest json: $ticketResponseJson")
-    http.post(url"${config.serviceBaseUrl}/ticket/$ticketId/response")
-      .withBody(ticketResponseJson)
-      .execute[HttpResponse]
-      .map(response =>
-        response.status match {
-          case OK        =>
-            logger.info(s"Deskpro ticket response for ticket '$ticketId' success")
-            DeskproTicketResponseSuccess
-          case NOT_FOUND =>
-            logger.warn(s"Deskpro ticket response for ticket '$ticketId' failed Not found")
-            DeskproTicketResponseNotFound
-          case _         =>
-            logger.error(s"Deskpro ticket response for ticket '$ticketId' failed status: ${response.status}")
-            DeskproTicketResponseFailure
-        }
-      )
-  }
+  def createResponse(ticketId: Int, userEmail: LaxEmailAddress, message: String, status: String, fileReferences: List[String], hc: HeaderCarrier)
+      : Future[DeskproTicketResponseResult] =
+    metrics.record(api) {
+      implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
+      val ticketResponseJson                    = Json.toJson(CreateTicketResponseRequest(userEmail, message, status, fileReferences))
+      logger.debug(s"CreateTicketResponseRequest json: $ticketResponseJson")
+      http.post(url"${config.serviceBaseUrl}/ticket/$ticketId/response")
+        .withBody(ticketResponseJson)
+        .execute[HttpResponse]
+        .map(response =>
+          response.status match {
+            case OK        =>
+              logger.info(s"Deskpro ticket response for ticket '$ticketId' success")
+              DeskproTicketResponseSuccess
+            case NOT_FOUND =>
+              logger.warn(s"Deskpro ticket response for ticket '$ticketId' failed Not found")
+              DeskproTicketResponseNotFound
+            case _         =>
+              logger.error(s"Deskpro ticket response for ticket '$ticketId' failed status: ${response.status}")
+              DeskproTicketResponseFailure
+          }
+        )
+    }
 }

@@ -178,7 +178,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     "create a ticket response" in new Setup {
       ApiPlatformDeskproStub.CreateResponse.succeeds(ticketId, userEmail, message)
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, status, None, hc))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, Nil, hc))
 
       result shouldBe DeskproTicketResponseSuccess
     }
@@ -186,7 +186,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     "create a ticket response with attachmend file reference" in new Setup {
       ApiPlatformDeskproStub.CreateResponse.succeedsWithFileReference(ticketId, userEmail, message, fileReference)
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, status, Some(fileReference), hc))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, List(fileReference), hc))
 
       result shouldBe DeskproTicketResponseSuccess
     }
@@ -194,7 +194,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     "fail when the ticket to respond to is not found" in new Setup {
       ApiPlatformDeskproStub.CreateResponse.notFound(ticketId)
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, status, Some(fileReference), hc))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, List(fileReference), hc))
 
       result shouldBe DeskproTicketResponseNotFound
     }
@@ -202,7 +202,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     "fail when the ticket respond call returns an error" in new Setup {
       ApiPlatformDeskproStub.CreateResponse.fails(ticketId)
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, status, Some(fileReference), hc))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, List(fileReference), hc))
 
       result shouldBe DeskproTicketResponseFailure
     }

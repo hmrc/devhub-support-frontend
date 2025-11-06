@@ -227,7 +227,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         contentAsString(result) should not include ("Mark as resolved")
       }
 
-      "populate the hidden fileReference with the upscan key set in the request param" in new Setup with IsLoggedIn {
+      "populate the hidden fileReferences with the upscan key set in the request param" in new Setup with IsLoggedIn {
         TicketServiceMock.FetchTicket.succeeds(Some(ticket))
         UpscanInitiateConnectorMock.Initiate.succeeds()
 
@@ -235,7 +235,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         val result    = addToken(underTest.ticketPageWithAttachments(ticketId, Some(upscanKey)))(request)
 
         status(result) shouldBe OK
-        contentAsString(result) should include("name=\"fileReference\" value=\"abc-123\"")
+        contentAsString(result) should include("name=\"fileReferences\" value=\"abc-123\"")
       }
 
       "return 404 if ticket not found" in new Setup with IsLoggedIn {
@@ -289,7 +289,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
           message = response,
           status = statusOpen,
           newStatus = statusAwaitingAgent,
-          fileReference = None
+          fileReferences = Nil
         )
       }
 
@@ -321,7 +321,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
           message = response,
           status = statusOpen,
           newStatus = statusAwaitingAgent,
-          fileReference = None
+          fileReferences = Nil
         )
       }
 
@@ -343,7 +343,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
           message = response,
           status = statusOpen,
           newStatus = statusAwaitingAgent,
-          fileReference = None
+          fileReferences = Nil
         )
       }
 
@@ -358,13 +358,13 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
   "Submit a response with attachments" when {
     "invoke submitTicketResponseWithAttachments" should {
-      "pass the fileReference to the ticket service" in new Setup with IsLoggedIn {
+      "pass the fileReferences to the ticket service" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
           .withFormUrlEncodedBody(
-            "status"        -> statusOpen,
-            "action"        -> actionSend,
-            "response"      -> response,
-            "fileReference" -> fileReference
+            "status"         -> statusOpen,
+            "action"         -> actionSend,
+            "response"       -> response,
+            "fileReferences" -> fileReference
           )
 
         TicketServiceMock.CreateResponse.succeeds()
@@ -379,7 +379,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
           message = response,
           status = statusOpen,
           newStatus = statusAwaitingAgent,
-          fileReference = Some(fileReference)
+          fileReferences = List(fileReference)
         )
       }
     }
