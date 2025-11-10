@@ -235,7 +235,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         val result    = addToken(underTest.ticketPageWithAttachments(ticketId, Some(upscanKey)))(request)
 
         status(result) shouldBe OK
-        contentAsString(result) should include("name=\"fileReference\" value=\"abc-123\"")
+        contentAsString(result) should include("name=\"fileReferences[0]\" value=\"abc-123\"")
       }
 
       "return 404 if ticket not found" in new Setup with IsLoggedIn {
@@ -289,7 +289,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
           message = response,
           status = statusOpen,
           newStatus = statusAwaitingAgent,
-          fileReference = None
+          fileReferences = List.empty
         )
       }
 
@@ -321,7 +321,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
           message = response,
           status = statusOpen,
           newStatus = statusAwaitingAgent,
-          fileReference = None
+          fileReferences = List.empty
         )
       }
 
@@ -343,7 +343,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
           message = response,
           status = statusOpen,
           newStatus = statusAwaitingAgent,
-          fileReference = None
+          fileReferences = List.empty
         )
       }
 
@@ -361,10 +361,10 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       "pass the fileReference to the ticket service" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
           .withFormUrlEncodedBody(
-            "status"        -> statusOpen,
-            "action"        -> actionSend,
-            "response"      -> response,
-            "fileReference" -> fileReference
+            "status"            -> statusOpen,
+            "action"            -> actionSend,
+            "response"          -> response,
+            "fileReferences[0]" -> fileReference
           )
 
         TicketServiceMock.CreateResponse.succeeds()
@@ -379,7 +379,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
           message = response,
           status = statusOpen,
           newStatus = statusAwaitingAgent,
-          fileReference = Some(fileReference)
+          fileReferences = List(fileReference)
         )
       }
     }

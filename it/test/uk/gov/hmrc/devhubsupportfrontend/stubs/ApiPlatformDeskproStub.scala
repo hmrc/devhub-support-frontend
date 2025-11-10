@@ -146,7 +146,8 @@ object ApiPlatformDeskproStub {
           .withRequestBody(equalToJson(s"""{
                                           |  "userEmail": "$userEmail",
                                           |  "message": "$message",
-                                          |  "status": "awaiting_agent"
+                                          |  "status": "awaiting_agent",
+                                          |  "fileReferences": []
                                           |}""".stripMargin))
           .willReturn(
             aResponse()
@@ -162,7 +163,24 @@ object ApiPlatformDeskproStub {
                                           |  "userEmail": "$userEmail",
                                           |  "message": "$message",
                                           |  "status": "awaiting_agent",
-                                          |  "fileReference": "$fileReference"
+                                          |  "fileReferences": ["$fileReference"]
+                                          |}""".stripMargin))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+          )
+      )
+    }
+
+    def succeedsWithMultipleFileReferences(ticketId: Int, userEmail: LaxEmailAddress, message: String, fileReferences: List[String]): StubMapping = {
+      val fileRefsJson = fileReferences.map(ref => s""""$ref"""").mkString("[", ",", "]")
+      stubFor(
+        post(urlEqualTo(s"/ticket/$ticketId/response"))
+          .withRequestBody(equalToJson(s"""{
+                                          |  "userEmail": "$userEmail",
+                                          |  "message": "$message",
+                                          |  "status": "awaiting_agent",
+                                          |  "fileReferences": $fileRefsJson
                                           |}""".stripMargin))
           .willReturn(
             aResponse()
