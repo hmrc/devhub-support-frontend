@@ -23,6 +23,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.filters.headers.SecurityHeadersFilter
 
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
@@ -102,7 +103,19 @@ class TicketController @Inject() (
       upscanInitiateResponse <- upscanInitiateConnector.initiate(Some(successRedirectUrl), Some(errorRedirectUrl))
     } yield (maybeTicket, upscanInitiateResponse) match {
       case (Some(ticket), upscan) if ticket.personEmail == userEmail =>
-        Ok(ticketViewWithAttachments(ticketResponseFormWithFileRef, Some(request.userSession), ticket, upscan))
+        val result = Ok(ticketViewWithAttachments(ticketResponseFormWithFileRef, Some(request.userSession), ticket, upscan))
+
+        // If key parameter is present, this is an Upscan success redirect - override headers for iframe
+        key match {
+          case Some(_) =>
+            println(s"with upscan key: $key")
+            result.withHeaders(
+              SecurityHeadersFilter.X_FRAME_OPTIONS_HEADER -> "ALLOWALL",
+              SecurityHeadersFilter.CONTENT_SECURITY_POLICY_HEADER -> "frame-ancestors *"
+            )
+          case None =>
+            result
+        }
       case _                                                         =>
         NotFound
     }
