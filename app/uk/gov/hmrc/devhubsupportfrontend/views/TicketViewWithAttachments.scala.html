@@ -43,7 +43,7 @@
 )
 
 
-@(form: Form[TicketResponseForm], loggedInSession: Option[UserSession], ticket: DeskproTicket, upscanInitiateResponse: UpscanInitiateResponse)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(form: Form[TicketResponseForm], loggedInSession: Option[UserSession], ticket: DeskproTicket,upscanInitiateResponse: UpscanInitiateResponse)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @buildHistoryLinkHtml(text: String) = {
   <a href='#history' class='govuk-link govuk-link--no-visited-state'>@{text}</a>
@@ -54,7 +54,7 @@
 }
 
 @layout(
-  pageTitle = "Your support request",
+  pageTitle = s"${ticket.subject} - ${ticket.ref}",
   backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
   loggedInSession = loggedInSession,
 ) {
@@ -75,16 +75,18 @@
               @{messages("ticketdetails.resolvedticketmessage1")}
               <br>
               @{messages("ticketdetails.resolvedticketmessage2")}
-          </div> 
+          </div>
       }
 
       <h2 id="history" class="govuk-heading-l govuk-!-margin-bottom-6 govuk-!-margin-top-9">@{messages("ticketdetails.messagehistory")}</h2>
-       
-      @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.submitTicketResponseWithAttachments(ticket.id)) {
+
+      @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.TicketController.submitTicketResponseWithAttachments(ticket.id), 'id -> "message") {
           @helper.CSRF.formField
 
           <input type="hidden" name="status" value="@{ticket.status}">
-          <input type="hidden" name="fileReferences" value="@{form("fileReferences").value.getOrElse("")}">
+          @for(index <- form("fileReferences").indexes) {
+            <input type="hidden" name="fileReferences[@index]" value="@{form(s"fileReferences[$index]").value.getOrElse("")}">
+          }
 
           @govukCharacterCount(CC(
               id = "response",
@@ -100,71 +102,73 @@
           )
           )
 
-          @govukButton(
-              Button(
-                  id = Some("continue"),
-                  name = Some("action"),
-                  preventDoubleClick = Some(true),
-                  value = Some("send"),
-                  content = Text(messages("ticketdetails.button.sendmessage"))
-              )
-          )
-          @if(ticket.status != "resolved") {
+          @if(form("fileReferences").indexes.nonEmpty) {
+            <div class="govuk-inset-text">
+              <h3 class="govuk-heading-s">Attached files:</h3>
+              <ul class="govuk-list govuk-list--bullet">
+                @for(index <- form("fileReferences").indexes) {
+                  @form(s"fileReferences[$index]").value.filter(_.nonEmpty).map { fileRef =>
+                    <li>@fileRef</li>
+                  }
+                }
+              </ul>
+            </div>
+          }
+
+          <div class="upload-section">
+              <div class="govuk-form-group">
+                  <label class="govuk-label govuk-!-font-weight-bold" for="file-upload-1">
+                      Add files to your message
+                  </label>
+                  <div id="file-upload-1-hint" class="govuk-hint">
+                      Accepted file types are:
+                      <ul>
+                          <li>image (jpeg, jpg, png)</li>
+                          <li>pdf</li>
+                          <li>text files (doc, docx, txt, csv)</li>
+                          <li>Spreadsheets (xls, xlsx)</li>
+                      </ul>
+                  </div>
+
+                  <input class="govuk-file-upload" id="file-upload-1" type="file" name="file" accept=".xls,.xlsx,.jpg,.jpeg,.png,.doc,.docx,.txt,.csv,.pdf">
+                  
+                  <div id="uploaded-files-display" style="display: none;" class="govuk-!-margin-top-4">
+                      <h3 class="govuk-heading-s">Files ready to upload:</h3>
+                      <ul id="uploaded-files-list" class="govuk-list govuk-list--bullet"></ul>
+                  </div>
+              </div>
+          </div>
+
+          <div class="govuk-button-group">
               @govukButton(
                   Button(
-                      id = Some("close"),
+                      id = Some("continue"),
                       name = Some("action"),
-                      value = Some("close"),
                       preventDoubleClick = Some(true),
-                      classes = "govuk-button govuk-button--secondary",
-                      content = Text(messages("ticketdetails.button.close"))
-                  ))
-          }
-      }
-
-      @if(form("fileReferences").indexes.nonEmpty) {
-        <div class="govuk-inset-text">
-          <h3 class="govuk-heading-s">Attached files:</h3>
-          <ul class="govuk-list govuk-list--bullet">
-            @for(index <- form("fileReferences").indexes) {
-              @form(s"fileReferences[$index]").value.filter(_.nonEmpty).map { fileRef =>
-                <li>@fileRef</li>
+                      value = Some("send"),
+                      content = Text("Send")
+                  )
+              )
+              @if(ticket.status != "resolved") {
+                  @govukButton(
+                      Button(
+                          id = Some("close"),
+                          name = Some("action"),
+                          value = Some("close"),
+                          preventDoubleClick = Some(true),
+                          classes = "govuk-button govuk-button--secondary",
+                          content = Text(messages("ticketdetails.button.close"))
+                      ))
               }
-            }
-          </ul>
-        </div>
+          </div>
       }
 
-      <div class="upload-section">
-          <h3 class="govuk-heading-m">Add a file</h3>
-          <p class="govuk-body">You can upload supporting documents such as screenshots, log files, or other relevant files.</p>
-
-          <form action="@upscanInitiateResponse.postTarget" method="post" enctype="multipart/form-data" id="upscan-form">
-
+      <form action="@upscanInitiateResponse.postTarget" method="post" enctype="multipart/form-data" id="upscan-form" style="display: none;">
           @for(field <- upscanInitiateResponse.formFields) {
               <input type="hidden" name="@field._1" value="@field._2"/>
           }
-
-      <div class="js-visible mt-3">
-          <div class="govuk-form-group">
-              <label class="govuk-label" for="file-input">
-                  <span class="">File to upload</span>
-              </label>
-              <input
-              type="file"
-              id="file-input"
-              name="file"
-              class="govuk-file-upload"
-              accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpeg,.jpg,.txt"
-              />
-          </div>
-      </div>
-
-      <div class="section">
-          <button id="submit" type="submit" class="govuk-button"> Upload </button>
-      </div>
+          <input type="file" name="file" id="upscan-file-input">
       </form>
-      </div>
 
       @hmrcTimeline(Timeline(
         events = ticket.messages.filter(t => !t.isAgentNote).map(message =>
