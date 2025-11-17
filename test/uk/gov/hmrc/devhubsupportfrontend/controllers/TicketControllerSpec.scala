@@ -372,7 +372,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         val result = addToken(underTest.submitTicketResponseWithAttachments(ticketId))(ticketResponseRequest)
 
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe "/devhub-support/tickets"
+        redirectLocation(result).value shouldBe "/devhub-support/ticket/4232/withAttachments"
 
         TicketServiceMock.CreateResponse.verifyCalledWith(
           ticketId = ticketId,
