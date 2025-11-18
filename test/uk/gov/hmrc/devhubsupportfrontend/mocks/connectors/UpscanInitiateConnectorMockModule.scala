@@ -40,10 +40,10 @@ trait UpscanInitiateConnectorMockModule extends MockitoSugar with ArgumentMatche
         when(aMock.initiate(*, *)(*)).thenReturn(Future.successful(response))
       }
 
-      def succeedsWith(fileReference: String, postTarget: String, formFields: Map[String, String]) = {
+      def succeedsWith(postTarget: String, formFields: Map[String, String]) = {
         when(aMock.initiate(*, *)(*)).thenReturn(Future.successful(
           UpscanInitiateResponse(
-            UpscanFileReference(fileReference),
+            UpscanFileReference("fileReference"),
             postTarget,
             formFields
           )
