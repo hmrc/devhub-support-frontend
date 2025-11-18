@@ -16,12 +16,22 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services
 
+import play.api.libs.json.{Format, Json}
+
 case class UpscanFileReference(
     reference: String
   )
+
+object UpscanFileReference {
+  implicit val format: Format[UpscanFileReference] = Json.format[UpscanFileReference]
+}
 
 case class UpscanInitiateResponse(
     fileReference: UpscanFileReference,
     postTarget: String,
     formFields: Map[String, String]
   )
+
+object UpscanInitiateResponse {
+  implicit val format: Format[UpscanInitiateResponse] = Json.format[UpscanInitiateResponse]
+}

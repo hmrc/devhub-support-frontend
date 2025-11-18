@@ -45,6 +45,8 @@
                 if (fileKey) {
                     addFileReference(fileKey);
                     addToDisplay(fileName);
+                    // Refresh upscan form fields for next upload
+                    refreshUpscanKeys();
                 }
             } catch (e) {
                 console.warn('Could not extract file key from upload response');
@@ -72,6 +74,47 @@
             upscanFileInput.files = fileInput.files;
             uploadToUpscan(file.name);
         });
+    }
+
+    function refreshUpscanKeys() {
+        var ticketId = getTicketId();
+        
+        fetch('/devhub-support/ticket/' + ticketId + '/initiate-upscan')
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(upscanResponse) {
+                updateUpscanForm(upscanResponse);
+            })
+            .catch(function(error) {
+                console.error('Failed to refresh upscan keys:', error);
+            });
+    }
+
+    function updateUpscanForm(upscanResponse) {
+        var upscanForm = document.querySelector('form[enctype="multipart/form-data"]');
+
+        upscanForm.action = upscanResponse.postTarget;
+        
+        // Remove existing hidden fields
+        var hiddenInputs = upscanForm.querySelectorAll('input[type="hidden"]');
+        hiddenInputs.forEach(function(input) {
+            input.parentNode.removeChild(input);
+        });
+        
+        // Add new form fields from response
+        Object.keys(upscanResponse.formFields).forEach(function(fieldName) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = fieldName;
+            input.value = upscanResponse.formFields[fieldName];
+            upscanForm.appendChild(input);
+        });
+    }
+
+    function getTicketId() {
+        var ticketData = document.getElementById('ticket-data');
+        return ticketData.getAttribute('data-ticket-id');
     }
 
     if (document.readyState === 'loading') {

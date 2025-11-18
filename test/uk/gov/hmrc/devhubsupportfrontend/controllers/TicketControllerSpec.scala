@@ -87,6 +87,11 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     val actionSend          = "send"
     val response            = "Test response"
     val fileReference       = "abc-123"
+
+    val upscanPostTarget       = "https://upscan.example.com/upload"
+    val upscanKey             = "new-upscan-upload-key"
+    val upscanSuccessRedirect = "http://localhost:9685/devhub-support/ticket/4232/withAttachments?upload=success"
+    val upscanErrorRedirect   = "http://localhost:9685/devhub-support/ticket/4232/withAttachments?upload=error"
   }
 
   trait IsLoggedIn {
@@ -227,15 +232,57 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         contentAsString(result) should not include ("Mark as resolved")
       }
 
+      "populate the post target and the hidden upscan fields in the upscan attachment upload form" in new Setup with IsLoggedIn {
+        TicketServiceMock.FetchTicket.succeeds(Some(ticket))
+        UpscanInitiateConnectorMock.Initiate.succeedsWith(
+          upscanPostTarget,
+          Map(
+            "key"                     -> upscanKey,
+            "success_action_redirect" -> upscanSuccessRedirect,
+            "error_action_redirect"   -> upscanErrorRedirect
+          )
+        )
+
+        val result = addToken(underTest.ticketPageWithAttachments(ticketId))(request)
+
+        status(result) shouldBe OK
+        contentAsString(result) should include(s"form action=\"$upscanPostTarget\"")
+        contentAsString(result) should include(s"name=\"key\" value=\"$upscanKey\"")
+        contentAsString(result) should include(s"name=\"success_action_redirect\" value=\"$upscanSuccessRedirect\"")
+        contentAsString(result) should include(s"name=\"error_action_redirect\" value=\"$upscanErrorRedirect\"")
+      }
+
+      "return upscan initiate response as JSON for javascript upscan fields refresh requests" in new Setup with IsLoggedIn {
+        TicketServiceMock.FetchTicket.succeeds(Some(ticket))
+        UpscanInitiateConnectorMock.Initiate.succeedsWith(
+          upscanPostTarget,
+          Map(
+            "key"                     -> upscanKey,
+            "success_action_redirect" -> upscanSuccessRedirect,
+            "error_action_redirect"   -> upscanErrorRedirect
+          )
+        )
+
+        val result = addToken(underTest.ticketPageInitiateUpscan(ticketId))(request)
+
+        status(result) shouldBe OK
+        contentType(result) shouldBe Some("application/json")
+
+        val json = contentAsJson(result)
+        (json \ "postTarget").as[String] shouldBe upscanPostTarget
+        (json \ "formFields" \ "key").as[String] shouldBe upscanKey
+        (json \ "formFields" \ "success_action_redirect").as[String] shouldBe upscanSuccessRedirect
+        (json \ "formFields" \ "error_action_redirect").as[String] shouldBe upscanErrorRedirect
+      }
+
       "populate the hidden fileReference with the upscan key set in the request param" in new Setup with IsLoggedIn {
         TicketServiceMock.FetchTicket.succeeds(Some(ticket))
         UpscanInitiateConnectorMock.Initiate.succeeds()
 
-        val upscanKey = "abc-123"
-        val result    = addToken(underTest.ticketPageWithAttachments(ticketId, Some(upscanKey)))(request)
+        val result = addToken(underTest.ticketPageWithAttachments(ticketId, Some(upscanKey)))(request)
 
         status(result) shouldBe OK
-        contentAsString(result) should include("name=\"fileReferences[0]\" value=\"abc-123\"")
+        contentAsString(result) should include(s"name=\"fileReferences[0]\" value=\"$upscanKey\"")
       }
 
       "return 404 if ticket not found" in new Setup with IsLoggedIn {
