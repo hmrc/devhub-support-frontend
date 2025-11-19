@@ -41,15 +41,21 @@
             try {
                 var url = new URL(iframe.contentWindow.location.href);
                 var fileKey = url.searchParams.get('key');
+                var errorCode = url.searchParams.get('errorCode');
                 
-                if (fileKey) {
+                if (errorCode) {
+                    displayUploadError('File upload failed: ' + errorCode);
+                } else if (fileKey) {
                     addFileReference(fileKey);
                     addToDisplay(fileName);
                     // Refresh upscan form fields for next upload
                     refreshUpscanKeys();
+                } else {
+                    displayUploadError('File upload failed: No file key or error code received');
                 }
             } catch (e) {
                 console.warn('Could not extract file key from upload response');
+                displayUploadError('File upload failed: Unable to process upload response');
             }
             
             document.body.removeChild(iframe);
@@ -70,6 +76,9 @@
         fileInput.addEventListener('change', function(event) {
             var file = event.target.files[0];
             if (!file) return;
+            
+            // Clear any previous error messages
+            clearUploadError();
             
             upscanFileInput.files = fileInput.files;
             uploadToUpscan(file.name);
@@ -102,19 +111,46 @@
             input.parentNode.removeChild(input);
         });
         
-        // Add new form fields from response
+        // Get the file input to preserve its position
+        var fileInput = upscanForm.querySelector('input[type="file"]');
+        
+        // Add new form fields from response, preserving original order, upscan seems to be sensitive to this
         Object.keys(upscanResponse.formFields).forEach(function(fieldName) {
             var input = document.createElement('input');
             input.type = 'hidden';
             input.name = fieldName;
             input.value = upscanResponse.formFields[fieldName];
-            upscanForm.appendChild(input);
+            upscanForm.insertBefore(input, fileInput);
         });
     }
 
     function getTicketId() {
         var ticketData = document.getElementById('ticket-data');
         return ticketData.getAttribute('data-ticket-id');
+    }
+
+    function displayUploadError(errorMessage) {
+        var errorContainer = document.getElementById('upload-error-display');
+        if (!errorContainer) {
+            errorContainer = document.createElement('div');
+            errorContainer.id = 'upload-error-display';
+            errorContainer.className = 'govuk-error-message';
+            errorContainer.style.display = 'block';
+            
+            var uploadSection = document.querySelector('.upload-section');
+            if (uploadSection) {
+                uploadSection.appendChild(errorContainer);
+            }
+        }
+        errorContainer.textContent = errorMessage;
+        errorContainer.style.display = 'block';
+    }
+
+    function clearUploadError() {
+        var errorContainer = document.getElementById('upload-error-display');
+        if (errorContainer) {
+            errorContainer.style.display = 'none';
+        }
     }
 
     if (document.readyState === 'loading') {
