@@ -25,6 +25,9 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.Text
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
 
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.header.v2.{HeaderParams, HeaderNames, HeaderNavigation, HeaderUrls, HeaderTemplateOverrides}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.servicenavigation.{ServiceNavigation, ServiceNavigationItem}
+
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcTrackingConsentSnippet
 
@@ -85,26 +88,30 @@
   @hmrcScripts()
   @autocompleteJavascript()
 }
-@navigation = @{
+@serviceNavigationItems = @{
   StaticNavLinks(appConfig.apiDocumentationFrontendUrl, appConfig.thirdPartyDeveloperFrontendUrl)
-    .map(navLink => NavigationItem(
+    .map(navLink => ServiceNavigationItem(
       content = Text(navLink.label),
-      href = Some(navLink.href),
+      href = navLink.href,
       attributes = if (navLink.openInNewWindow) Map("target" -> "_blank") else Map.empty
     ))
 }
 
 @headerBlock = {
-  @hmrcHeader(Header(
-    homepageUrl = messages("header.govuk.url"),
-    serviceName = Some(appConfig.serviceName),
-    navigation = Some(navigation),
-    serviceUrl = "/api-documentation",
-    signOutHref = None,
+  @hmrcHeader(HeaderParams(
+    headerUrls = HeaderUrls(
+      homepageUrl = messages("header.govuk.url"), 
+      serviceUrl = "/api-documentation", 
+      signOutHref = None, 
+      assetsPath = uk.gov.hmrc.hmrcfrontend.controllers.routes.Assets.at("govuk/images").url
+    ),
     language = if(messages.lang.code == "cy") Cy else En,
-    assetsPath = uk.gov.hmrc.hmrcfrontend.controllers.routes.Assets.at("govuk/images").url,
-    displayHmrcBanner = false,
-    containerClasses = "govuk-width-container"
+    banners = Banners(displayHmrcBanner = false),
+    headerTemplateOverrides = HeaderTemplateOverrides(containerClasses = "govuk-width-container"),
+    serviceNavigation = Some(ServiceNavigation(
+      serviceName = Some(appConfig.serviceName),
+      navigation = serviceNavigationItems
+    ))
   ))
 }
 

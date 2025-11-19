@@ -18,11 +18,13 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
+
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import play.filters.headers.SecurityHeadersFilter
+
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ThirdPartyDeveloperConnector, UpscanInitiateConnector}
@@ -109,14 +111,14 @@ class TicketController @Inject() (
         } else {
           result
         }
-      case _                                                         =>
+      case _                                                                 =>
         NotFound
     }
   }
 
   private def overrideIframeHeaders(result: Result) = {
     result.withHeaders(
-      SecurityHeadersFilter.X_FRAME_OPTIONS_HEADER -> "ALLOWALL",
+      SecurityHeadersFilter.X_FRAME_OPTIONS_HEADER         -> "ALLOWALL",
       SecurityHeadersFilter.CONTENT_SECURITY_POLICY_HEADER -> "frame-ancestors *"
     )
   }
