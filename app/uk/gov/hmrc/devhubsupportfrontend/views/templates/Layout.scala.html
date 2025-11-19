@@ -101,7 +101,6 @@
   @hmrcHeader(HeaderParams(
     headerUrls = HeaderUrls(
       homepageUrl = messages("header.govuk.url"), 
-      serviceUrl = "/api-documentation", 
       signOutHref = None, 
       assetsPath = uk.gov.hmrc.hmrcfrontend.controllers.routes.Assets.at("govuk/images").url
     ),
@@ -110,6 +109,7 @@
     headerTemplateOverrides = HeaderTemplateOverrides(containerClasses = "govuk-width-container"),
     serviceNavigation = Some(ServiceNavigation(
       serviceName = Some(appConfig.serviceName),
+      serviceUrl = Some("/api-documentation"),
       navigation = serviceNavigationItems
     ))
   ))
