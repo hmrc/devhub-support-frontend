@@ -22,12 +22,14 @@ import scala.concurrent.ExecutionContext
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.crypto.CookieSigner
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import play.filters.headers.SecurityHeadersFilter
 
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ThirdPartyDeveloperConnector, UpscanInitiateConnector}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services.UpscanInitiateResponse._
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services.{UpscanFileReference, UpscanInitiateResponse}
 import uk.gov.hmrc.devhubsupportfrontend.services._
 import uk.gov.hmrc.devhubsupportfrontend.views.html._
@@ -114,6 +116,17 @@ class TicketController @Inject() (
       case _                                                                 =>
         NotFound
     }
+  }
+
+  /** Returns fresh Upscan upload fields for multi-file uploads. Called by JavaScript after each successful file upload to refresh the Upscan form with new upscan fields for the
+    * upload
+    */
+  def ticketPageInitiateUpscan(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
+    val successRedirectUrl = appConfig.devhubSupportFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
+    val errorRedirectUrl   = appConfig.devhubSupportFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
+
+    upscanInitiateConnector.initiate(Some(successRedirectUrl), Some(errorRedirectUrl))
+      .map(upscanInitiateResponse => Ok(Json.toJson(upscanInitiateResponse)))
   }
 
   private def overrideIframeHeaders(result: Result) = {
