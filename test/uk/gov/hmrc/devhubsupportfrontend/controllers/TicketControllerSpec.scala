@@ -88,7 +88,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     val response            = "Test response"
     val fileReference       = "abc-123"
 
-    val upscanPostTarget      = "https://upscan.example.com/upload"
+    val upscanPostTarget       = "https://upscan.example.com/upload"
     val upscanKey             = "new-upscan-upload-key"
     val upscanSuccessRedirect = "http://localhost:9685/devhub-support/ticket/4232/withAttachments?upload=success"
     val upscanErrorRedirect   = "http://localhost:9685/devhub-support/ticket/4232/withAttachments?upload=error"
