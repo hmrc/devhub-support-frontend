@@ -25,10 +25,8 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.Text
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
 
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.header.v2.{HeaderParams, HeaderNames, HeaderNavigation, HeaderUrls, HeaderTemplateOverrides}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.servicenavigation.{ServiceNavigation, ServiceNavigationItem}
 
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcTrackingConsentSnippet
 
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
@@ -39,7 +37,7 @@
 @this(
   appConfig: AppConfig,
   govukLayout: GovukLayout,
-  hmrcHeader: HmrcHeader,
+  hmrcStandardHeader: HmrcStandardHeader,
   hmrcFooter: HmrcFooter,
   hmrcLanguageSelectHelper: HmrcLanguageSelectHelper,
   hmrcScripts: HmrcScripts,
@@ -98,21 +96,15 @@
 }
 
 @headerBlock = {
-  @hmrcHeader(HeaderParams(
-    headerUrls = HeaderUrls(
-      homepageUrl = messages("header.govuk.url"), 
-      signOutHref = None, 
-      assetsPath = uk.gov.hmrc.hmrcfrontend.controllers.routes.Assets.at("govuk/images").url
-    ),
-    language = if(messages.lang.code == "cy") Cy else En,
-    banners = Banners(displayHmrcBanner = false),
-    headerTemplateOverrides = HeaderTemplateOverrides(containerClasses = "govuk-width-container"),
+  @hmrcStandardHeader(
+    serviceName = Some(appConfig.serviceName),
+    serviceUrl = Some("/api-documentation"),
     serviceNavigation = Some(ServiceNavigation(
       serviceName = Some(appConfig.serviceName),
       serviceUrl = Some("/api-documentation"),
       navigation = serviceNavigationItems
     ))
-  ))
+  )
 }
 
 @feedbackBannerBlock = {
