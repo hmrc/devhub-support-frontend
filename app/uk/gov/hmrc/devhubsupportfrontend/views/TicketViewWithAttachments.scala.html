@@ -129,13 +129,12 @@
                           <li>Spreadsheets (xls, xlsx)</li>
                       </ul>
                   </div>
-
-                  <input class="govuk-file-upload" id="file-upload-1" type="file" accept=".xls,.xlsx,.jpg,.jpeg,.png,.doc,.docx,.txt,.csv,.pdf">
                   
-                  <div id="uploaded-files-display" style="display: none;" class="govuk-!-margin-top-4">
-                      <h3 class="govuk-heading-s">Files ready to upload:</h3>
-                      <ul id="uploaded-files-list" class="govuk-list govuk-list--bullet"></ul>
-                  </div>
+                  <p class="govuk-body" aria-live="polite"><span id="files-uploaded">0</span> of a maximum of 5 files uploaded</p>
+
+                  <input class="govuk-file-upload" id="file-upload-1" type="file"  accept=".xls,.xlsx, .jpg, .jpeg,.png, .doc, .docx, .txt, .csv, .pdf">
+                  
+                  <dl class="govuk-summary-list govuk-summary-list--long-key govuk-!-margin-top-4" id="upload-summary"></dl>
               </div>
           </div>
 
