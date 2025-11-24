@@ -91,6 +91,7 @@
     .map(navLink => ServiceNavigationItem(
       content = Text(navLink.label),
       href = navLink.href,
+      active = navLink.active,
       attributes = if (navLink.openInNewWindow) Map("target" -> "_blank") else Map.empty
     ))
 }
