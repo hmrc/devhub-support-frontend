@@ -1,60 +1,80 @@
 (function() {
     'use strict';
 
-    var fileInput, uploadedFilesDisplay, uploadedFilesList;
+    const MAX_FILES = 5;
+
+    const UPLOAD_STATES = {
+        UPLOADING: {
+            cssClass: 'govuk-tag--yellow',
+            displayText: 'Uploading'
+        },
+        UPLOADED: {
+            cssClass: 'govuk-tag--green',
+            displayText: 'Uploaded'
+        },
+        FAILED: {
+            cssClass: 'govuk-tag--red',
+            displayText: 'Failed'
+        }
+    };
+    
+    let currentFiles = 0;
+    let fileInput;
+    let summaryList;
+    let filesUploadedCount;
 
     function addFileReference(fileKey) {
-        var existingFields = document.querySelectorAll('input[name^="fileReferences["]');
-        var newField = document.createElement('input');
+        const existingFields = document.querySelectorAll('input[name^="fileReferences["]');
+        const newField = document.createElement('input');
         newField.type = 'hidden';
-        newField.name = 'fileReferences[' + existingFields.length + ']';
+        newField.name = `fileReferences[${existingFields.length}]`;
         newField.value = fileKey;
         
-        var form = document.getElementById('message');
-        if (form) {
-            form.appendChild(newField);
-        }
+        const form = document.getElementById('message');
+        form.appendChild(newField);
     }
 
-    function addToDisplay(fileName) {
-        if (!uploadedFilesDisplay || !uploadedFilesList) return;
-        
-        uploadedFilesDisplay.style.display = 'block';
-        var listItem = document.createElement('li');
-        listItem.textContent = fileName;
-        uploadedFilesList.appendChild(listItem);
-    }
+    function uploadToUpscan(file, fileName, row) {
+        const upscanForm = document.querySelector('form[enctype="multipart/form-data"]');
 
-    function uploadToUpscan(fileName) {
-        var upscanForm = document.querySelector('form[enctype="multipart/form-data"]');
-        if (!upscanForm) return;
-
-        var iframe = document.createElement('iframe');
+        // Create an iframe to handle the upload response
+        const iframe = document.createElement('iframe');
         iframe.style.display = 'none';
-        iframe.name = 'upscan-upload-iframe-' + Date.now();
+        iframe.name = `upscan-upload-iframe-${Date.now()}`;
         document.body.appendChild(iframe);
         
-        var originalTarget = upscanForm.target;
+        const originalTarget = upscanForm.target;
         upscanForm.target = iframe.name;
         
-        iframe.onload = function() {
+        iframe.onload = () => {
             try {
-                var url = new URL(iframe.contentWindow.location.href);
-                var fileKey = url.searchParams.get('key');
-                var errorCode = url.searchParams.get('errorCode');
-                
-                if (errorCode) {
-                    displayUploadError('File upload failed: ' + errorCode);
-                } else if (fileKey) {
+                const url = new URL(iframe.contentWindow.location.href);
+                const fileKey = url.searchParams.get('key');
+                const errorCode = url.searchParams.get('errorCode');
+
+                if (fileKey) {
                     addFileReference(fileKey);
-                    addToDisplay(fileName);
+                    updateUploadState(row, 'UPLOADED');
+                    currentFiles++;
+                    updateFileCount();
+
                     // Refresh upscan form fields for next upload
                     refreshUpscanKeys();
+                } else if (errorCode) {
+                    updateUploadState(row, 'FAILED');
+                    displayUploadError(`File upload failed: ${errorCode}`);
+                    console.error('File upload failed with error code:', errorCode, {
+                        fileName: fileName,
+                        formAction: upscanForm.action,
+                        formData: new FormData(upscanForm)
+                    });
                 } else {
+                    updateUploadState(row, 'FAILED');
                     displayUploadError('File upload failed: No file key or error code received');
                 }
             } catch (e) {
-                console.warn('Could not extract file key from upload response');
+                console.error('Could not extract file key from upload response', e);
+                updateUploadState(row, 'FAILED');
                 displayUploadError('File upload failed: Unable to process upload response');
             }
             
@@ -67,56 +87,58 @@
 
     function initUpscanUpload() {
         fileInput = document.getElementById('file-upload-1');
-        uploadedFilesDisplay = document.getElementById('uploaded-files-display');
-        uploadedFilesList = document.getElementById('uploaded-files-list');
-        var upscanFileInput = document.getElementById('upscan-file-input');
+        summaryList = document.getElementById('upload-summary');
+        filesUploadedCount = document.getElementById('files-uploaded');
+        const upscanFileInput = document.getElementById('upscan-file-input');
         
-        if (!fileInput || !upscanFileInput) return;
-
-        fileInput.addEventListener('change', function(event) {
-            var file = event.target.files[0];
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
             if (!file) return;
-            
-            // Clear any previous error messages
+
             clearUploadError();
             
+            // Create and add summary row for progress tracking
+            const row = createSummaryRow(file.name);
+            summaryList.appendChild(row);
+
             upscanFileInput.files = fileInput.files;
-            uploadToUpscan(file.name);
+            
+            uploadToUpscan(file, file.name, row);
         });
+
+        updateFileCount();
     }
 
     function refreshUpscanKeys() {
-        var ticketId = getTicketId();
+        const ticketId = getTicketId();
         
-        fetch('/devhub-support/ticket/' + ticketId + '/initiate-upscan')
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(upscanResponse) {
+        fetch(`/devhub-support/ticket/${ticketId}/initiate-upscan`)
+            .then(response => response.json())
+            .then(upscanResponse => {
                 updateUpscanForm(upscanResponse);
             })
-            .catch(function(error) {
+            .catch(error => {
                 console.error('Failed to refresh upscan keys:', error);
             });
     }
 
     function updateUpscanForm(upscanResponse) {
-        var upscanForm = document.querySelector('form[enctype="multipart/form-data"]');
+        const upscanForm = document.querySelector('form[enctype="multipart/form-data"]');
 
         upscanForm.action = upscanResponse.postTarget;
         
         // Remove existing hidden fields
-        var hiddenInputs = upscanForm.querySelectorAll('input[type="hidden"]');
-        hiddenInputs.forEach(function(input) {
+        const hiddenInputs = upscanForm.querySelectorAll('input[type="hidden"]');
+        hiddenInputs.forEach(input => {
             input.parentNode.removeChild(input);
         });
         
         // Get the file input to preserve its position
-        var fileInput = upscanForm.querySelector('input[type="file"]');
+        const fileInput = upscanForm.querySelector('input[type="file"]');
         
         // Add new form fields from response, preserving original order, upscan seems to be sensitive to this
-        Object.keys(upscanResponse.formFields).forEach(function(fieldName) {
-            var input = document.createElement('input');
+        Object.keys(upscanResponse.formFields).forEach(fieldName => {
+            const input = document.createElement('input');
             input.type = 'hidden';
             input.name = fieldName;
             input.value = upscanResponse.formFields[fieldName];
@@ -125,37 +147,137 @@
     }
 
     function getTicketId() {
-        var ticketData = document.getElementById('ticket-data');
+        const ticketData = document.getElementById('ticket-data');
         return ticketData.getAttribute('data-ticket-id');
     }
 
     function displayUploadError(errorMessage) {
-        var errorContainer = document.getElementById('upload-error-display');
+        let errorContainer = document.getElementById('upload-error-display');
         if (!errorContainer) {
             errorContainer = document.createElement('div');
             errorContainer.id = 'upload-error-display';
             errorContainer.className = 'govuk-error-message';
             errorContainer.style.display = 'block';
             
-            var uploadSection = document.querySelector('.upload-section');
-            if (uploadSection) {
-                uploadSection.appendChild(errorContainer);
-            }
+            const uploadSection = document.querySelector('.upload-section');
+            uploadSection.appendChild(errorContainer);
         }
         errorContainer.textContent = errorMessage;
         errorContainer.style.display = 'block';
     }
 
     function clearUploadError() {
-        var errorContainer = document.getElementById('upload-error-display');
+        const errorContainer = document.getElementById('upload-error-display');
         if (errorContainer) {
             errorContainer.style.display = 'none';
         }
     }
 
+    function updateFileCount() {
+        filesUploadedCount.textContent = currentFiles;
+        if (currentFiles >= MAX_FILES) {
+            fileInput.style.display = 'none';
+        } else {
+            fileInput.style.display = '';
+        }
+    }
+
+    function createSummaryRow(fileName) {
+        const row = document.createElement('div');
+        row.className = 'govuk-summary-list__row';
+        row.innerHTML = `
+            <dt class="govuk-summary-list__key">${fileName}</dt>
+            <dd class="govuk-summary-list__value">
+                <strong class="govuk-tag"><!-- Status will be set by updateUploadState --></strong>
+            </dd>
+        `;
+
+        // Set initial uploading state
+        updateUploadState(row, 'UPLOADING');
+        
+        return row;
+    }
+
+    function updateUploadState(row, state) {
+        const tag = row.querySelector('.govuk-tag');
+        const stateConfig = UPLOAD_STATES[state];
+        
+        if (!stateConfig) {
+            console.error('Invalid upload state:', state);
+            return;
+        }
+        
+        if (!tag) {
+            console.error('Status tag not found in dynamically created row');
+            return;
+        }
+        
+        tag.className = `govuk-tag ${stateConfig.cssClass}`;
+        tag.textContent = stateConfig.displayText;
+        
+        // Disable browse button while file is uploading
+        if (state === 'UPLOADING') {
+            fileInput.disabled = true;
+        } else if (state === 'UPLOADED' || state === 'FAILED') {
+            fileInput.disabled = false;
+        }
+    }
+
+    function initFormValidation() {
+        const messageForm = document.getElementById('message');
+        
+        messageForm.addEventListener('submit', (event) => {
+            const submitter = event.submitter;
+            
+            // Only validate if the Send button was clicked (not Close)
+            if (submitter && submitter.value === 'send') {
+                const responseValue = document.getElementById('response').value.trim();
+                
+                if (!responseValue) {
+                    event.preventDefault();
+                    displayValidationError();
+                    return false;
+                }
+                
+                clearValidationError();
+            }
+        });
+    }
+
+    function displayValidationError() {
+        const responseField = document.getElementById('response');
+        const formGroup = responseField.closest('.govuk-form-group');
+
+        formGroup.classList.add('govuk-form-group--error');
+        responseField.classList.add('govuk-textarea--error');
+
+        if (!document.getElementById('response-error')) {
+            const errorElement = document.createElement('p');
+            errorElement.id = 'response-error';
+            errorElement.className = 'govuk-error-message';
+            errorElement.innerHTML = '<span class="govuk-visually-hidden">Error:</span> Enter a response';
+            
+            responseField.parentNode.insertBefore(errorElement, responseField);
+        }
+    }
+
+    function clearValidationError() {
+        const responseField = document.getElementById('response');
+        const formGroup = responseField.closest('.govuk-form-group');
+        const errorElement = document.getElementById('response-error');
+        
+        if (formGroup) formGroup.classList.remove('govuk-form-group--error');
+        if (responseField) responseField.classList.remove('govuk-textarea--error');
+        if (errorElement) errorElement.remove();
+    }
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initUpscanUpload);
+        document.addEventListener('DOMContentLoaded', () => {
+            initUpscanUpload();
+            initFormValidation();
+        });
     } else {
         initUpscanUpload();
+        initFormValidation();
     }
 })();
