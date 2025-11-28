@@ -47,6 +47,13 @@
         upscanForm.target = iframe.name;
         
         iframe.onload = () => {
+            // Check if file row still exists - if user removed it during upload, ignore results
+            if (!document.body.contains(row)) {
+                document.body.removeChild(iframe);
+                upscanForm.target = originalTarget;
+                return;
+            }
+            
             try {
                 const url = new URL(iframe.contentWindow.location.href);
                 const fileKey = url.searchParams.get('key');
@@ -54,7 +61,7 @@
 
                 if (fileKey) {
                     addFileReference(fileKey);
-                    updateUploadState(row, 'UPLOADED');
+                    updateUploadState(row, 'UPLOADED', fileKey);
                     currentFiles++;
                     updateFileCount();
 
@@ -107,6 +114,15 @@
         });
 
         updateFileCount();
+        
+        // Add event delegation for remove buttons
+        summaryList.addEventListener('click', (event) => {
+            if (event.target.classList.contains('remove-file')) {
+                event.preventDefault();
+                const row = event.target.closest('.govuk-summary-list__row');
+                removeFile(row);
+            }
+        });
     }
 
     function refreshUpscanKeys() {
@@ -190,6 +206,9 @@
             <dd class="govuk-summary-list__value">
                 <strong class="govuk-tag"><!-- Status will be set by updateUploadState --></strong>
             </dd>
+            <dd class="govuk-summary-list__actions">
+                <a href="#" class="govuk-link remove-file">Remove<span class="govuk-visually-hidden"> ${fileName}</span></a>
+            </dd>
         `;
 
         // Set initial uploading state
@@ -198,7 +217,7 @@
         return row;
     }
 
-    function updateUploadState(row, state) {
+    function updateUploadState(row, state, fileKey = null) {
         const tag = row.querySelector('.govuk-tag');
         const stateConfig = UPLOAD_STATES[state];
         
@@ -214,6 +233,10 @@
         
         tag.className = `govuk-tag ${stateConfig.cssClass}`;
         tag.textContent = stateConfig.displayText;
+
+        if (fileKey) {
+            row.dataset.fileKey = fileKey;
+        }
         
         // Disable browse button while file is uploading
         if (state === 'UPLOADING') {
@@ -221,6 +244,29 @@
         } else if (state === 'UPLOADED' || state === 'FAILED') {
             fileInput.disabled = false;
         }
+    }
+
+    function removeFile(row) {
+        row.remove();
+
+        const fileKey = row.dataset.fileKey;
+
+        // Check if removing an uploading file (no fileKey yet)
+        if (!fileKey) {
+            // Re-enable browse button since upload is being cancelled
+            fileInput.disabled = false;
+        }
+        
+        // If file was uploaded, remove the hidden input
+        if (fileKey) {
+            const hiddenInput = document.querySelector(`input[name^="fileReferences"][value="${fileKey}"]`);
+            if (hiddenInput) {
+                hiddenInput.remove();
+                currentFiles--;
+            }
+        }
+
+        updateFileCount();
     }
 
     function initFormValidation() {
