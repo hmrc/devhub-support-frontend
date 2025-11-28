@@ -47,7 +47,7 @@
         upscanForm.target = iframe.name;
         
         iframe.onload = () => {
-            // Check if file row still exists - if user removed it during upload, ignore results
+            // Check if file upload status row still exists - if user removed it during upload, ignore upload results
             if (!document.body.contains(row)) {
                 document.body.removeChild(iframe);
                 upscanForm.target = originalTarget;
