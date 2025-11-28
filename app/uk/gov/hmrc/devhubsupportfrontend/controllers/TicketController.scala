@@ -93,7 +93,7 @@ class TicketController @Inject() (
   }
 
   def ticketPageWithAttachments(ticketId: Int, upscanKey: Option[String] = None): Action[AnyContent] = loggedInAction { implicit request =>
-    logger.info(s"CSRF token in session: ${CSRF.getToken.map(_.value)}")
+    logger.warn(s"CSRF token in session: ${CSRF.getToken.map(_.value)}")
     val successRedirectUrl = appConfig.devhubSupportFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
     val errorRedirectUrl   = appConfig.devhubSupportFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
 
