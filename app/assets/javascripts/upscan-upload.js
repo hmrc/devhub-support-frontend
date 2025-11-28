@@ -114,8 +114,7 @@
         });
 
         updateFileCount();
-        
-        // Add event delegation for remove buttons
+
         summaryList.addEventListener('click', (event) => {
             if (event.target.classList.contains('remove-file')) {
                 event.preventDefault();
