@@ -18,14 +18,13 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
-
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.crypto.CookieSigner
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.filters.csrf.CSRF
 import play.filters.headers.SecurityHeadersFilter
-
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ThirdPartyDeveloperConnector, UpscanInitiateConnector}
@@ -94,6 +93,7 @@ class TicketController @Inject() (
   }
 
   def ticketPageWithAttachments(ticketId: Int, upscanKey: Option[String] = None): Action[AnyContent] = loggedInAction { implicit request =>
+    logger.info(s"CSRF token in session: ${CSRF.getToken.map(_.value)}")
     val successRedirectUrl = appConfig.devhubSupportFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
     val errorRedirectUrl   = appConfig.devhubSupportFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
 
