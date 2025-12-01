@@ -34,4 +34,6 @@ POST        /ticket/:tid/responseWithAttachments            uk.gov.hmrc.devhubsu
 
 GET         /login-restriction                              uk.gov.hmrc.devhubsupportfrontend.controllers.LoggedInRestrictionController.page()
 
+GET         /upscan/success                                 uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.upscanSuccessRedirect
+
 GET         /assets/*file                                   controllers.Assets.versioned(path = "/public", file: Asset)

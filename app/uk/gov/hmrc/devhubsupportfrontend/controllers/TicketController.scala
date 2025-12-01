@@ -94,7 +94,7 @@ class TicketController @Inject() (
 
   def ticketPageWithAttachments(ticketId: Int, upscanKey: Option[String] = None): Action[AnyContent] = loggedInAction { implicit request =>
     logger.warn(s"CSRF token in session: ${CSRF.getToken.map(_.value)}")
-    val successRedirectUrl = appConfig.devhubSupportFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
+    val successRedirectUrl = appConfig.devhubSupportFrontendUrl + routes.TicketController.upscanSuccessRedirect.url
     val errorRedirectUrl   = appConfig.devhubSupportFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
 
     val ticketResponseFormWithFileRef = ticketResponseForm.fill(TicketResponseForm(None, "open", "", upscanKey.map(List(_)).getOrElse(List.empty)))
@@ -122,7 +122,7 @@ class TicketController @Inject() (
     * upload
     */
   def ticketPageInitiateUpscan(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
-    val successRedirectUrl = appConfig.devhubSupportFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
+    val successRedirectUrl = appConfig.devhubSupportFrontendUrl + routes.TicketController.upscanSuccessRedirect.url
     val errorRedirectUrl   = appConfig.devhubSupportFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
 
     upscanInitiateConnector.initiate(Some(successRedirectUrl), Some(errorRedirectUrl))
@@ -192,8 +192,11 @@ class TicketController @Inject() (
         case DeskproTicketResponseFailure  => InternalServerError
       }
     }
-
+    
     requestForm.fold(errors, handleValidForm)
   }
 
+  def upscanSuccessRedirect: Action[AnyContent] = Action { _ =>
+    overrideIframeHeaders(Ok(""))
+  }
 }
