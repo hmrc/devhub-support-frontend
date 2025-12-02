@@ -431,4 +431,17 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       }
     }
   }
+
+  "Upscan success redirect endpoint" when {
+    "invoke upscanSuccessRedirect" should {
+      "return HTTP 200 with empty body and iframe headers" in new Setup {
+        val result = underTest.upscanSuccessRedirect()(FakeRequest())
+
+        status(result) shouldBe OK
+        contentAsString(result) shouldBe ""
+        header("X-Frame-Options", result) shouldBe Some("ALLOWALL")
+        header("Content-Security-Policy", result) shouldBe Some("frame-ancestors *")
+      }
+    }
+  }
 }
