@@ -52,7 +52,9 @@ object ApiPlatformDeskproConnector {
 
   case class CreateTicketResponse(ref: Option[String])
 
-  case class CreateTicketResponseRequest(userEmail: LaxEmailAddress, message: String, status: String, fileReferences: List[String] = List.empty)
+  case class Attachment(fileReference: String, fileName: String)
+  
+  case class CreateTicketResponseRequest(userEmail: LaxEmailAddress, message: String, status: String, attachments: List[Attachment] = List.empty)
 
   sealed trait DeskproTicketCloseResult
   object DeskproTicketCloseSuccess  extends DeskproTicketCloseResult
@@ -69,6 +71,7 @@ object ApiPlatformDeskproConnector {
   implicit val createTicketRequestFormat: Format[CreateTicketRequest]            = Json.format[CreateTicketRequest]
   implicit val createTicketResponseFormat: Format[CreateTicketResponse]          = Json.format[CreateTicketResponse]
   implicit val getTicketsByEmailRequest: Format[GetTicketsByEmailRequest]        = Json.format[GetTicketsByEmailRequest]
+  implicit val attachmentFormat: Format[Attachment]                              = Json.format[Attachment]
   implicit val createTicketResponseRequest: OFormat[CreateTicketResponseRequest] = Json.format[CreateTicketResponseRequest]
 }
 
@@ -120,10 +123,10 @@ class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlat
       )
   }
 
-  def createResponse(ticketId: Int, userEmail: LaxEmailAddress, message: String, status: String, fileReferences: List[String], hc: HeaderCarrier)
+  def createResponse(ticketId: Int, userEmail: LaxEmailAddress, message: String, status: String, attachments: List[Attachment], hc: HeaderCarrier)
       : Future[DeskproTicketResponseResult] = metrics.record(api) {
     implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
-    val ticketResponseJson                    = Json.toJson(CreateTicketResponseRequest(userEmail, message, status, fileReferences))
+    val ticketResponseJson                    = Json.toJson(CreateTicketResponseRequest(userEmail, message, status, attachments))
     logger.info(s"Sending CreateTicketResponseRequest: $ticketResponseJson")
     http.post(url"${config.serviceBaseUrl}/ticket/$ticketId/response")
       .withBody(ticketResponseJson)

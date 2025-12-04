@@ -24,7 +24,7 @@ import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.DeskproTicketResponseResult
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.{DeskproTicketResponseResult, Attachment}
 import uk.gov.hmrc.devhubsupportfrontend.domain.models._
 
 @Singleton
@@ -49,7 +49,7 @@ class TicketService @Inject() (
       status: String,
       userName: String,
       newStatus: String,
-      fileReferences: List[String] = List.empty
+      attachments: List[Attachment] = List.empty
     )(implicit hc: HeaderCarrier
     ): Future[DeskproTicketResponseResult] = {
     def getMessage() = {
@@ -61,6 +61,6 @@ class TicketService @Inject() (
         message
       }
     }
-    deskproConnector.createResponse(ticketId, userEmail, getMessage(), newStatus, fileReferences, hc)
+    deskproConnector.createResponse(ticketId, userEmail, getMessage(), newStatus, attachments, hc)
   }
 }

@@ -23,15 +23,23 @@
     let summaryList;
     let filesUploadedCount;
 
-    function addFileReference(fileKey) {
-        const existingFields = document.querySelectorAll('input[name^="fileReferences["]');
-        const newField = document.createElement('input');
-        newField.type = 'hidden';
-        newField.name = `fileReferences[${existingFields.length}]`;
-        newField.value = fileKey;
+    function addFileAttachment(fileKey, fileName) {
+        const existingFields = document.querySelectorAll('input[name^="fileAttachments["]');
+        const index = existingFields.length / 2; // Divide by 2 since we have both key and name fields
+        
+        const keyField = document.createElement('input');
+        keyField.type = 'hidden';
+        keyField.name = `fileAttachments[${index}].fileReference`;
+        keyField.value = fileKey;
+        
+        const nameField = document.createElement('input');
+        nameField.type = 'hidden';
+        nameField.name = `fileAttachments[${index}].fileName`;
+        nameField.value = fileName;
         
         const form = document.getElementById('message');
-        form.appendChild(newField);
+        form.appendChild(keyField);
+        form.appendChild(nameField);
     }
 
     function uploadToUpscan(file, fileName, row) {
@@ -60,7 +68,7 @@
                 const errorCode = url.searchParams.get('errorCode');
 
                 if (fileKey) {
-                    addFileReference(fileKey);
+                    addFileAttachment(fileKey, fileName);
                     updateUploadState(row, 'UPLOADED', fileKey);
                     currentFiles++;
                     updateFileCount();
@@ -256,11 +264,13 @@
             fileInput.disabled = false;
         }
         
-        // If file was uploaded, remove the hidden input
+        // If file was uploaded, remove the hidden inputs
         if (fileKey) {
-            const hiddenInput = document.querySelector(`input[name^="fileReferences"][value="${fileKey}"]`);
-            if (hiddenInput) {
-                hiddenInput.remove();
+            const keyInput = document.querySelector(`input[name^="fileAttachments"][name$=".fileReference"][value="${fileKey}"]`);
+            if (keyInput) {
+                const nameInput = document.querySelector(`input[name="${keyInput.name.replace('.fileReference', '.fileName')}"]`);
+                keyInput.remove();
+                nameInput?.remove();
                 currentFiles--;
             }
         }

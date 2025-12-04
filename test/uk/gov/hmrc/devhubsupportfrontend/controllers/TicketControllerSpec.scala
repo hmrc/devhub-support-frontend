@@ -26,6 +26,7 @@ import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.Attachment
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{DeskproAttachment, DeskproMessage, DeskproTicket, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ThirdPartyDeveloperConnectorMockModule, UpscanInitiateConnectorMockModule}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.TicketServiceMockModule
@@ -87,6 +88,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     val actionSend          = "send"
     val response            = "Test response"
     val fileReference       = "abc-123"
+    val fileName            = "test-document.pdf"
 
     val upscanPostTarget       = "https://upscan.example.com/upload"
     val upscanKey             = "new-upscan-upload-key"
@@ -282,7 +284,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         val result = addToken(underTest.ticketPageWithAttachments(ticketId, Some(upscanKey)))(request)
 
         status(result) shouldBe OK
-        contentAsString(result) should include(s"name=\"fileReferences[0]\" value=\"$upscanKey\"")
+        contentAsString(result) should include(s"name=\"fileAttachments[0].fileReference\" value=\"$upscanKey\"")
       }
 
       "return 404 if ticket not found" in new Setup with IsLoggedIn {
@@ -336,7 +338,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
           message = response,
           status = statusOpen,
           newStatus = statusAwaitingAgent,
-          fileReferences = List.empty
+          attachments = List.empty
         )
       }
 
@@ -368,7 +370,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
           message = response,
           status = statusOpen,
           newStatus = statusAwaitingAgent,
-          fileReferences = List.empty
+          attachments = List.empty
         )
       }
 
@@ -390,7 +392,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
           message = response,
           status = statusOpen,
           newStatus = statusAwaitingAgent,
-          fileReferences = List.empty
+          attachments = List.empty
         )
       }
 
@@ -408,10 +410,11 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       "pass the fileReference to the ticket service" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
           .withFormUrlEncodedBody(
-            "status"            -> statusOpen,
-            "action"            -> actionSend,
-            "response"          -> response,
-            "fileReferences[0]" -> fileReference
+            "status"                    -> statusOpen,
+            "action"                    -> actionSend,
+            "response"                  -> response,
+            "fileAttachments[0].fileReference" -> fileReference,
+            "fileAttachments[0].fileName"      -> fileName
           )
 
         TicketServiceMock.CreateResponse.succeeds()
@@ -426,7 +429,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
           message = response,
           status = statusOpen,
           newStatus = statusAwaitingAgent,
-          fileReferences = List(fileReference)
+          attachments = List(Attachment(fileReference, fileName))
         )
       }
     }

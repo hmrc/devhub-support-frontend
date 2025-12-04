@@ -22,6 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.Attachment
 
 object ApiPlatformDeskproStub {
 
@@ -147,7 +148,7 @@ object ApiPlatformDeskproStub {
                                           |  "userEmail": "$userEmail",
                                           |  "message": "$message",
                                           |  "status": "awaiting_agent",
-                                          |  "fileReferences": []
+                                          |  "attachments": []
                                           |}""".stripMargin))
           .willReturn(
             aResponse()
@@ -156,14 +157,14 @@ object ApiPlatformDeskproStub {
       )
     }
 
-    def succeedsWithFileReference(ticketId: Int, userEmail: LaxEmailAddress, message: String, fileReference: String): StubMapping = {
+    def succeedsWithFileAttachment(ticketId: Int, userEmail: LaxEmailAddress, message: String, attachment: Attachment): StubMapping = {
       stubFor(
         post(urlEqualTo(s"/ticket/$ticketId/response"))
           .withRequestBody(equalToJson(s"""{
                                           |  "userEmail": "$userEmail",
                                           |  "message": "$message",
                                           |  "status": "awaiting_agent",
-                                          |  "fileReferences": ["$fileReference"]
+                                          |  "attachments": [{"fileReference": "${attachment.fileReference}", "fileName": "${attachment.fileName}"}]
                                           |}""".stripMargin))
           .willReturn(
             aResponse()
@@ -172,15 +173,15 @@ object ApiPlatformDeskproStub {
       )
     }
 
-    def succeedsWithMultipleFileReferences(ticketId: Int, userEmail: LaxEmailAddress, message: String, fileReferences: List[String]): StubMapping = {
-      val fileRefsJson = fileReferences.map(ref => s""""$ref"""").mkString("[", ",", "]")
+    def succeedsWithMultipleFileAttachments(ticketId: Int, userEmail: LaxEmailAddress, message: String, attachments: List[Attachment]): StubMapping = {
+      val attachmentsJson = attachments.map(att => s"""{"fileReference": "${att.fileReference}", "fileName": "${att.fileName}"}""").mkString("[", ",", "]")
       stubFor(
         post(urlEqualTo(s"/ticket/$ticketId/response"))
           .withRequestBody(equalToJson(s"""{
                                           |  "userEmail": "$userEmail",
                                           |  "message": "$message",
                                           |  "status": "awaiting_agent",
-                                          |  "fileReferences": $fileRefsJson
+                                          |  "attachments": $attachmentsJson
                                           |}""".stripMargin))
           .willReturn(
             aResponse()
