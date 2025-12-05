@@ -50,15 +50,18 @@ object TicketController {
       response: Option[String],
       status: String,
       action: String,
-      fileReferences: List[String]
+      attachments: List[Attachment]
     )
 
   val ticketResponseForm: Form[TicketResponseForm] = Form(
     mapping(
-      "response"       -> optional(text).verifying("ticketdetails.response.required", _.isDefined),
-      "status"         -> nonEmptyText,
-      "action"         -> nonEmptyText,
-      "fileReferences" -> list(text).transform[List[String]](_.filter(_.nonEmpty), identity)
+      "response"        -> optional(text).verifying("ticketdetails.response.required", _.isDefined),
+      "status"          -> nonEmptyText,
+      "action"          -> nonEmptyText,
+      "fileAttachments" -> list(mapping(
+        "fileReference"  -> text,
+        "fileName" -> text
+      )(Attachment.apply)(Attachment.unapply)).transform[List[Attachment]](_.filter(_.fileReference.nonEmpty), identity)
     )(TicketResponseForm.apply)(TicketResponseForm.unapply)
   )
 }
@@ -97,7 +100,7 @@ class TicketController @Inject() (
     val successRedirectUrl = appConfig.devhubSupportFrontendUrl + routes.TicketController.upscanSuccessRedirect.url
     val errorRedirectUrl   = appConfig.devhubSupportFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
 
-    val ticketResponseFormWithFileRef = ticketResponseForm.fill(TicketResponseForm(None, "open", "", upscanKey.map(List(_)).getOrElse(List.empty)))
+    val ticketResponseFormWithFileRef = ticketResponseForm.fill(TicketResponseForm(None, "open", "", upscanKey.map(key => List(Attachment(key, ""))).getOrElse(List.empty)))
     val userEmail                     = request.userSession.developer.email
 
     for {
@@ -152,7 +155,7 @@ class TicketController @Inject() (
         case "close" => "resolved"
       }
 
-      ticketService.createResponse(ticketId, request.email, validForm.response.get, validForm.status, request.displayedName, newStatus, validForm.fileReferences).map {
+      ticketService.createResponse(ticketId, request.email, validForm.response.get, validForm.status, request.displayedName, newStatus, validForm.attachments).map {
         case DeskproTicketResponseSuccess  => Redirect(routes.TicketController.ticketListPage().url)
         case DeskproTicketResponseNotFound => InternalServerError
         case DeskproTicketResponseFailure  => InternalServerError
@@ -185,7 +188,7 @@ class TicketController @Inject() (
         validForm.status,
         request.displayedName,
         newStatus,
-        validForm.fileReferences
+        validForm.attachments
       ).map {
         case DeskproTicketResponseSuccess  => Redirect(routes.TicketController.ticketPageWithAttachments(ticketId, None).url)
         case DeskproTicketResponseNotFound => InternalServerError

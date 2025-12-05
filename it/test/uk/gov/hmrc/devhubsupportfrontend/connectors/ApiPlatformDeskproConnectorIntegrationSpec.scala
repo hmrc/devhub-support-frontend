@@ -58,6 +58,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     val subject       = "Test"
     val message       = "Message"
     val fileReference = "fileRef"
+    val fileName      = "test-file.pdf"
     val deskproTicket = ApiPlatformDeskproConnector.CreateTicketRequest(fullName, email, subject, message)
     val status        = "awaiting_agent"
   }
@@ -183,10 +184,10 @@ class ApiPlatformDeskproConnectorIntegrationSpec
       result shouldBe DeskproTicketResponseSuccess
     }
 
-    "create a ticket response with attachmend file reference" in new Setup {
-      ApiPlatformDeskproStub.CreateResponse.succeedsWithFileReference(ticketId, userEmail, message, fileReference)
+    "create a ticket response with attached file" in new Setup {
+      ApiPlatformDeskproStub.CreateResponse.succeedsWithFileAttachment(ticketId, userEmail, message, Attachment(fileReference, fileName))
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, status, List(fileReference), hc))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, List(Attachment(fileReference, fileName)), hc))
 
       result shouldBe DeskproTicketResponseSuccess
     }
@@ -194,7 +195,7 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     "fail when the ticket to respond to is not found" in new Setup {
       ApiPlatformDeskproStub.CreateResponse.notFound(ticketId)
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, status, List(fileReference), hc))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, List(Attachment(fileReference, fileName)), hc))
 
       result shouldBe DeskproTicketResponseNotFound
     }
@@ -202,15 +203,15 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     "fail when the ticket respond call returns an error" in new Setup {
       ApiPlatformDeskproStub.CreateResponse.fails(ticketId)
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, status, List(fileReference), hc))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, List(Attachment(fileReference, fileName)), hc))
 
       result shouldBe DeskproTicketResponseFailure
     }
 
-    "create a ticket response with multiple file references" in new Setup {
-      ApiPlatformDeskproStub.CreateResponse.succeedsWithMultipleFileReferences(ticketId, userEmail, message, List("fileRef1", "fileRef2"))
+    "create a ticket response with multiple file attachments" in new Setup {
+      ApiPlatformDeskproStub.CreateResponse.succeedsWithMultipleFileAttachments(ticketId, userEmail, message, List(Attachment("fileRef1", "file1.pdf"), Attachment("fileRef2", "file2.pdf")))
 
-      val result = await(underTest.createResponse(ticketId, userEmail, message, status, List("fileRef1", "fileRef2"), hc))
+      val result = await(underTest.createResponse(ticketId, userEmail, message, status, List(Attachment("fileRef1", "file1.pdf"), Attachment("fileRef2", "file2.pdf")), hc))
 
       result shouldBe DeskproTicketResponseSuccess
     }

@@ -52,7 +52,7 @@ trait TicketServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
       def fails() =
         when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *, *, *)(*)).thenReturn(successful(DeskproTicketResponseFailure))
 
-      def verifyCalledWith(ticketId: Int, message: String, status: String, newStatus: String, fileReferences: List[String]) = {
+      def verifyCalledWith(ticketId: Int, message: String, status: String, newStatus: String, attachments: List[Attachment]) = {
         verify(aMock).createResponse(
           eqTo(ticketId),
           *[LaxEmailAddress],
@@ -60,7 +60,7 @@ trait TicketServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
           eqTo(status),
           *,
           eqTo(newStatus),
-          eqTo(fileReferences)
+          eqTo(attachments)
         )(*)
       }
     }

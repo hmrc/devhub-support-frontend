@@ -81,8 +81,9 @@
           @helper.CSRF.formField
 
           <input type="hidden" name="status" value="@{ticket.status}">
-          @for(index <- form("fileReferences").indexes) {
-            <input type="hidden" name="fileReferences[@index]" value="@{form(s"fileReferences[$index]").value.getOrElse("")}">
+          @for(index <- form("fileAttachments").indexes) {
+            <input type="hidden" name="fileAttachments[@index].fileReference" value="@{form(s"fileAttachments[$index].fileReference").value.getOrElse("")}">
+            <input type="hidden" name="fileAttachments[@index].fileName" value="@{form(s"fileAttachments[$index].fileName").value.getOrElse("")}">
           }
 
           @govukCharacterCount(CC(
@@ -99,13 +100,15 @@
           )
           )
 
-          @if(form("fileReferences").indexes.nonEmpty) {
+          @if(form("fileAttachments").indexes.nonEmpty) {
             <div class="govuk-inset-text">
               <h3 class="govuk-heading-s">Attached files:</h3>
               <ul class="govuk-list govuk-list--bullet">
-                @for(index <- form("fileReferences").indexes) {
-                  @form(s"fileReferences[$index]").value.filter(_.nonEmpty).map { fileRef =>
-                    <li>@fileRef</li>
+                @for(index <- form("fileAttachments").indexes) {
+                  @form(s"fileAttachments[$index].fileReference").value.filter(_.nonEmpty).map { fileKey =>
+                    @defining(form(s"fileAttachments[$index].fileName").value.getOrElse(fileKey)) { fileName =>
+                      <li>@fileName (@fileKey)</li>
+                    }
                   }
                 }
               </ul>
