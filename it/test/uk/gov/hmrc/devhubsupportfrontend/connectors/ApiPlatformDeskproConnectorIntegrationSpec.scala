@@ -209,7 +209,12 @@ class ApiPlatformDeskproConnectorIntegrationSpec
     }
 
     "create a ticket response with multiple file attachments" in new Setup {
-      ApiPlatformDeskproStub.CreateResponse.succeedsWithMultipleFileAttachments(ticketId, userEmail, message, List(Attachment("fileRef1", "file1.pdf"), Attachment("fileRef2", "file2.pdf")))
+      ApiPlatformDeskproStub.CreateResponse.succeedsWithMultipleFileAttachments(
+        ticketId,
+        userEmail,
+        message,
+        List(Attachment("fileRef1", "file1.pdf"), Attachment("fileRef2", "file2.pdf"))
+      )
 
       val result = await(underTest.createResponse(ticketId, userEmail, message, status, List(Attachment("fileRef1", "file1.pdf"), Attachment("fileRef2", "file2.pdf")), hc))
 

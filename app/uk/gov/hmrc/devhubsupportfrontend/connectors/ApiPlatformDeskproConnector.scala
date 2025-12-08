@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.http.metrics.common.API
 
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.DeskproTicket
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{DeskproTicket, FileAttachment}
 
 object ApiPlatformDeskproConnector {
 
@@ -47,13 +47,14 @@ object ApiPlatformDeskproConnector {
       organisation: Option[String] = None,
       supportReason: Option[String] = None,
       reasonKey: Option[String] = None,
-      teamMemberEmail: Option[String] = None
+      teamMemberEmail: Option[String] = None,
+      attachments: List[FileAttachment] = List.empty
     )
 
   case class CreateTicketResponse(ref: Option[String])
 
   case class Attachment(fileReference: String, fileName: String)
-  
+
   case class CreateTicketResponseRequest(userEmail: LaxEmailAddress, message: String, status: String, attachments: List[Attachment] = List.empty)
 
   sealed trait DeskproTicketCloseResult
