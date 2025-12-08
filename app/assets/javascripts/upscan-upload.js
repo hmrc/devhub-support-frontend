@@ -67,15 +67,7 @@
                 const fileKey = url.searchParams.get('key');
                 const errorCode = url.searchParams.get('errorCode');
 
-                if (fileKey) {
-                    addFileAttachment(fileKey, fileName);
-                    updateUploadState(row, 'UPLOADED', fileKey);
-                    currentFiles++;
-                    updateFileCount();
-
-                    // Refresh upscan form fields for next upload
-                    refreshUpscanKeys();
-                } else if (errorCode) {
+                if (errorCode) {
                     updateUploadState(row, 'FAILED');
                     displayUploadError(`File upload failed: ${errorCode}`);
                     console.error('File upload failed with error code:', errorCode, {
@@ -83,6 +75,14 @@
                         formAction: upscanForm.action,
                         formData: new FormData(upscanForm)
                     });
+                } else if (fileKey) {
+                    addFileAttachment(fileKey, fileName);
+                    updateUploadState(row, 'UPLOADED', fileKey);
+                    currentFiles++;
+                    updateFileCount();
+
+                    // Refresh upscan form fields for next upload
+                    refreshUpscanKeys();
                 } else {
                     updateUploadState(row, 'FAILED');
                     displayUploadError('File upload failed: No file key or error code received');
