@@ -181,7 +181,7 @@
         } else if (errorCode == `EntityTooSmall`) {
             errorMessage = `File upload failed: The selected file is empty`;
         } else {
-            errorMessage = `File upload failed`
+            errorMessage = `File upload failed`;
         }
         displayUploadError(errorMessage);
     }
