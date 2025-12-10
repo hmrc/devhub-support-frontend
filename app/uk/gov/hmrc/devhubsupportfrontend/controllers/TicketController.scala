@@ -18,6 +18,7 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
+
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.crypto.CookieSigner
@@ -25,6 +26,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import play.filters.csrf.CSRF
 import play.filters.headers.SecurityHeadersFilter
+
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ThirdPartyDeveloperConnector, UpscanInitiateConnector}
@@ -59,8 +61,8 @@ object TicketController {
       "status"          -> nonEmptyText,
       "action"          -> nonEmptyText,
       "fileAttachments" -> list(mapping(
-        "fileReference"  -> text,
-        "fileName" -> text
+        "fileReference" -> text,
+        "fileName"      -> text
       )(Attachment.apply)(Attachment.unapply)).transform[List[Attachment]](_.filter(_.fileReference.nonEmpty), identity)
     )(TicketResponseForm.apply)(TicketResponseForm.unapply)
   )
@@ -195,7 +197,7 @@ class TicketController @Inject() (
         case DeskproTicketResponseFailure  => InternalServerError
       }
     }
-    
+
     requestForm.fold(errors, handleValidForm)
   }
 

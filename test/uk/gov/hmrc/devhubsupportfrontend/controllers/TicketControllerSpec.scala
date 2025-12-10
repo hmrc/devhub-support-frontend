@@ -90,7 +90,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     val fileReference       = "abc-123"
     val fileName            = "test-document.pdf"
 
-    val upscanPostTarget       = "https://upscan.example.com/upload"
+    val upscanPostTarget      = "https://upscan.example.com/upload"
     val upscanKey             = "new-upscan-upload-key"
     val upscanSuccessRedirect = "http://localhost:9685/devhub-support/ticket/4232/withAttachments?upload=success"
     val upscanErrorRedirect   = "http://localhost:9685/devhub-support/ticket/4232/withAttachments?upload=error"
@@ -410,9 +410,9 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       "pass the fileReference to the ticket service" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
           .withFormUrlEncodedBody(
-            "status"                    -> statusOpen,
-            "action"                    -> actionSend,
-            "response"                  -> response,
+            "status"                           -> statusOpen,
+            "action"                           -> actionSend,
+            "response"                         -> response,
             "fileAttachments[0].fileReference" -> fileReference,
             "fileAttachments[0].fileName"      -> fileName
           )
