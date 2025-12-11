@@ -69,7 +69,7 @@
 
                 if (errorCode) {
                     updateUploadState(row, 'FAILED');
-                    displayUploadError(`File upload failed: ${errorCode}`);
+                    displayUploadErrorCode(errorCode);
                     console.error('File upload failed with error code:', errorCode, {
                         fileName: fileName,
                         formAction: upscanForm.action,
@@ -172,6 +172,18 @@
     function getTicketId() {
         const ticketData = document.getElementById('ticket-data');
         return ticketData.getAttribute('data-ticket-id');
+    }
+
+    function displayUploadErrorCode(errorCode) {
+        let errorMessage;
+        if (errorCode == `EntityTooLarge`) {
+            errorMessage = `File upload failed: The selected file must be smaller than 10MB`;
+        } else if (errorCode == `EntityTooSmall`) {
+            errorMessage = `File upload failed: The selected file is empty`;
+        } else {
+            errorMessage = `File upload failed`;
+        }
+        displayUploadError(errorMessage);
     }
 
     function displayUploadError(errorMessage) {
