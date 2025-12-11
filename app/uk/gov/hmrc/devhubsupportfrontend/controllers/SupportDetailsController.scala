@@ -24,10 +24,15 @@ import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
+import uk.gov.hmrc.devhubsupportfrontend.connectors.{ThirdPartyDeveloperConnector, UpscanInitiateConnector}
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.services._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.{SupportPageConfirmationForHoneyPotFieldView, SupportPageConfirmationView, SupportPageDetailView}
+import uk.gov.hmrc.devhubsupportfrontend.views.html.{
+  SupportPageConfirmationForHoneyPotFieldView,
+  SupportPageConfirmationView,
+  SupportPageDetailView,
+  SupportPageDetailViewWithAttachments
+}
 
 @Singleton
 class SupportDetailsController @Inject() (
@@ -35,8 +40,10 @@ class SupportDetailsController @Inject() (
     val cookieSigner: CookieSigner,
     val errorHandler: ErrorHandler,
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
+    upscanInitiateConnector: UpscanInitiateConnector,
     supportService: SupportService,
     supportPageDetailView: SupportPageDetailView,
+    supportPageDetailViewWithAttachments: SupportPageDetailViewWithAttachments,
     supportPageConfirmationView: SupportPageConfirmationView,
     supportPageConfirmationForHoneyPotFieldView: SupportPageConfirmationForHoneyPotFieldView
   )(implicit val ec: ExecutionContext,
@@ -83,6 +90,64 @@ class SupportDetailsController @Inject() (
 
     def handleInvalidForm(flow: SupportFlow)(formWithErrors: Form[SupportDetailsForm]): Future[Result] = {
       renderSupportDetailsPageErrorView(flow)(formWithErrors)
+    }
+
+    val sessionId = extractSupportSessionIdFromCookie(request).getOrElse(SupportSessionId.random)
+
+    supportService.getSupportFlow(sessionId).flatMap { flow =>
+      SupportDetailsForm.form.bindFromRequest().fold(handleInvalidForm(flow), handleValidForm(sessionId, flow))
+    }
+  }
+
+  def supportDetailsPageWithAttachments(upscanKey: Option[String] = None): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
+    val sessionId = extractSupportSessionIdFromCookie(request).getOrElse(SupportSessionId.random)
+
+    val form = upscanKey match {
+      case Some(key) =>
+        SupportDetailsForm.form.bind(Map(
+          "fileAttachments[0].fileReference" -> key,
+          "fileAttachments[0].fileName"      -> ""
+        ))
+      case None      =>
+        SupportDetailsForm.form
+    }
+
+    for {
+      flow                   <- supportService.getSupportFlow(sessionId)
+      upscanInitiateResponse <- upscanInitiateConnector.initiate()
+    } yield Ok(
+      supportPageDetailViewWithAttachments(
+        fullyloggedInDeveloper,
+        form,
+        flow,
+        upscanInitiateResponse
+      )
+    )
+  }
+
+  def submitSupportDetailsWithAttachments: Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
+    def handleValidForm(sessionId: SupportSessionId, flow: SupportFlow)(form: SupportDetailsForm): Future[Result] = {
+      if (form.url.isDefined && fullyloggedInDeveloper.map(user => !user.loggedInState.isLoggedIn).getOrElse(true)) {
+        logger.warn(s"Honeypot field triggered via generic 'Tell us about your query' support form with attachments")
+        Future.successful(withSupportCookie(Ok(supportPageConfirmationForHoneyPotFieldView(fullyloggedInDeveloper)), sessionId))
+      } else {
+        supportService.submitTicket(flow, form).map(_ =>
+          withSupportCookie(Redirect(routes.SupportDetailsController.supportConfirmationPage()), sessionId)
+        )
+      }
+    }
+
+    def handleInvalidForm(flow: SupportFlow)(formWithErrors: Form[SupportDetailsForm]): Future[Result] = {
+      upscanInitiateConnector.initiate().map { upscanResponse =>
+        BadRequest(
+          supportPageDetailViewWithAttachments(
+            fullyloggedInDeveloper,
+            formWithErrors,
+            flow,
+            upscanResponse
+          )
+        )
+      }
     }
 
     val sessionId = extractSupportSessionIdFromCookie(request).getOrElse(SupportSessionId.random)

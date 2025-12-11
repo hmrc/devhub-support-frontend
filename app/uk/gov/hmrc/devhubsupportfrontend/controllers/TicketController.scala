@@ -22,15 +22,12 @@ import scala.concurrent.ExecutionContext
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.crypto.CookieSigner
-import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.filters.csrf.CSRF
-import play.filters.headers.SecurityHeadersFilter
 
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ThirdPartyDeveloperConnector, UpscanInitiateConnector}
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services.UpscanInitiateResponse._
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services.{UpscanFileReference, UpscanInitiateResponse}
 import uk.gov.hmrc.devhubsupportfrontend.services._
 import uk.gov.hmrc.devhubsupportfrontend.views.html._
@@ -99,46 +96,18 @@ class TicketController @Inject() (
 
   def ticketPageWithAttachments(ticketId: Int, upscanKey: Option[String] = None): Action[AnyContent] = loggedInAction { implicit request =>
     logger.warn(s"CSRF token in session: ${CSRF.getToken.map(_.value)}")
-    val successRedirectUrl = appConfig.devhubSupportFrontendUrl + routes.TicketController.upscanSuccessRedirect.url
-    val errorRedirectUrl   = appConfig.devhubSupportFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
-
     val ticketResponseFormWithFileRef = ticketResponseForm.fill(TicketResponseForm(None, "open", "", upscanKey.map(key => List(Attachment(key, ""))).getOrElse(List.empty)))
     val userEmail                     = request.userSession.developer.email
 
     for {
       maybeTicket            <- ticketService.fetchTicket(ticketId)
-      upscanInitiateResponse <- upscanInitiateConnector.initiate(Some(successRedirectUrl), Some(errorRedirectUrl))
+      upscanInitiateResponse <- upscanInitiateConnector.initiate()
     } yield (maybeTicket, upscanInitiateResponse) match {
       case (Some(ticket), upscanResponse) if ticket.personEmail == userEmail =>
-        val result = Ok(ticketViewWithAttachments(ticketResponseFormWithFileRef, Some(request.userSession), ticket, upscanResponse))
-
-        // If key parameter is present, this is an Upscan success redirect - override headers to allow displaying in iframe
-        if (upscanKey.isDefined) {
-          overrideIframeHeaders(result)
-        } else {
-          result
-        }
+        Ok(ticketViewWithAttachments(ticketResponseFormWithFileRef, Some(request.userSession), ticket, upscanResponse))
       case _                                                                 =>
         NotFound
     }
-  }
-
-  /** Returns fresh Upscan upload fields for multi-file uploads. Called by JavaScript after each successful file upload to refresh the Upscan form with new upscan fields for the
-    * upload
-    */
-  def ticketPageInitiateUpscan(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
-    val successRedirectUrl = appConfig.devhubSupportFrontendUrl + routes.TicketController.upscanSuccessRedirect.url
-    val errorRedirectUrl   = appConfig.devhubSupportFrontendUrl + routes.TicketController.ticketPageWithAttachments(ticketId, None).url
-
-    upscanInitiateConnector.initiate(Some(successRedirectUrl), Some(errorRedirectUrl))
-      .map(upscanInitiateResponse => Ok(Json.toJson(upscanInitiateResponse)))
-  }
-
-  private def overrideIframeHeaders(result: Result) = {
-    result.withHeaders(
-      SecurityHeadersFilter.X_FRAME_OPTIONS_HEADER         -> "ALLOWALL",
-      SecurityHeadersFilter.CONTENT_SECURITY_POLICY_HEADER -> "frame-ancestors *"
-    )
   }
 
   def submitTicketResponse(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
@@ -201,7 +170,4 @@ class TicketController @Inject() (
     requestForm.fold(errors, handleValidForm)
   }
 
-  def upscanSuccessRedirect: Action[AnyContent] = Action { _ =>
-    overrideIframeHeaders(Ok(""))
-  }
 }

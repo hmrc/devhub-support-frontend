@@ -254,29 +254,6 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         contentAsString(result) should include(s"name=\"error_action_redirect\" value=\"$upscanErrorRedirect\"")
       }
 
-      "return upscan initiate response as JSON for javascript upscan fields refresh requests" in new Setup with IsLoggedIn {
-        TicketServiceMock.FetchTicket.succeeds(Some(ticket))
-        UpscanInitiateConnectorMock.Initiate.succeedsWith(
-          upscanPostTarget,
-          Map(
-            "key"                     -> upscanKey,
-            "success_action_redirect" -> upscanSuccessRedirect,
-            "error_action_redirect"   -> upscanErrorRedirect
-          )
-        )
-
-        val result = addToken(underTest.ticketPageInitiateUpscan(ticketId))(request)
-
-        status(result) shouldBe OK
-        contentType(result) shouldBe Some("application/json")
-
-        val json = contentAsJson(result)
-        (json \ "postTarget").as[String] shouldBe upscanPostTarget
-        (json \ "formFields" \ "key").as[String] shouldBe upscanKey
-        (json \ "formFields" \ "success_action_redirect").as[String] shouldBe upscanSuccessRedirect
-        (json \ "formFields" \ "error_action_redirect").as[String] shouldBe upscanErrorRedirect
-      }
-
       "populate the hidden fileReference with the upscan key set in the request param" in new Setup with IsLoggedIn {
         TicketServiceMock.FetchTicket.succeeds(Some(ticket))
         UpscanInitiateConnectorMock.Initiate.succeeds()
@@ -431,19 +408,6 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
           newStatus = statusAwaitingAgent,
           attachments = List(Attachment(fileReference, fileName))
         )
-      }
-    }
-  }
-
-  "Upscan success redirect endpoint" when {
-    "invoke upscanSuccessRedirect" should {
-      "return HTTP 200 with empty body and iframe headers" in new Setup {
-        val result = underTest.upscanSuccessRedirect()(FakeRequest())
-
-        status(result) shouldBe OK
-        contentAsString(result) shouldBe ""
-        header("X-Frame-Options", result) shouldBe Some("ALLOWALL")
-        header("Content-Security-Policy", result) shouldBe Some("frame-ancestors *")
       }
     }
   }

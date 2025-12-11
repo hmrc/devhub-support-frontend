@@ -74,6 +74,18 @@ class ApiPlatformDeskproConnectorIntegrationSpec
       result shouldBe Some(ticketReference)
     }
 
+    "return a ticket reference when creating ticket with attachments" in new Setup {
+      val ticketReference       = "DP12346"
+      val attachments           = List(Attachment(fileReference, fileName))
+      val ticketWithAttachments = deskproTicket.copy(attachments = attachments)
+
+      ApiPlatformDeskproStub.CreateTicket.succeedsWithAttachments(ticketReference, fullName, email, subject, message, attachments)
+
+      val result = await(underTest.createTicket(ticketWithAttachments, hc))
+
+      result shouldBe Some(ticketReference)
+    }
+
     "fail when the ticket creation call returns an error" in new Setup {
       val failureStatus = INTERNAL_SERVER_ERROR
       ApiPlatformDeskproStub.CreateTicket.fails(failureStatus)

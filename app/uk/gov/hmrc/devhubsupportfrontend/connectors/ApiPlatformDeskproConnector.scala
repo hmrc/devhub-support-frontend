@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.http.metrics.common.API
 
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.{DeskproTicket, FileAttachment}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.DeskproTicket
 
 object ApiPlatformDeskproConnector {
 
@@ -48,7 +48,7 @@ object ApiPlatformDeskproConnector {
       supportReason: Option[String] = None,
       reasonKey: Option[String] = None,
       teamMemberEmail: Option[String] = None,
-      attachments: List[FileAttachment] = List.empty
+      attachments: List[Attachment] = List.empty
     )
 
   case class CreateTicketResponse(ref: Option[String])
@@ -69,10 +69,10 @@ object ApiPlatformDeskproConnector {
 
   case class GetTicketsByEmailRequest(email: LaxEmailAddress, status: Option[String] = None)
 
+  implicit val attachmentFormat: Format[Attachment]                              = Json.format[Attachment]
   implicit val createTicketRequestFormat: Format[CreateTicketRequest]            = Json.format[CreateTicketRequest]
   implicit val createTicketResponseFormat: Format[CreateTicketResponse]          = Json.format[CreateTicketResponse]
   implicit val getTicketsByEmailRequest: Format[GetTicketsByEmailRequest]        = Json.format[GetTicketsByEmailRequest]
-  implicit val attachmentFormat: Format[Attachment]                              = Json.format[Attachment]
   implicit val createTicketResponseRequest: OFormat[CreateTicketResponseRequest] = Json.format[CreateTicketResponseRequest]
 }
 
@@ -86,8 +86,10 @@ class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlat
 
   def createTicket(createRequest: CreateTicketRequest, hc: HeaderCarrier): Future[Option[String]] = metrics.record(api) {
     implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
+    val createRequestJson                     = Json.toJson(createRequest)
+    logger.info(s"Sending CreateTicketRequest: $createRequestJson")
     http.post(url"${config.serviceBaseUrl}/ticket")
-      .withBody(Json.toJson(createRequest))
+      .withBody(createRequestJson)
       .execute[CreateTicketResponse]
       .map(_.ref)
   }
@@ -141,7 +143,7 @@ class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlat
             logger.warn(s"Deskpro ticket response for ticket '$ticketId' failed Not found")
             DeskproTicketResponseNotFound
           case _         =>
-            logger.error(s"Deskpro ticket response for ticket '$ticketId' failed status: ${response.status}")
+            logger.error(s"Deskpro ticket response for ticket '$ticketId' failed status: ${response.status}. Response body: ${response.body}")
             DeskproTicketResponseFailure
         }
       )

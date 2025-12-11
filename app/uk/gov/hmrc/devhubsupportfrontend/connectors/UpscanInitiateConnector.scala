@@ -72,15 +72,14 @@ class UpscanInitiateConnector @Inject() (
     HeaderNames.CONTENT_TYPE -> "application/json"
   )
 
-  def initiate(
-      redirectOnSuccess: Option[String],
-      redirectOnError: Option[String]
-    )(implicit hc: HeaderCarrier
-    ): Future[UpscanInitiateResponse] = {
+  def initiate()(implicit hc: HeaderCarrier): Future[UpscanInitiateResponse] = {
+    val successRedirectUrl = appConfig.devhubSupportFrontendUrl + "/devhub-support/upscan/success"
+    val errorRedirectUrl   = appConfig.devhubSupportFrontendUrl + "/devhub-support/upscan/success"
+
     val request = UpscanInitiateRequest(
       callbackUrl = appConfig.callbackEndpointTarget,
-      successRedirect = redirectOnSuccess,
-      errorRedirect = redirectOnError
+      successRedirect = Some(successRedirectUrl),
+      errorRedirect = Some(errorRedirectUrl)
     )
 
     for {
