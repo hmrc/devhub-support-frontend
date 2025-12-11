@@ -37,11 +37,11 @@ trait UpscanInitiateConnectorMockModule extends MockitoSugar with ArgumentMatche
             Map("key" -> "value")
           )
         ) = {
-        when(aMock.initiate(*, *)(*)).thenReturn(Future.successful(response))
+        when(aMock.initiate()(*)).thenReturn(Future.successful(response))
       }
 
       def succeedsWith(postTarget: String, formFields: Map[String, String]) = {
-        when(aMock.initiate(*, *)(*)).thenReturn(Future.successful(
+        when(aMock.initiate()(*)).thenReturn(Future.successful(
           UpscanInitiateResponse(
             UpscanFileReference("fileReference"),
             postTarget,
@@ -51,7 +51,7 @@ trait UpscanInitiateConnectorMockModule extends MockitoSugar with ArgumentMatche
       }
 
       def fails(exception: Throwable = new RuntimeException("Upscan initiate failed")) = {
-        when(aMock.initiate(*, *)(*)).thenReturn(Future.failed(exception))
+        when(aMock.initiate()(*)).thenReturn(Future.failed(exception))
       }
     }
   }

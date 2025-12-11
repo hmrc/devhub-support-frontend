@@ -19,13 +19,16 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 import play.api.data.Forms._
 import play.api.data.{Form, Mapping}
 
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.Attachment
+
 final case class SupportDetailsForm(
     details: String,
     fullName: String,
     emailAddress: String,
     organisation: Option[String],
     teamMemberEmailAddress: Option[String],
-    url: Option[String]
+    url: Option[String],
+    fileAttachments: List[Attachment] = List.empty
   )
 
 object SupportDetailsForm extends FormValidation {
@@ -46,9 +49,13 @@ object SupportDetailsForm extends FormValidation {
       formPrefix ~> "details" ~> detailsValidator,
       formPrefix ~> "fullName" ~> requiredLimitedTextValidator(100),
       formPrefix ~> "emailAddress" ~> emailValidator,
-      "organisation" -> optional(text),
+      "organisation"    -> optional(text),
       formPrefix ~> "teamMemberEmailAddress" ~> optionalEmailValidator,
-      "url"          -> optional(text)
+      "url"             -> optional(text),
+      "fileAttachments" -> list(mapping(
+        "fileReference" -> text,
+        "fileName"      -> text
+      )(Attachment.apply)(Attachment.unapply)).transform[List[Attachment]](_.filter(_.fileReference.nonEmpty), identity)
     )(SupportDetailsForm.apply)(SupportDetailsForm.unapply)
   )
 }
