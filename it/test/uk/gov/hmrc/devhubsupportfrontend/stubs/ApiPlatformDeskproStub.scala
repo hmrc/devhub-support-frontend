@@ -41,6 +41,26 @@ object ApiPlatformDeskproStub {
       )
     }
 
+    def succeedsWithAttachments(ticketReference: String, fullName: String, email: String, subject: String, message: String, attachments: List[Attachment]): StubMapping = {
+      val attachmentsJson = attachments.map(att => s"""{"fileReference": "${att.fileReference}", "fileName": "${att.fileName}"}""").mkString("[", ",", "]")
+      stubFor(
+        post(urlEqualTo("/ticket"))
+          .withRequestBody(equalToJson(s"""{
+                                          |  "fullName": "$fullName",
+                                          |  "email": "$email",
+                                          |  "subject": "$subject",
+                                          |  "message": "$message",
+                                          |  "attachments": $attachmentsJson
+                                          |}""".stripMargin))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(Json.parse(s"""{"ref":"$ticketReference"}""").toString)
+              .withHeader("content-type", "application/json")
+          )
+      )
+    }
+
     def fails(status: Int): StubMapping = {
       stubFor(
         post(urlEqualTo("/ticket"))

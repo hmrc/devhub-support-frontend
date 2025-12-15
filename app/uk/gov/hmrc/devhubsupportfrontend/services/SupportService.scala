@@ -87,7 +87,8 @@ class SupportService @Inject() (
       supportFlow,
       baseDeskproTicket.copy(
         organisation = form.organisation.filterNot(_.isBlank),
-        teamMemberEmail = form.teamMemberEmailAddress.filterNot(_.isBlank)
+        teamMemberEmail = form.teamMemberEmailAddress.filterNot(_.isBlank),
+        attachments = form.fileAttachments
       )
     )
   }

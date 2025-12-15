@@ -45,6 +45,13 @@ trait SupportServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
         when(aMock.submitTicket(*, *[ApplyForPrivateApiAccessForm])(*)).thenReturn(successful(flow))
         when(aMock.submitTicket(*, *[SupportDetailsForm])(*)).thenReturn(successful(flow))
       }
+
+      def verifyCalledWith(flow: SupportFlow, form: SupportDetailsForm) = {
+        verify(aMock).submitTicket(
+          eqTo(flow),
+          eqTo(form)
+        )(*)
+      }
     }
 
     object UpdateWithDelta {

@@ -2,6 +2,7 @@
     'use strict';
 
     const MAX_FILES = 5;
+    const FORM_ID = 'details-form';
 
     const UPLOAD_STATES = {
         UPLOADING: {
@@ -37,7 +38,7 @@
         nameField.name = `fileAttachments[${index}].fileName`;
         nameField.value = fileName;
         
-        const form = document.getElementById('message');
+        const form = document.getElementById(FORM_ID);
         form.appendChild(keyField);
         form.appendChild(nameField);
     }
@@ -106,6 +107,9 @@
         filesUploadedCount = document.getElementById('files-uploaded');
         const upscanFileInput = document.getElementById('upscan-file-input');
         
+        // Load any existing files from form (e.g. after validation error form reload)
+        loadExistingFiles();
+        
         fileInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (!file) return;
@@ -121,8 +125,6 @@
             uploadToUpscan(file, file.name, row);
         });
 
-        updateFileCount();
-
         summaryList.addEventListener('click', (event) => {
             if (event.target.classList.contains('remove-file')) {
                 event.preventDefault();
@@ -132,10 +134,29 @@
         });
     }
 
-    function refreshUpscanKeys() {
-        const ticketId = getTicketId();
+    function loadExistingFiles() {
+        const fileInputs = document.querySelectorAll('input[name^="fileAttachments"][name$=".fileReference"]');
         
-        fetch(`/devhub-support/ticket/${ticketId}/initiate-upscan`)
+        fileInputs.forEach(input => {
+            const fileKey = input.value;
+            if (fileKey) {
+                // Get the corresponding fileName input for this fileReference
+                const fileNameInput = document.querySelector(`input[name="${input.name.replace('.fileReference', '.fileName')}"]`);
+                const fileName = fileNameInput ? fileNameInput.value : fileKey;
+                
+                // Create summary row
+                const row = createSummaryRow(fileName);
+                summaryList.appendChild(row);
+                updateUploadState(row, 'UPLOADED', fileKey);
+                currentFiles++;
+            }
+        });
+        
+        updateFileCount();
+    }
+        
+    function refreshUpscanKeys() {
+        fetch('/devhub-support/upscan/initiate')
             .then(response => response.json())
             .then(upscanResponse => {
                 updateUpscanForm(upscanResponse);
@@ -169,9 +190,18 @@
         });
     }
 
-    function getTicketId() {
-        const ticketData = document.getElementById('ticket-data');
-        return ticketData.getAttribute('data-ticket-id');
+    function getContextData() {
+        const contextElement = document.getElementById('upload-context');
+        
+        if (!contextElement) {
+            console.error('No upload-context element found');
+            return null;
+        }
+        
+        return {
+            contextType: contextElement.getAttribute('data-context-type'),
+            ticketId: contextElement.getAttribute('data-ticket-id')
+        };
     }
 
     function displayUploadErrorCode(errorCode) {
@@ -291,19 +321,45 @@
     }
 
     function initFormValidation() {
-        const messageForm = document.getElementById('message');
+        const contextData = getContextData();
+        if (!contextData) {
+            console.error('No context data found, skipping init form validation');
+            return;
+        }
         
-        messageForm.addEventListener('submit', (event) => {
+        const form = document.getElementById(FORM_ID);
+        if (!form) {
+            console.error('Form not found for validation, formId:', FORM_ID);
+            return;
+        }
+        
+        form.addEventListener('submit', (event) => {
             const submitter = event.submitter;
             
             // Only validate if the Send button was clicked (not Close)
             if (submitter && submitter.value === 'send') {
-                const responseValue = document.getElementById('response').value.trim();
-                
-                if (!responseValue) {
-                    event.preventDefault();
-                    displayValidationError();
-                    return false;
+                if (contextData.contextType === 'ticket') {
+                    const responseField = document.getElementById('response');
+                    if (responseField) {
+                        const responseValue = responseField.value.trim();
+                        
+                        if (!responseValue) {
+                            event.preventDefault();
+                            displayValidationError('response');
+                            return false;
+                        }
+                    }
+                } else if (contextData.contextType === 'support-request') {
+                    const detailsField = document.getElementById('details');
+                    if (detailsField) {
+                        const detailsValue = detailsField.value.trim();
+                        
+                        if (!detailsValue) {
+                            event.preventDefault();
+                            displayValidationError('details');
+                            return false;
+                        }
+                    }
                 }
                 
                 clearValidationError();
@@ -311,31 +367,41 @@
         });
     }
 
-    function displayValidationError() {
-        const responseField = document.getElementById('response');
-        const formGroup = responseField.closest('.govuk-form-group');
+    function displayValidationError(fieldId) {
+        const field = document.getElementById(fieldId);
+        if (!field) return;
+        
+        const formGroup = field.closest('.govuk-form-group');
+        const errorId = `${fieldId}-error`;
+        const errorMessage = fieldId === 'response' ? 'Enter a response' : 'Enter details';
 
         formGroup.classList.add('govuk-form-group--error');
-        responseField.classList.add('govuk-textarea--error');
+        field.classList.add('govuk-textarea--error');
 
-        if (!document.getElementById('response-error')) {
+        if (!document.getElementById(errorId)) {
             const errorElement = document.createElement('p');
-            errorElement.id = 'response-error';
+            errorElement.id = errorId;
             errorElement.className = 'govuk-error-message';
-            errorElement.innerHTML = '<span class="govuk-visually-hidden">Error:</span> Enter a response';
+            errorElement.innerHTML = `<span class="govuk-visually-hidden">Error:</span> ${errorMessage}`;
             
-            responseField.parentNode.insertBefore(errorElement, responseField);
+            field.parentNode.insertBefore(errorElement, field);
         }
     }
 
     function clearValidationError() {
         const responseField = document.getElementById('response');
-        const formGroup = responseField.closest('.govuk-form-group');
-        const errorElement = document.getElementById('response-error');
+        const detailsField = document.getElementById('details');
         
-        if (formGroup) formGroup.classList.remove('govuk-form-group--error');
-        if (responseField) responseField.classList.remove('govuk-textarea--error');
-        if (errorElement) errorElement.remove();
+        [responseField, detailsField].forEach(field => {
+            if (field) {
+                const formGroup = field.closest('.govuk-form-group');
+                const errorElement = document.getElementById(`${field.id}-error`);
+                
+                if (formGroup) formGroup.classList.remove('govuk-form-group--error');
+                field.classList.remove('govuk-textarea--error');
+                if (errorElement) errorElement.remove();
+            }
+        });
     }
 
     if (document.readyState === 'loading') {

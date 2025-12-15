@@ -179,6 +179,49 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       AuditServiceMock.ExplicitAudit.verifyCalledWith(auditAction)
     }
 
+    "send attachments when provided" in new Setup {
+      import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.Attachment
+
+      val details     = "This is some\ndescription"
+      val fullName    = "test name"
+      val email       = "email@test.com"
+      val attachments = List(Attachment("fileRef1", "file1.pdf"), Attachment("fileRef2", "file2.pdf"))
+      ApiPlatformDeskproConnectorMock.CreateTicket.succeeds()
+      AuditServiceMock.ExplicitAudit.succeeds()
+
+      await(
+        underTest.submitTicket(
+          SupportFlow(
+            SupportSessionId.random,
+            SupportData.FindingAnApi.id
+          ),
+          SupportDetailsForm(
+            details,
+            fullName,
+            email,
+            organisation = None,
+            teamMemberEmailAddress = None,
+            url = None,
+            fileAttachments = attachments
+          )
+        )
+      )
+
+      val createTicketRequest: CreateTicketRequest = CreateTicketRequest(
+        fullName = fullName,
+        email = email,
+        subject = SupportData.FindingAnApi.text,
+        message = details,
+        supportReason = Some(SupportData.FindingAnApi.text),
+        reasonKey = Some(SupportData.FindingAnApi.id),
+        attachments = attachments
+      )
+      val auditAction                              = CreateTicketAuditAction(createTicketRequest)
+
+      ApiPlatformDeskproConnectorMock.CreateTicket.verifyCalledWith(createTicketRequest)
+      AuditServiceMock.ExplicitAudit.verifyCalledWith(auditAction)
+    }
+
     "send the API when one is provided" in new Setup {
       val apiName  = "Hello world"
       val details  = "This is some\ndescription"
