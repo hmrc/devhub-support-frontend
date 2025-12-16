@@ -211,7 +211,13 @@ class TicketController @Inject() (
     requestForm.fold(errors, handleValidForm)
   }
 
-  def upscanSuccessRedirect: Action[AnyContent] = Action { _ =>
+  def upscanSuccessRedirect: Action[AnyContent] = Action { implicit request =>
+    logger.warn(s"[FIREFOX-DEBUG] upscanSuccessRedirect called (iframe callback)")
+    logger.warn(s"[FIREFOX-DEBUG] Iframe - CSRF token in session: ${CSRF.getToken.map(_.value).getOrElse("NONE")}")
+    logger.warn(s"[FIREFOX-DEBUG] Iframe - Session keys: ${request.session.data.keySet}")
+    logger.warn(s"[FIREFOX-DEBUG] Iframe - User-Agent: ${request.headers.get("User-Agent").getOrElse("UNKNOWN")}")
+    logger.warn(s"[FIREFOX-DEBUG] Iframe - Query params: ${request.queryString}")
+    
     overrideIframeHeaders(Ok(""))
   }
 }
