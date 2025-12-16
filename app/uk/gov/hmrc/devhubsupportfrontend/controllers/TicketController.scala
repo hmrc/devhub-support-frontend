@@ -137,7 +137,22 @@ class TicketController @Inject() (
   }
 
   def submitTicketResponseWithAttachments(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
+    logger.warn(s"[FIREFOX-DEBUG] submitTicketResponseWithAttachments called for ticket $ticketId")
+    logger.warn(s"[FIREFOX-DEBUG] User-Agent: ${request.headers.get("User-Agent").getOrElse("UNKNOWN")}")
+
+    logger.warn(s"[FIREFOX-DEBUG] csrfToken from session: ${request.session.get("csrfToken").getOrElse("NOT FOUND")}")
+
+    // Check CSRF token extraction
+    val csrfTokenFromRequest = CSRF.getToken(request)
+    logger.warn(s"[FIREFOX-DEBUG] CSRF.getToken result: ${csrfTokenFromRequest.map(t => s"Token(${t.name}, ${t.value})").getOrElse("NONE")}")
+
+    logger.warn(s"[FIREFOX-DEBUG] Cookie names: ${request.cookies.map(_.name).mkString(", ")}")
+    logger.warn(s"[FIREFOX-DEBUG] Mdtp cookie: ${request.cookies.get("mdtp").map(c => s"(${c.value.take(50)}...)").getOrElse("NO")}")
+
+    logger.warn(s"[FIREFOX-DEBUG] CSRF token from form body: ${request.body.asFormUrlEncoded.flatMap(_.get("csrfToken").flatMap(_.headOption)).getOrElse("NONE")}")
+
     val requestForm: Form[TicketResponseForm] = ticketResponseForm.bindFromRequest()
+    logger.warn(s"[FIREFOX-DEBUG] Form binding result - hasErrors: ${requestForm.hasErrors}, errors: ${requestForm.errors}")
 
     def errors(errors: Form[TicketResponseForm]) =
       ticketService.fetchTicket(ticketId).map {
