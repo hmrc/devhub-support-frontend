@@ -174,12 +174,22 @@
       </form>
 
       @hmrcTimeline(Timeline(
-        events = ticket.messages.filter(t => !t.isAgentNote).map(message =>
-          Event(
-            title = if (ticket.person == message.person) "By " + loggedInSession.map(_.developer.displayedName).getOrElse("you") else "By HMRC Software Developers Support Team (SDST)",
-            content = s"<h3 class='govuk-heading-s govuk-!-margin-bottom-2'>Message</h3><p>${message.message}</p><ul>${message.attachments.map(attachment => s"<li><a href=${attachment.url} download>${attachment.filename}</a></li>").mkString}</ul>",
-            time = dateFormatter.format(message.dateCreated)
-          )
+        events = ticket.messages.filter(t => !t.isAgentNote).map(message => {
+            val attachedHeader = "<h4 class='govuk-heading-s govuk-!-margin-bottom-1'>Attached files</h4>"
+            Event(
+                title = if(ticket.person == message.person) "By " + loggedInSession.map(_.developer.displayedName).getOrElse("you") else "By HMRC Software Developers Support Team (SDST)",
+                content =
+                    s"""<h3 class='govuk-heading-s govuk-!-margin-bottom-2'>Message</h3>
+                   |<p class="govuk-body">${message.message}</p>
+                   |${if(!message.message.contains(attachedHeader) && message.attachments.nonEmpty) attachedHeader else ""}
+                   |${message.attachments.map(attachment =>
+                            s"""<a class="govuk-link--no-visited-state govuk-!-font-size-16" href=${attachment.url} download>${attachment.filename}</a><br>
+                       |<p class="govuk-body govuk-!-margin-bottom-0 govuk-!-margin-top-1 govuk-!-font-size-16">The file has been scanned and received.</p>
+                       |<hr class="govuk-section-break govuk-!-margin-top-2 govuk-!-margin-bottom-3 govuk-section-break--visible">""".stripMargin).mkString
+                    }""".stripMargin,
+                time = dateFormatter.format(message.dateCreated)
+            )
+        }
         )
       ))
   }
