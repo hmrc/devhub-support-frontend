@@ -39,9 +39,7 @@
 }
 
 .hmrc-timeline__event-content {
-  p, h1, h2, h3 {
-    @extend .govuk-body;
-  }
+  font-family: "GDS Transport", arial, sans-serif;
   ul {
     @extend .govuk-list--bullet;
     @extend .govuk-list;
