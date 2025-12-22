@@ -277,6 +277,28 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         contentAsString(result) should include(s"name=\"error_action_redirect\" value=\"$upscanErrorRedirect\"")
       }
 
+      "upload attachment section should be hidden when not logged in" in new Setup with NotLoggedIn {
+        val upscanPostTarget      = "https://upscan.example.com/upload"
+        val upscanKey             = "new-upscan-upload-key"
+        val upscanSuccessRedirect = "http://localhost:9685/devhub-support/upscan/support-success"
+        val upscanErrorRedirect   = "http://localhost:9685/devhub-support/upscan/support-success"
+
+        SupportServiceMock.GetSupportFlow.succeeds()
+        UpscanInitiateConnectorMock.Initiate.succeedsWith(
+          upscanPostTarget,
+          Map(
+            "key"                     -> upscanKey,
+            "success_action_redirect" -> upscanSuccessRedirect,
+            "error_action_redirect"   -> upscanErrorRedirect
+          )
+        )
+
+        val result = addToken(underTest.supportDetailsPageWithAttachments())(request)
+
+        status(result) shouldBe OK
+        contentAsString(result) should include(s"class=\"upload-section  hidden\"")
+      }
+
       "populate the hidden fileReference with the upscan key set in the request param" in new Setup with IsLoggedIn {
         val upscanKey = "test-upscan-key"
         SupportServiceMock.GetSupportFlow.succeeds()
@@ -290,10 +312,28 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
     }
 
     "invoke submitSupportDetailsWithAttachments" should {
-      "submit new request with name, email, comments and attachments from form" in new Setup {
+      "redirect to login when new request with name, email, comments and attachments from form when not logged in" in new Setup with NotLoggedIn {
         val supportFlow = SupportFlow(SupportSessionId.random, SupportData.UsingAnApi.id)
-        val request     = FakeRequest()
-          .withSession(sessionParams: _*)
+        val newRequest = request
+          .withFormUrlEncodedBody(
+            "fullName"                         -> fullName,
+            "emailAddress"                     -> emailAddress,
+            "details"                          -> details,
+            "fileAttachments[0].fileReference" -> fileReference,
+            "fileAttachments[0].fileName"      -> fileName
+          )
+        SupportServiceMock.GetSupportFlow.succeeds(supportFlow)
+
+        val result = addToken(underTest.submitSupportDetailsWithAttachments())(newRequest)
+
+        status(result) shouldBe 303
+        redirectLocation(result) shouldBe Some("/developer/login")
+
+      }
+
+      "submit new request with name, email, comments and attachments from form when logged in" in new Setup with IsLoggedIn {
+        val supportFlow = SupportFlow(SupportSessionId.random, SupportData.UsingAnApi.id)
+        val newRequest = request
           .withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
@@ -304,7 +344,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         SupportServiceMock.GetSupportFlow.succeeds(supportFlow)
         SupportServiceMock.SubmitTicket.succeeds()
 
-        val result = addToken(underTest.submitSupportDetailsWithAttachments())(request)
+        val result = addToken(underTest.submitSupportDetailsWithAttachments())(newRequest)
 
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/devhub-support/confirmation")
@@ -325,7 +365,6 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
 
       "create support ticket when request with attachments and url (honeypot field) on form and user is logged in" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withSession(sessionParams: _*)
           .withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
@@ -343,20 +382,17 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         redirectLocation(result) shouldBe Some("/devhub-support/confirmation")
       }
 
-      "not create support ticket but show dummy confirmation page when url (honeypot field) on form and user is not logged in" in new Setup {
-        val request = FakeRequest()
-          .withSession(sessionParams: _*)
+      "not create support ticket but show dummy confirmation page when url (honeypot field) on form and user is not logged in" in new Setup with NotLoggedIn {
+        val newRequest = request
           .withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
             "details"                          -> details,
-            "url"                              -> honeypotUrl,
-            "fileAttachments[0].fileReference" -> fileReference,
-            "fileAttachments[0].fileName"      -> fileName
+            "url"                              -> honeypotUrl
           )
         SupportServiceMock.GetSupportFlow.succeeds()
 
-        val result = addToken(underTest.submitSupportDetailsWithAttachments())(request)
+        val result = addToken(underTest.submitSupportDetailsWithAttachments())(newRequest)
 
         status(result) shouldBe OK
         contentAsString(result) should include("We've sent you a confirmation email")
@@ -364,9 +400,8 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         contentAsString(result) should include("We'll send an email to your email address whenever there's an update")
       }
 
-      "submit request with attachments and 3000 characters including \r\n details returns success" in new Setup {
-        val request = FakeRequest()
-          .withSession(sessionParams: _*)
+      "submit request with attachments and 3000 characters including \r\n details returns success" in new Setup with IsLoggedIn {
+        val newRequest = request
           .withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
@@ -377,15 +412,14 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         SupportServiceMock.GetSupportFlow.succeeds()
         SupportServiceMock.SubmitTicket.succeeds()
 
-        val result = addToken(underTest.submitSupportDetailsWithAttachments())(request)
+        val result = addToken(underTest.submitSupportDetailsWithAttachments())(newRequest)
 
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/devhub-support/confirmation")
       }
 
-      "submit request with attachments and invalid details returns BAD_REQUEST" in new Setup {
-        val request = FakeRequest()
-          .withSession(sessionParams: _*)
+      "submit request with attachments and invalid details returns BAD_REQUEST" in new Setup with IsPartLoggedInEnablingMFA {
+        request
           .withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
@@ -401,9 +435,8 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         status(result) shouldBe 400
       }
 
-      "submit request with attachments, details and invalid team member email returns BAD_REQUEST" in new Setup {
-        val request = FakeRequest()
-          .withSession(sessionParams: _*)
+      "submit request with attachments, details and invalid team member email returns BAD_REQUEST" in new Setup with IsPartLoggedInEnablingMFA {
+        request
           .withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
