@@ -277,7 +277,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         contentAsString(result) should include(s"name=\"error_action_redirect\" value=\"$upscanErrorRedirect\"")
       }
 
-      "upload attachment section should be hidden when not logged in" in new Setup with NotLoggedIn {
+      "not include upload attachment section when not logged in" in new Setup with NotLoggedIn {
         val upscanPostTarget      = "https://upscan.example.com/upload"
         val upscanKey             = "new-upscan-upload-key"
         val upscanSuccessRedirect = "http://localhost:9685/devhub-support/upscan/support-success"
@@ -296,7 +296,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         val result = addToken(underTest.supportDetailsPageWithAttachments())(request)
 
         status(result) shouldBe OK
-        contentAsString(result) should include(s"class=\"upload-section  hidden\"")
+        contentAsString(result) should not include (s"class=\"upload-section\"")
       }
 
       "populate the hidden fileReference with the upscan key set in the request param" in new Setup with IsLoggedIn {
@@ -314,7 +314,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
     "invoke submitSupportDetailsWithAttachments" should {
       "redirect to login when new request with name, email, comments and attachments from form when not logged in" in new Setup with NotLoggedIn {
         val supportFlow = SupportFlow(SupportSessionId.random, SupportData.UsingAnApi.id)
-        val newRequest = request
+        val newRequest  = request
           .withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
@@ -333,7 +333,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
 
       "submit new request with name, email, comments and attachments from form when logged in" in new Setup with IsLoggedIn {
         val supportFlow = SupportFlow(SupportSessionId.random, SupportData.UsingAnApi.id)
-        val newRequest = request
+        val newRequest  = request
           .withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
@@ -385,10 +385,10 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
       "not create support ticket but show dummy confirmation page when url (honeypot field) on form and user is not logged in" in new Setup with NotLoggedIn {
         val newRequest = request
           .withFormUrlEncodedBody(
-            "fullName"                         -> fullName,
-            "emailAddress"                     -> emailAddress,
-            "details"                          -> details,
-            "url"                              -> honeypotUrl
+            "fullName"     -> fullName,
+            "emailAddress" -> emailAddress,
+            "details"      -> details,
+            "url"          -> honeypotUrl
           )
         SupportServiceMock.GetSupportFlow.succeeds()
 

@@ -39,10 +39,10 @@
 @loggedInSession.map(_ => " hidden").getOrElse("")
 }
 
-@hiddenIfNotLoggedIn = @{
+@loggedIn = @{
     loggedInSession match {
-        case None => " hidden"
-        case _ => " "
+        case Some(_) => true
+        case None => false
     }
 }
 
@@ -265,8 +265,8 @@
         @* Display-only file upload section, so that it appears above main form submit buttons.
         The upscan form cannot be inside the main form (nested forms are not allowed)
         The real upscan form is below the main form, and the selected file to upload is copied over by javascript *@
-      @if(!hiddenIfNotLoggedIn){
-        <div class="upload-section @hiddenIfNotLoggedIn">
+      @if(loggedIn){
+        <div class="upload-section">
             <div class="govuk-form-group">
                 <label class="govuk-label govuk-!-font-weight-bold" for="file-upload-1">
                     Add files to your support request
@@ -297,17 +297,16 @@
         )
     }
 
-    @if(!hiddenIfNotLoggedIn) {
-@*      @upscanInitiateResponse.map{ response =>*@
-@*    *@@* Real upscan form (hidden) The selected file to upload is copied over by javascript from the file upload section above *@
-@*    <form action="@response.postTarget" method="post" enctype="multipart/form-data" id="upscan-form" style="display: none;">*@
-@*        @for(field <- response.formFields) {*@
-@*            <input type="hidden" name="@field._1" value="@field._2"/>*@
-@*        }*@
-@*        <input type="file" name="file" id="upscan-file-input">*@
-@*    </form>*@
-@*}*@
+    @if(loggedIn) {
+        @* Real upscan form (hidden) The selected file to upload is copied over by javascript from the file upload section above *@
+        <form action="@upscanInitiateResponse.postTarget" method="post" enctype="multipart/form-data" id="upscan-form" style="display: none;">
+            @for(field <- upscanInitiateResponse.formFields) {
+                <input type="hidden" name="@field._1" value="@field._2"/>
+            }
+            <input type="file" name="file" id="upscan-file-input">
+        </form>
 
     @additionalScripts
     }
-}
+    }
+
