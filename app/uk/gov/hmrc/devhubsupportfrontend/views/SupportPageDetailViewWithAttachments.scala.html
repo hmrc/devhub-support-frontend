@@ -298,14 +298,15 @@
     }
 
     @if(!hiddenIfNotLoggedIn) {
-    @* Real upscan form (hidden) The selected file to upload is copied over by javascript from the file upload section above *@
-    <form action="@upscanInitiateResponse.postTarget" method="post" enctype="multipart/form-data" id="upscan-form" style="display: none;">
-        @for(field <- upscanInitiateResponse.formFields) {
-            <input type="hidden" name="@field._1" value="@field._2"/>
-        }
-        <input type="file" name="file" id="upscan-file-input">
-    </form>
-
+@*      @upscanInitiateResponse.map{ response =>*@
+@*    *@@* Real upscan form (hidden) The selected file to upload is copied over by javascript from the file upload section above *@
+@*    <form action="@response.postTarget" method="post" enctype="multipart/form-data" id="upscan-form" style="display: none;">*@
+@*        @for(field <- response.formFields) {*@
+@*            <input type="hidden" name="@field._1" value="@field._2"/>*@
+@*        }*@
+@*        <input type="file" name="file" id="upscan-file-input">*@
+@*    </form>*@
+@*}*@
 
     @additionalScripts
     }

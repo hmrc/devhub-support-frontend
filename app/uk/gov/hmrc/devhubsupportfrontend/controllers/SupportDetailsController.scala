@@ -18,21 +18,15 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-
 import play.api.data.Form
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ThirdPartyDeveloperConnector, UpscanInitiateConnector}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services.UpscanInitiateResponse
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 import uk.gov.hmrc.devhubsupportfrontend.services._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.{
-  SupportPageConfirmationForHoneyPotFieldView,
-  SupportPageConfirmationView,
-  SupportPageDetailView,
-  SupportPageDetailViewWithAttachments
-}
+import uk.gov.hmrc.devhubsupportfrontend.views.html.{SupportPageConfirmationForHoneyPotFieldView, SupportPageConfirmationView, SupportPageDetailView, SupportPageDetailViewWithAttachments}
 
 @Singleton
 class SupportDetailsController @Inject() (
@@ -112,9 +106,15 @@ class SupportDetailsController @Inject() (
         SupportDetailsForm.form
     }
 
+    val maybeUpscanInitiateResponse: Option[Future[UpscanInitiateResponse]] = fullyloggedInDeveloper.map(user => !user.loggedInState.isLoggedIn).getOrElse(true) match {
+      case true => Some(upscanInitiateConnector.initiate())
+      case false => None
+
+    }
+
     for {
       flow                   <- supportService.getSupportFlow(sessionId)
-      upscanInitiateResponse <- upscanInitiateConnector.initiate()
+      upscanInitiateResponse <- maybeUpscanInitiateResponse
     } yield Ok(
       supportPageDetailViewWithAttachments(
         fullyloggedInDeveloper,
