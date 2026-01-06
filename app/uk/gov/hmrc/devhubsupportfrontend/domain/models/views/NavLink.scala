@@ -21,7 +21,7 @@ import play.api.libs.json._
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
 
-case class NavLink(label: String, href: String, truncate: Boolean = false, openInNewWindow: Boolean = false, isSensitive: Boolean = false)
+case class NavLink(label: String, href: String, active: Boolean = false, truncate: Boolean = false, openInNewWindow: Boolean = false, isSensitive: Boolean = false)
 
 object NavLink {
   implicit val format: OFormat[NavLink] = Json.format[NavLink]
@@ -34,7 +34,7 @@ case object StaticNavLinks {
       NavLink("Getting started", s"$apiDocumentationFrontendUrl/api-documentation/docs/using-the-hub"),
       NavLink("API documentation", s"$apiDocumentationFrontendUrl/api-documentation/docs/api"),
       NavLink("Applications", s"$thirdPartyDeveloperFrontendUrl/developer/applications"),
-      NavLink("Support", routes.SupportEnquiryInitialChoiceController.page().url),
+      NavLink("Support", routes.SupportEnquiryInitialChoiceController.page().url, active = true),
       NavLink("Service availability", "https://api-platform-status.production.tax.service.gov.uk/", openInNewWindow = true)
     )
   }
