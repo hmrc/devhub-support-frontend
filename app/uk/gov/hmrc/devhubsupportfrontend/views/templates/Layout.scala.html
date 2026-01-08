@@ -25,7 +25,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.Text
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
 
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.servicenavigation.{ServiceNavigation, ServiceNavigationItem}
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcTrackingConsentSnippet
 
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
@@ -36,7 +36,7 @@
 @this(
   appConfig: AppConfig,
   govukLayout: GovukLayout,
-  hmrcHeader: HmrcHeader,
+  hmrcStandardHeader: HmrcStandardHeader,
   hmrcFooter: HmrcFooter,
   hmrcLanguageSelectHelper: HmrcLanguageSelectHelper,
   hmrcScripts: HmrcScripts,
@@ -85,27 +85,27 @@
   @hmrcScripts()
   @autocompleteJavascript()
 }
-@navigation = @{
+
+@serviceNavigationItems = @{
   StaticNavLinks(appConfig.apiDocumentationFrontendUrl, appConfig.thirdPartyDeveloperFrontendUrl)
-    .map(navLink => NavigationItem(
+    .map(navLink => ServiceNavigationItem(
       content = Text(navLink.label),
-      href = Some(navLink.href),
+      href = navLink.href,
+      active = navLink.active,
       attributes = if (navLink.openInNewWindow) Map("target" -> "_blank") else Map.empty
     ))
 }
 
 @headerBlock = {
-  @hmrcHeader(Header(
-    homepageUrl = messages("header.govuk.url"),
+  @hmrcStandardHeader(
     serviceName = Some(appConfig.serviceName),
-    navigation = Some(navigation),
-    serviceUrl = "/api-documentation",
-    signOutHref = None,
-    language = if(messages.lang.code == "cy") Cy else En,
-    assetsPath = uk.gov.hmrc.hmrcfrontend.controllers.routes.Assets.at("govuk/images").url,
-    displayHmrcBanner = false,
-    containerClasses = "govuk-width-container"
-  ))
+      serviceUrl = Some("/api-documentation"),
+      serviceNavigation = Some(ServiceNavigation(
+          serviceName = Some(appConfig.serviceName),
+          serviceUrl = Some("/api-documentation"),
+          navigation = serviceNavigationItems
+      ))
+  )
 }
 
 @feedbackBannerBlock = {
