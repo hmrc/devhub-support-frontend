@@ -16,32 +16,25 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.repositories
 
-import uk.gov.hmrc.mongo.cache.{CacheIdType, DataKey, MongoCacheRepository}
+import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
+import uk.gov.hmrc.mongo.cache.{CacheIdType, MongoCacheRepository}
 import uk.gov.hmrc.mongo.{MongoComponent, TimestampSupport}
-import uk.gov.hmrc.uploaddocuments.models.{FileUploadContext, FileUploads}
-import uk.gov.hmrc.uploaddocuments.wiring.AppConfig
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.Duration
 
 @Singleton
-class JourneyCacheRepository @Inject()(
+class FileCacheRepository @Inject()(
   mongoComponent: MongoComponent,
   timestampSupport: TimestampSupport,
   appConfig: AppConfig
 )(implicit ec: ExecutionContext)
     extends MongoCacheRepository(
       mongoComponent   = mongoComponent,
-      collectionName   = "upload-customs-documents-journeys",
-      ttl              = appConfig.mongoSessionExpiration,
+      collectionName   = "upscan-uploads",
+      ttl              = Duration("1 hour"),
       timestampSupport = timestampSupport,
       replaceIndexes   = true,
       cacheIdType      = CacheIdType.SimpleCacheId
     )
-
-object JourneyCacheRepository {
-  object DataKeys {
-    val journeyContext: DataKey[FileUploadContext] = DataKey[FileUploadContext]("journeyConfig")
-    val uploadedFiles: DataKey[FileUploads]        = DataKey[FileUploads]("uploadedFiles")
-  }
-}

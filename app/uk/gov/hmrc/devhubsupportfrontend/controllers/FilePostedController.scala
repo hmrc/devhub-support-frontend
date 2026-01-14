@@ -16,28 +16,15 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
-import play.api.data.Forms.{mapping, nonEmptyText, optional}
-import play.api.data.{Form, Forms}
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.libs.F.Tuple
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
-import uk.gov.hmrc.devhubsupportfrontend.controllers.FilePostedController.UpscanUploadSuccessForm
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.{JourneyId, S3UploadSuccess}
+import uk.gov.hmrc.devhubsupportfrontend.controllers.models.Forms
 import uk.gov.hmrc.devhubsupportfrontend.services.FileUploadService
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-
-object FilePostedController {
-  val UpscanUploadSuccessForm = Form[S3UploadSuccess](
-    mapping(
-      "key"    -> nonEmptyText,
-      "bucket" -> optional(nonEmptyText)
-    )(S3UploadSuccess.apply)(o => Some((o.key, o.bucket)))
-  )
-}
 
 @Singleton
 class FilePostedController @Inject() (
@@ -49,12 +36,11 @@ class FilePostedController @Inject() (
   )(implicit val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
-
-
-  // GET /journey/:journeyId/file-posted
-  final def asyncMarkFileUploadAsPosted(implicit journeyId: JourneyId): Action[AnyContent] = Action.async {
+  
+  // GET /upscan/file-posted
+  final def asyncMarkFileUploadAsPosted(): Action[AnyContent] = Action.async {
     implicit request =>
-      UpscanUploadSuccessForm
+      Forms.UpscanUploadSuccessForm
         .bindFromRequest()
         .fold(
           _ => {
