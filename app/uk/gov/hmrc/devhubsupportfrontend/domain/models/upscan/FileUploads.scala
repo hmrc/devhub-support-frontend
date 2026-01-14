@@ -17,7 +17,7 @@
 package uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan
 
 import play.api.libs.json.{Format, JsValue, Json}
-import uk.gov.hmrc.uploaddocuments.support.HtmlCleaner
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services.UpscanInitiateResponse
 
 import java.time.ZonedDateTime
 import scala.util.matching.Regex
@@ -83,8 +83,7 @@ object FileUpload extends SealedTraitFormats[FileUpload] {
     FileUpload.Initiated(
       nonce = nonce,
       timestamp = Timestamp.now,
-      reference = upscanResponse.reference,
-      uploadRequest = Some(upscanResponse.uploadRequest),
+      reference = upscanResponse.fileReference.reference,
       uploadId = uploadId
     )
 

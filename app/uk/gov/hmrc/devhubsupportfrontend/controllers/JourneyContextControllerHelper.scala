@@ -25,7 +25,7 @@ import scala.concurrent.Future
 trait JourneyContextControllerHelper {
 
   val journeyContextService: JourneyContextService
-  def govukStartUrl: String
+  def govukStartUrl: String = ""
 
   def withJourneyContext(body: FileUploadContext => Future[Result])(implicit journeyId: JourneyId): Future[Result] =
     journeyContextService.withJourneyContext(

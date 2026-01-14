@@ -20,6 +20,7 @@ import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
+import uk.gov.hmrc.devhubsupportfrontend.controllers.models.Forms
 import uk.gov.hmrc.devhubsupportfrontend.services.{FileUploadService, JourneyContextService}
 
 import javax.inject.{Inject, Singleton}
@@ -27,15 +28,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FileRejectedController @Inject() (
-                                         mcc: MessagesControllerComponents,
-                                         val cookieSigner: CookieSigner,
-                                         val errorHandler: ErrorHandler,
-                                         val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
-  override val fileUploadService: FileUploadService,
-  override val journeyContextService: JourneyContextService
-)(implicit val ec: ExecutionContext,
-  val appConfig: AppConfig)
-    extends AbstractController(mcc) with FileUploadsControllerHelper with JourneyContextControllerHelper {
+    mcc: MessagesControllerComponents,
+    val cookieSigner: CookieSigner,
+    val errorHandler: ErrorHandler,
+    val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
+    override val fileUploadService: FileUploadService,
+    override val journeyContextService: JourneyContextService
+  )(implicit val ec: ExecutionContext,
+    val appConfig: AppConfig
+  ) extends AbstractController(mcc) with FileUploadsControllerHelper with JourneyContextControllerHelper {
 
   // GET /file-rejected
   final val markFileUploadAsRejected: Action[AnyContent] = Action.async { implicit request =>

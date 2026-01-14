@@ -17,6 +17,8 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import play.api.mvc.{Result, Results}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.{FileUploads, JourneyId}
+import uk.gov.hmrc.devhubsupportfrontend.services.FileUploadService
 
 import scala.concurrent.Future
 

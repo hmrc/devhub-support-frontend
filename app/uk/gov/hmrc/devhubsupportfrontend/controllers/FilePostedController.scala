@@ -20,21 +20,12 @@ import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
-import uk.gov.hmrc.devhubsupportfrontend.controllers.FilePostedController.UpscanUploadSuccessForm
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.{JourneyId, S3UploadSuccess}
+import uk.gov.hmrc.devhubsupportfrontend.controllers.models.Forms
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.JourneyId
 import uk.gov.hmrc.devhubsupportfrontend.services.FileUploadService
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-
-object FilePostedController {
-  val UpscanUploadSuccessForm = Form[S3UploadSuccess](
-    mapping(
-      "key"    -> nonEmptyText,
-      "bucket" -> optional(nonEmptyText)
-    )(S3UploadSuccess.apply)(o => Some((o.key, o.bucket)))
-  )
-}
 
 @Singleton
 class FilePostedController @Inject() (
@@ -51,7 +42,7 @@ class FilePostedController @Inject() (
   // GET /journey/:journeyId/file-posted
   final def asyncMarkFileUploadAsPosted(implicit journeyId: JourneyId): Action[AnyContent] = Action.async {
     implicit request =>
-      UpscanUploadSuccessForm
+      Forms.UpscanUploadSuccessForm
         .bindFromRequest()
         .fold(
           _ => {

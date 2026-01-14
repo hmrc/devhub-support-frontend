@@ -18,7 +18,7 @@ package uk.gov.hmrc.devhubsupportfrontend.services
 
 import org.apache.pekko.actor.{ActorSystem, Scheduler}
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.{FileUploadContext, FileUploads, JourneyId}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan._
 import uk.gov.hmrc.devhubsupportfrontend.repositories.JourneyCacheRepository.DataKeys
 import uk.gov.hmrc.devhubsupportfrontend.repositories.{JourneyCacheRepository, JourneyLocking}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -54,8 +54,8 @@ class FileUploadService @Inject() (
     journeyNotFoundResult: => Future[T]
   )(f: FileUploads => Future[T])(implicit journeyId: JourneyId): Future[T] =
     getFiles.flatMap(_.fold {
-      Logger.error("[withFiles] No files exist for the supplied journeyID")
-      Logger.debug(s"[withFiles] journeyId: '$journeyId'")
+      logger.error("[withFiles] No files exist for the supplied journeyID")
+      logger.debug(s"[withFiles] journeyId: '$journeyId'")
       journeyNotFoundResult
     }(f))
 
@@ -75,13 +75,13 @@ class FileUploadService @Inject() (
       withFiles[Option[FileUploads]](Future.successful(None)) { files =>
         val updatedFileUploads =
           FileUploads(files.files.map {
-            case FileUpload.Initiated(nonce, _, `key`, _, _) => FileUpload.Posted(nonce, Timestamp.now, key)
+            case FileUpload.Initiated(nonce, _, `key`, _) => FileUpload.Posted(nonce, Timestamp.now, key)
             case file                                        => file
           })
 
         if (updatedFileUploads == files) {
-          Logger.info(s"[markFileAsPosted] No file with the supplied journeyID & key was updated and marked as posted")
-          Logger.debug(
+          logger.info(s"[markFileAsPosted] No file with the supplied journeyID & key was updated and marked as posted")
+          logger.debug(
             s"[markFileAsPosted] No file with the supplied journeyID: '$journeyId' & key: '$key' was updated and marked as posted"
           )
           Future.successful(None)
@@ -96,7 +96,7 @@ class FileUploadService @Inject() (
   )(implicit journeyId: JourneyId, journeyContext: FileUploadContext): Future[Option[FileUploads]] =
     takeLock[Option[FileUploads]](Future.successful(None)) {
       withFiles[Option[FileUploads]](Future.successful(None)) { files =>
-        logFailure(journeyContext, s3UploadError)
+        logger.error(s"$journeyContext $s3UploadError")
 
         val updatedFileUploads = FileUploads(files.files.map {
           case FileUpload(nonce, s3UploadError.key) =>
