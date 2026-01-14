@@ -20,8 +20,7 @@ import play.api.libs.json.{Format, Json}
 
 /** Details of the S3 file upload success.
   *
-  * The query parameter named key contains the globally unique file reference that was allocated by the initiate request
-  * to identify the upload.
+  * The query parameter named key contains the globally unique file reference that was allocated by the initiate request to identify the upload.
   *
   * @param key
   *   file upload reference
@@ -29,9 +28,9 @@ import play.api.libs.json.{Format, Json}
   *   upscan inbound bucket name, optional
   */
 case class S3UploadSuccess(
-  key: String,
-  bucket: Option[String]
-)
+    key: String,
+    bucket: Option[String]
+  )
 
 object S3UploadSuccess {
   implicit val formats: Format[S3UploadSuccess] = Json.format[S3UploadSuccess]

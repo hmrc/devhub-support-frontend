@@ -18,18 +18,16 @@ package uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan
 
 import play.api.libs.json.{Format, Json}
 
-/** Details of the S3 file upload error are supplied as query parameters, with the names errorCode, errorMessage,
-  * errorResource and errorRequestId.
+/** Details of the S3 file upload error are supplied as query parameters, with the names errorCode, errorMessage, errorResource and errorRequestId.
   *
-  * The query parameter named key contains the globally unique file reference that was allocated by the initiate request
-  * to identify the upload.
+  * The query parameter named key contains the globally unique file reference that was allocated by the initiate request to identify the upload.
   *
-  * If a redirect URL is not set, the proxy responds with the failure status code. The details of the error along with
-  * the key are available from the JSON body that has the following structure:
+  * If a redirect URL is not set, the proxy responds with the failure status code. The details of the error along with the key are available from the JSON body that has the
+  * following structure:
   *
   * @example
-  *   { "key": "11370e18-6e24-453e-b45a-76d3e32ea33d", "errorCode": "NoSuchKey", "errorMessage": "The resource you
-  *   requested does not exist", "errorResource": "/mybucket/myfoto.jpg", "errorRequestId": "4442587FB7D0A2F9" }
+  *   { "key": "11370e18-6e24-453e-b45a-76d3e32ea33d", "errorCode": "NoSuchKey", "errorMessage": "The resource you requested does not exist", "errorResource":
+  *   "/mybucket/myfoto.jpg", "errorRequestId": "4442587FB7D0A2F9" }
   *
   * @param key
   *   file upload reference
@@ -37,27 +35,27 @@ import play.api.libs.json.{Format, Json}
   *   S3 error code as per https://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html#ErrorCodeList
   */
 case class S3UploadError(
-  key: String,
-  errorCode: String,
-  errorMessage: String,
-  errorRequestId: Option[String] = None,
-  errorResource: Option[String] = None
-)
+    key: String,
+    errorCode: String,
+    errorMessage: String,
+    errorRequestId: Option[String] = None,
+    errorResource: Option[String] = None
+  )
 
 object S3UploadError {
   implicit val formats: Format[S3UploadError] = Json.format[S3UploadError]
 
   def from(
-    key: String,
-    errorCode: Option[String],
-    errorMessage: Option[String],
-    errorRequestId: Option[String],
-    errorResource: Option[String]
-  ): S3UploadError =
+      key: String,
+      errorCode: Option[String],
+      errorMessage: Option[String],
+      errorRequestId: Option[String],
+      errorResource: Option[String]
+    ): S3UploadError =
     S3UploadError(key, errorCode.getOrElse("UNDEFINED"), errorMessage.getOrElse(""), errorRequestId, errorResource)
 
   def unapplyOptional(
-    error: S3UploadError
-  ): Option[(String, Option[String], Option[String], Option[String], Option[String])] =
+      error: S3UploadError
+    ): Option[(String, Option[String], Option[String], Option[String], Option[String])] =
     Some((error.key, Some(error.errorCode), Some(error.errorMessage), error.errorRequestId, error.errorResource))
 }

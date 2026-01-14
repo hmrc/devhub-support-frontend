@@ -16,15 +16,16 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
+
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.controllers.models.Forms
 import uk.gov.hmrc.devhubsupportfrontend.services.FileUploadService
-
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FilePostedController @Inject() (
@@ -36,9 +37,9 @@ class FilePostedController @Inject() (
   )(implicit val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
-  
+
   // GET /upscan/file-posted
-  final def asyncMarkFileUploadAsPosted(): Action[AnyContent] = Action.async {
+  final def markFileUploadAsPosted(): Action[AnyContent] = Action.async {
     implicit request =>
       Forms.UpscanUploadSuccessForm
         .bindFromRequest()

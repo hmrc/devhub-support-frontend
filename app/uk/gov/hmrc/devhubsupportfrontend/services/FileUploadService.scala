@@ -16,20 +16,21 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.services
 
-import org.apache.pekko.actor.{ActorSystem, Scheduler}
-import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.S3UploadError
-import uk.gov.hmrc.devhubsupportfrontend.repositories.FileCacheRepository
-import uk.gov.hmrc.mongo.cache.DataKey
-
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import org.apache.pekko.actor.{ActorSystem, Scheduler}
+import uk.gov.hmrc.mongo.cache.DataKey
+import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.UploadStatus.UploadedSuccessfully
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.{S3UploadError, UploadStatus}
+import uk.gov.hmrc.devhubsupportfrontend.repositories.FileCacheRepository
 
 class FileUploadService @Inject() (
-                                    repo: FileCacheRepository,
-                                    val appConfig: AppConfig,
-                                    val actorSystem: ActorSystem
-)(implicit ec: ExecutionContext) {
+    repo: FileCacheRepository,
+    val appConfig: AppConfig,
+    val actorSystem: ActorSystem
+  )(implicit ec: ExecutionContext
+  ) {
 
   implicit lazy val scheduler: Scheduler = actorSystem.scheduler
 
@@ -37,17 +38,17 @@ class FileUploadService @Inject() (
 //  def lockTimeout: Duration              = appConfig.lockTimeout
 
   def markFileAsPosted(key: String): Future[Unit] = {
-    val dataKey = DataKey[String]("status")
-    repo.put(key)(dataKey, "posted").map(_ => ())
+    val dataKey = DataKey[UploadStatus]("status")
+    repo.put(key)(dataKey, UploadedSuccessfully("")).map(_ => ())
   }
 
   def markFileAsRejected(s3UploadError: S3UploadError): Future[Unit] = {
-    val dataKey = DataKey[String]("status")
-    repo.put(s3UploadError.key)(dataKey, s"rejected:${s3UploadError.errorCode}:${s3UploadError.errorMessage}").map(_ => ())
+    val dataKey = DataKey[UploadStatus]("status")
+    repo.put(s3UploadError.key)(dataKey, UploadStatus.Failed(s3UploadError.errorMessage, s3UploadError.errorCode)).map(_ => ())
   }
 
-  def getFileVerificationStatus(key: String): Future[Option[String]] = {
-    val dataKey = DataKey[String]("status")
+  def getFileVerificationStatus(key: String): Future[Option[UploadStatus]] = {
+    val dataKey = DataKey[UploadStatus]("status")
     repo.get(key)(dataKey)
   }
 }

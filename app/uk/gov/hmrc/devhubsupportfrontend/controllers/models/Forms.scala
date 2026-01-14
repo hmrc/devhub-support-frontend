@@ -18,10 +18,11 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers.models
 
 import play.api.data.Form
 import play.api.data.Forms.{mapping, nonEmptyText, optional, text}
+
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.{S3UploadError, S3UploadSuccess}
 
 object Forms {
-  
+
   val UpscanUploadSuccessForm = Form[S3UploadSuccess](
     mapping(
       "key"    -> nonEmptyText,

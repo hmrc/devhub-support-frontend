@@ -18,6 +18,7 @@ package uk.gov.hmrc.devhubsupportfrontend.config
 
 import java.time.Duration
 import javax.inject.{Inject, Singleton}
+
 import play.api.{ConfigLoader, Configuration}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -62,7 +63,7 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   val lockReleaseCheckInterval: scala.concurrent.duration.Duration =
     scala.concurrent.duration.Duration.apply(config.underlying.getString("mongodb.lock.releaseCheckInterval"))
-  val lockTimeout: scala.concurrent.duration.Duration = scala.concurrent.duration.Duration.apply(config.underlying.getString("mongodb.lock.timeout"))
+  val lockTimeout: scala.concurrent.duration.Duration              = scala.concurrent.duration.Duration.apply(config.underlying.getString("mongodb.lock.timeout"))
 
   private def getConfigDefaulted[A](key: String, default: => A)(implicit loader: ConfigLoader[A]): A = config.getOptional[A](key)(loader).getOrElse(default)
 

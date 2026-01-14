@@ -17,15 +17,15 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
-
+import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.crypto.CookieSigner
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import play.filters.headers.SecurityHeadersFilter
-
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ThirdPartyDeveloperConnector, UpscanInitiateConnector}
+import uk.gov.hmrc.devhubsupportfrontend.controllers.models.Forms
+import uk.gov.hmrc.devhubsupportfrontend.services.FileUploadService
 
 @Singleton
 class UpscanController @Inject() (
@@ -33,7 +33,8 @@ class UpscanController @Inject() (
     val cookieSigner: CookieSigner,
     val errorHandler: ErrorHandler,
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
-    upscanInitiateConnector: UpscanInitiateConnector
+    upscanInitiateConnector: UpscanInitiateConnector,
+    fileUploadService: FileUploadService
   )(implicit val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
@@ -45,6 +46,56 @@ class UpscanController @Inject() (
     upscanInitiateConnector.initiate().map(upscanInitiateResponse =>
       Ok(Json.toJson(upscanInitiateResponse))
     )
+  }
+
+  // GET /upscan/file-posted
+  final def markFileUploadAsPosted(): Action[AnyContent] = Action.async {
+    implicit request =>
+      Forms.UpscanUploadSuccessForm
+        .bindFromRequest()
+        .fold(
+          _ => {
+            logger.error("[markFileUploadAsPosted] Query Parameters from Upscan could not be bound to form")
+            logger.debug(s"[markFileUploadAsPosted] Query Params Received: ${request.queryString}")
+            Future.successful(BadRequest)
+          },
+          {
+            logger.debug(s"[markFileUploadAsPosted success] Query Params Received: ${request.queryString}")
+            s3UploadSuccess => fileUploadService.markFileAsPosted(s3UploadSuccess.key).map(_ => Created)
+          }
+        )
+  }
+
+  // GET /upscan/file-rejected
+  final val markFileUploadAsRejected: Action[AnyContent] = Action.async { implicit request =>
+    Forms.UpscanUploadErrorForm
+      .bindFromRequest()
+      .fold(
+        _ => {
+          logger.error("[markFileUploadAsRejected] Query Parameters from Upscan could not be bound to form")
+          logger.debug(s"[markFileUploadAsRejected] Query Params Received: ${request.queryString}")
+          Future.successful(InternalServerError)
+        },
+        s3UploadError => {
+          logger.debug(s"[markFileUploadAsRejected success] Query Params Received: ${request.queryString}")
+          logger.debug(s"[markFileUploadAsRejected success] Form parsed: $s3UploadError")
+          fileUploadService.markFileAsRejected(s3UploadError).map { _ => Ok }
+        }
+      )
+  }
+
+  // GET /upscan/:reference/status
+  final def checkFileUploadStatus(reference: String): Action[AnyContent] = Action.async { implicit request =>
+    fileUploadService.getFileVerificationStatus(reference).map {
+      case Some(verificationStatus) =>
+        logger.info(
+          s"[checkFileVerificationStatus] UpscanRef: '$reference', Status: ${verificationStatus}"
+        )
+        Ok(Json.toJson(verificationStatus))
+      case None                     =>
+        logger.error(s"[checkFileVerificationStatus] No File exists for UpscanRef: '$reference'")
+        NotFound
+    }
   }
 
   def upscanSuccessRedirect: Action[AnyContent] = Action { _ =>

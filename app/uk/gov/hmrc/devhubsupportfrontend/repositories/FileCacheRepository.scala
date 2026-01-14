@@ -16,25 +16,26 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.repositories
 
-import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-import uk.gov.hmrc.mongo.cache.{CacheIdType, MongoCacheRepository}
-import uk.gov.hmrc.mongo.{MongoComponent, TimestampSupport}
-
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.Duration
 
+import uk.gov.hmrc.mongo.cache.{CacheIdType, MongoCacheRepository}
+import uk.gov.hmrc.mongo.{MongoComponent, TimestampSupport}
+
+import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
+
 @Singleton
-class FileCacheRepository @Inject()(
-  mongoComponent: MongoComponent,
-  timestampSupport: TimestampSupport,
-  appConfig: AppConfig
-)(implicit ec: ExecutionContext)
-    extends MongoCacheRepository(
-      mongoComponent   = mongoComponent,
-      collectionName   = "upscan-uploads",
-      ttl              = Duration("1 hour"),
+class FileCacheRepository @Inject() (
+    mongoComponent: MongoComponent,
+    timestampSupport: TimestampSupport,
+    appConfig: AppConfig
+  )(implicit ec: ExecutionContext
+  ) extends MongoCacheRepository(
+      mongoComponent = mongoComponent,
+      collectionName = "upscan-uploads",
+      ttl = Duration("1 hour"),
       timestampSupport = timestampSupport,
-      replaceIndexes   = true,
-      cacheIdType      = CacheIdType.SimpleCacheId
+      replaceIndexes = true,
+      cacheIdType = CacheIdType.SimpleCacheId
     )

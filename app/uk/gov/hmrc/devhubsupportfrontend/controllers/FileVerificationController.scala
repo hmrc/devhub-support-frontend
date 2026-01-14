@@ -16,16 +16,16 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
-import org.apache.pekko.actor.{ActorSystem, Scheduler}
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext
+
 import play.api.libs.crypto.CookieSigner
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.services.FileUploadService
-
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FileVerificationController @Inject() (
@@ -38,8 +38,8 @@ class FileVerificationController @Inject() (
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
 
-  // GET /file-verification/:reference/status
-  final def checkFileVerificationStatus(reference: String): Action[AnyContent] = Action.async { implicit request =>
+  // GET /upscan/:reference/status
+  final def checkFileUploadStatus(reference: String): Action[AnyContent] = Action.async { implicit request =>
     fileUploadService.getFileVerificationStatus(reference).map {
       case Some(verificationStatus) =>
         logger.info(

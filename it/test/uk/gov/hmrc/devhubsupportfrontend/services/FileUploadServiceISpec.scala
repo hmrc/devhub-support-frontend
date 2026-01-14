@@ -17,18 +17,16 @@
 package uk.gov.hmrc.devhubsupportfrontend.services
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
-
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.S3UploadError
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.UploadStatus.UploadedSuccessfully
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.{S3UploadError, UploadStatus}
 import uk.gov.hmrc.devhubsupportfrontend.repositories.FileCacheRepository
 
 class FileUploadServiceISpec extends AnyWordSpec
@@ -40,8 +38,9 @@ class FileUploadServiceISpec extends AnyWordSpec
     with BeforeAndAfterEach {
 
   private val fileCacheRepository = app.injector.instanceOf[FileCacheRepository]
-  private val appConfig = app.injector.instanceOf[AppConfig]
-  private val underTest = new FileUploadService(
+  private val appConfig           = app.injector.instanceOf[AppConfig]
+
+  private val underTest           = new FileUploadService(
     fileCacheRepository,
     appConfig,
     app.injector.instanceOf[org.apache.pekko.actor.ActorSystem]
@@ -65,8 +64,8 @@ class FileUploadServiceISpec extends AnyWordSpec
 
       await(underTest.markFileAsPosted(testKey))
 
-      val result = await(fileCacheRepository.get(testKey)(uk.gov.hmrc.mongo.cache.DataKey[String]("status")))
-      result shouldBe Some("posted")
+      val result = await(fileCacheRepository.get(testKey)(uk.gov.hmrc.mongo.cache.DataKey[UploadStatus]("status")))
+      result shouldBe Some(UploadedSuccessfully(""))
     }
   }
 
@@ -81,21 +80,20 @@ class FileUploadServiceISpec extends AnyWordSpec
 
       await(underTest.markFileAsRejected(s3Error))
 
-      val result = await(fileCacheRepository.get(testKey)(uk.gov.hmrc.mongo.cache.DataKey[String]("status")))
-      result shouldBe Some("rejected:NoSuchKey:The resource you requested does not exist")
+      val result = await(fileCacheRepository.get(testKey)(uk.gov.hmrc.mongo.cache.DataKey[UploadStatus]("status")))
+      result shouldBe Some(UploadStatus.Failed(s3Error.errorMessage, s3Error.errorCode))
     }
   }
 
   "getFileVerificationStatus" should {
     "retrieve the status for a given key" in {
       val testKey = "test-key-789"
-      
-      // First set a status
-      await(fileCacheRepository.put(testKey)(uk.gov.hmrc.mongo.cache.DataKey[String]("status"), "posted"))
+
+      await(underTest.markFileAsPosted(testKey))
 
       val result = await(underTest.getFileVerificationStatus(testKey))
 
-      result shouldBe Some("posted")
+      result shouldBe Some(UploadedSuccessfully(""))
     }
 
     "return None when no status is found for a key" in {

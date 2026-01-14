@@ -16,17 +16,21 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.services
 
-import org.apache.pekko.actor.Scheduler
-import org.apache.pekko.pattern.FutureTimeoutSupport
-
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
+
+import org.apache.pekko.actor.Scheduler
+import org.apache.pekko.pattern.FutureTimeoutSupport
 
 object ScheduleAfter extends FutureTimeoutSupport {
 
   /** Delay execution of the future by given miliseconds */
-  def apply[T](delayInMiliseconds: Long)(
-    body: => Future[T]
-  )(implicit scheduler: Scheduler, ec: ExecutionContext): Future[T] =
+  def apply[T](
+      delayInMiliseconds: Long
+    )(
+      body: => Future[T]
+    )(implicit scheduler: Scheduler,
+      ec: ExecutionContext
+    ): Future[T] =
     after(duration = FiniteDuration(delayInMiliseconds, "ms"), using = scheduler)(body)
 }
