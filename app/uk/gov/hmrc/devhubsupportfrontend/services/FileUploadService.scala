@@ -20,9 +20,9 @@ import org.apache.pekko.actor.{ActorSystem, Scheduler}
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.S3UploadError
 import uk.gov.hmrc.devhubsupportfrontend.repositories.FileCacheRepository
+import uk.gov.hmrc.mongo.cache.DataKey
 
 import javax.inject.Inject
-import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 
 class FileUploadService @Inject() (
@@ -33,12 +33,21 @@ class FileUploadService @Inject() (
 
   implicit lazy val scheduler: Scheduler = actorSystem.scheduler
 
-  def lockReleaseCheckInterval: Duration = appConfig.lockReleaseCheckInterval
-  def lockTimeout: Duration              = appConfig.lockTimeout
+//  def lockReleaseCheckInterval: Duration = appConfig.lockReleaseCheckInterval
+//  def lockTimeout: Duration              = appConfig.lockTimeout
 
-  def markFileAsPosted(key: String): Future[Unit] = ???
+  def markFileAsPosted(key: String): Future[Unit] = {
+    val dataKey = DataKey[String]("status")
+    repo.put(key)(dataKey, "posted").map(_ => ())
+  }
 
-  def markFileAsRejected(s3UploadError: S3UploadError): Future[Unit] = ???
+  def markFileAsRejected(s3UploadError: S3UploadError): Future[Unit] = {
+    val dataKey = DataKey[String]("status")
+    repo.put(s3UploadError.key)(dataKey, s"rejected:${s3UploadError.errorCode}:${s3UploadError.errorMessage}").map(_ => ())
+  }
 
-  def getFileVerificationStatus(key: String): Future[Option[String]] = ???
+  def getFileVerificationStatus(key: String): Future[Option[String]] = {
+    val dataKey = DataKey[String]("status")
+    repo.get(key)(dataKey)
+  }
 }
