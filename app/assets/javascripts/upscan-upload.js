@@ -3,6 +3,7 @@
 
     const MAX_FILES = 5;
     const FORM_ID = 'details-form';
+    const SECTION_ID = 'upscan-section';
 
     const UPLOAD_STATES = {
         UPLOADING: {
@@ -319,7 +320,14 @@
 
         updateFileCount();
     }
-
+    function unhideUpscan(){
+        const section = document.getElementById(SECTION_ID);
+        if (!section) {
+            console.error('Section not found for validation id:', SECTION_ID);
+            return;
+        }
+        section.style.display = 'block';
+    }
     function initFormValidation() {
         const contextData = getContextData();
         if (!contextData) {
@@ -406,10 +414,12 @@
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
+            unhideUpscan();
             initUpscanUpload();
             initFormValidation();
         });
     } else {
+        unhideUpscan();
         initUpscanUpload();
         initFormValidation();
     }
