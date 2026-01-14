@@ -17,7 +17,7 @@
 package uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.uploaddocuments.models.FileUpload.{Duplicate, Failed, Rejected}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.FileUpload.{Duplicate, Failed, Rejected}
 
 sealed trait FileUploadError
 

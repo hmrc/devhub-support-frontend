@@ -16,11 +16,8 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
-import play.api.data.Forms.{mapping, nonEmptyText, optional}
-import play.api.data.{Form, Forms}
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.libs.F.Tuple
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.controllers.FilePostedController.UpscanUploadSuccessForm

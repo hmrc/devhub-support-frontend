@@ -18,11 +18,7 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import org.apache.pekko.actor.{ActorSystem, Scheduler}
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Request}
-import uk.gov.hmrc.uploaddocuments.models.{FileUpload, FileUploadContext, JourneyId}
-import uk.gov.hmrc.uploaddocuments.services.{FileVerificationService, JourneyContextService}
-import uk.gov.hmrc.uploaddocuments.views.html.WaitingForFileVerificationView
-import uk.gov.hmrc.uploaddocuments.wiring.AppConfig
+import play.api.mvc.{Action, AnyContent}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,40 +34,6 @@ class FileVerificationController @Inject() (
     extends BaseController(components) with JourneyContextControllerHelper {
 
   implicit val scheduler: Scheduler = actorSystem.scheduler
-
-  // GET /file-verification?key
-  def showWaitingForFileVerification(key: Option[String]): Action[AnyContent] = Action.async { implicit request =>
-    key match {
-      case None => Future(BadRequest)
-      case Some(upscanReference) =>
-        whenInSession { implicit journeyId =>
-          whenAuthenticated {
-            withJourneyContext { implicit journeyContext =>
-              val timeoutNanoTime: Long = System.nanoTime() + appConfig.upscanInitialWaitTime.toNanos
-              fileVerificationService.waitForUpscanResponse(
-                upscanReference,
-                appConfig.upscanWaitInterval.toMillis,
-                timeoutNanoTime
-              )(
-                {
-                  case _: FileUpload.Accepted => Future(Redirect(routes.SummaryController.showSummary))
-                  case _                      => Future(Redirect(routes.ChooseSingleFileController.showChooseFile(None)))
-                },
-                Future(Ok(renderWaitingView(journeyContext, upscanReference)))
-              )
-            }
-          }
-        }
-    }
-  }
-
-  private def renderWaitingView(context: FileUploadContext, reference: String)(implicit request: Request[_]) =
-    waitingView(
-      successAction = routes.SummaryController.showSummary,
-      failureAction = routes.ChooseSingleFileController.showChooseFile(None),
-      checkStatusAction = routes.FileVerificationController.checkFileVerificationStatus(reference),
-      backLink = None
-    )(implicitly[Request[_]], context.messages, context.config.features, context.config.content)
 
   // GET /file-verification/:reference/status
   final def checkFileVerificationStatus(reference: String): Action[AnyContent] = Action.async { implicit request =>

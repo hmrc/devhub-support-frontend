@@ -17,31 +17,18 @@
 package uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan
 
 import play.api.http.HeaderNames.USER_AGENT
-import play.api.i18n.Messages
-import play.api.libs.json.{Format, JsString, JsSuccess, Json, Reads, Writes}
+import play.api.libs.json._
 import play.api.mvc.{Headers, RequestHeader}
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import uk.gov.hmrc.uploaddocuments.support.EnhancedMessages
 
 import java.util.UUID
 
 final case class FileUploadContext(
-  config: FileUploadSessionConfig,
   hostService: HostService = HostService.Any,
   active: Boolean = true,
   userWantsToUploadNextFile: Boolean = false
 ) {
-  def isValid: Boolean = config.isValid && hostService.userAgent.nonEmpty
-
-  implicit val content: CustomizedServiceContent = config.content
-  implicit val features: Features                = config.features
-
-  def messages(implicit m: Messages): Messages =
-    if (config.content.yesNoQuestionRequiredError.isDefined)
-      new EnhancedMessages(m, Map("error.choice.required" -> config.content.yesNoQuestionRequiredError.getOrElse("")))
-    else m
-
   def deactivate(): FileUploadContext =
     copy(active = false)
 }

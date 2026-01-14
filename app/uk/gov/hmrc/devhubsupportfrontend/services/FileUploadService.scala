@@ -17,7 +17,6 @@
 package uk.gov.hmrc.devhubsupportfrontend.services
 
 import org.apache.pekko.actor.{ActorSystem, Scheduler}
-import uk.gov.hmrc.audit.handler.HttpResult.Response
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.{FileUploadContext, FileUploads, JourneyId}
 import uk.gov.hmrc.devhubsupportfrontend.repositories.JourneyCacheRepository.DataKeys
@@ -26,8 +25,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mongo.lock.MongoLockRepository
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{ExecutionContext, Future}
 
 class FileUploadService @Inject() (
   repo: JourneyCacheRepository,
@@ -106,10 +105,10 @@ class FileUploadService @Inject() (
         })
 
         if (updatedFileUploads == files) {
-          Logger.warn(
+          logger.warn(
             s"[markFileAsRejected] No file with the supplied journeyID & key was updated and marked as rejected"
           )
-          Logger.debug(
+          logger.debug(
             s"[markFileAsRejected] No file with the supplied journeyID: '$journeyId' & key: '${s3UploadError.key}' was updated and marked as rejected"
           )
           Future.successful(None)

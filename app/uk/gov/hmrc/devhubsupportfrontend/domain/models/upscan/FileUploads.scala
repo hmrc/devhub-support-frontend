@@ -42,9 +42,6 @@ case class FileUploads(files: Seq[FileUpload] = Seq.empty) {
   lazy val onlyAccepted: FileUploads =
     copy(files = files.filter { case _: FileUpload.Accepted => true; case _ => false })
 
-  def hasFileWithDescription(description: String): Boolean =
-    files.exists { case a: FileUpload.Accepted => a.safeDescription.contains(description); case _ => false }
-
   lazy val tofileUploadErrors: Seq[FileUploadError] = files.collect { case e: ErroredFileUpload => FileUploadError(e) }
 
 }
@@ -52,7 +49,7 @@ case class FileUploads(files: Seq[FileUpload] = Seq.empty) {
 object FileUploads {
   implicit val formats: Format[FileUploads] = Json.format[FileUploads]
   def apply(initRequest: FileUploadInitializationRequest): FileUploads =
-    FileUploads(initRequest.existingFiles.take(initRequest.config.maximumNumberOfFiles).map(FileUpload.apply))
+    FileUploads(initRequest.existingFiles.take(5).map(FileUpload.apply))
 }
 
 /** File upload status */
@@ -106,7 +103,6 @@ object FileUpload extends SealedTraitFormats[FileUpload] {
     nonce: Nonce,
     timestamp: Timestamp,
     reference: String,
-    uploadRequest: Option[UploadRequest] = None,
     uploadId: Option[String] = None
   ) extends FileUpload {
     override val isReady: Boolean = false
@@ -147,7 +143,6 @@ object FileUpload extends SealedTraitFormats[FileUpload] {
   ) extends FileUpload {
     override val isReady: Boolean = true
 
-    final val safeDescription: Option[String] = description.map(HtmlCleaner.cleanSimpleText)
   }
 
   /** Status when the file has failed verification and may not be used. */
