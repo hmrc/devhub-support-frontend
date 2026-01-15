@@ -128,9 +128,9 @@ class SupportDetailsController @Inject() (
   def submitSupportDetailsWithAttachments: Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
     def handleValidForm(sessionId: SupportSessionId, flow: SupportFlow)(form: SupportDetailsForm): Future[Result] = {
       // submitting attachments whilst in the NotLoggedIn state is not allowed
-      if (fullyloggedInDeveloper.map(user => !user.loggedInState.isLoggedIn).getOrElse(true) && form.fileAttachments.nonEmpty) {
+      if (fullyloggedInDeveloper.forall(user => !user.loggedInState.isLoggedIn) && form.fileAttachments.nonEmpty) {
         Future.successful(withSupportCookie(Redirect(s"${appConfig.thirdPartyDeveloperFrontendUrl}/developer/login"), sessionId))
-      } else if (form.url.isDefined && fullyloggedInDeveloper.map(user => !user.loggedInState.isLoggedIn).getOrElse(true)) {
+      } else if (form.url.isDefined && fullyloggedInDeveloper.forall(user => !user.loggedInState.isLoggedIn)) {
         logger.warn(s"Honeypot field triggered via generic 'Tell us about your query' support form with attachments")
         Future.successful(withSupportCookie(Ok(supportPageConfirmationForHoneyPotFieldView(fullyloggedInDeveloper)), sessionId))
       } else {
