@@ -192,6 +192,7 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
         status(result) shouldBe OK
         contentType(result) shouldBe Some("application/json")
+        contentAsJson(result) shouldBe Json.parse(s"""{"uploadStatus":"UploadedSuccessfully"}""")
         FileUploadServiceMock.GetFileVerificationStatus.verifyWasCalledWith("test-reference")
       }
 
