@@ -18,7 +18,6 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
 import play.api.mvc.Result
 import play.api.mvc.request.RequestTarget
 import play.api.test.FakeRequest
@@ -26,8 +25,8 @@ import play.api.test.Helpers._
 import play.filters.csrf.CSRF.TokenProvider
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
-
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.UploadStatus
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ThirdPartyDeveloperConnectorMockModule, UpscanInitiateConnectorMockModule}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.FileUploadServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
@@ -120,11 +119,12 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
   "markFileUploadAsPosted" when {
     "user is logged in" should {
       "return Created status when file upload is marked as posted successfully" in new Setup with IsLoggedIn {
+        val uploadPostedRequest = request.withMethod("GET")
+          .withTarget(RequestTarget("", "", Map("key" -> Seq("test-key"))))
+
         FileUploadServiceMock.MarkFileAsPosted.succeeds()
 
-        val newRequest = request.withMethod("GET").withTarget(RequestTarget(uriString = "", path = "", queryString = Map("key" -> Seq("test-key"))))
-
-        val result = underTest.markFileUploadAsPosted()(newRequest)
+        val result = underTest.markFileUploadAsPosted()(uploadPostedRequest)
 
         status(result) shouldBe CREATED
       }
@@ -138,7 +138,7 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
     "user is not logged in" should {
       "redirect to login page" in new Setup with NotLoggedIn {
-        val result = underTest.markFileUploadAsPosted()(FakeRequest("GET", s"?key=test-key"))
+        val result = underTest.markFileUploadAsPosted()(request)
 
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe Some("/developer/login")
@@ -149,9 +149,14 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
   "markFileUploadAsRejected" when {
     "user is logged in" should {
       "return Ok status when file upload is marked as rejected successfully" in new Setup with IsLoggedIn {
+        val uploadRejectedRequest = request.withMethod("GET")
+          .withTarget(RequestTarget("", "",
+            Map("key" -> Seq("test-key"), "errorCode" -> Seq("EntityTooLarge"), "errorMessage" -> Seq("Entity+Too+Large"))))
+
         FileUploadServiceMock.MarkFileAsRejected.succeeds()
-        val newRequest             = request.withMethod("GET").withTarget(RequestTarget(uriString = "", path = "", queryString = Map("key" -> Seq("test-key"), "error" -> Seq("test-error"))))
-        val result: Future[Result] = underTest.markFileUploadAsRejected(newRequest)
+
+        val result: Future[Result] = underTest.markFileUploadAsRejected(uploadRejectedRequest)
+
         status(result) shouldBe OK
       }
 
@@ -164,7 +169,7 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
     "user is not logged in" should {
       "redirect to login page" in new Setup with NotLoggedIn {
-        val result = underTest.markFileUploadAsRejected(FakeRequest("GET", s"?key=test-key&error=test-error"))
+        val result = underTest.markFileUploadAsRejected(request)
 
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe Some("/developer/login")
@@ -175,7 +180,7 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
   "checkFileUploadStatus" when {
     "user is logged in" should {
       "return Ok with file verification status when it exists" in new Setup with IsLoggedIn {
-        FileUploadServiceMock.GetFileVerificationStatus.returns(Some(uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.UploadStatus.UploadedSuccessfully))
+        FileUploadServiceMock.GetFileVerificationStatus.returns(Some(UploadStatus.UploadedSuccessfully))
 
         val result = underTest.checkFileUploadStatus("test-reference")(request)
 
@@ -194,7 +199,7 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
     "user is not logged in" should {
       "redirect to login page" in new Setup with NotLoggedIn {
-        FileUploadServiceMock.GetFileVerificationStatus.returns(Some(uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.UploadStatus.UploadedSuccessfully))
+        FileUploadServiceMock.GetFileVerificationStatus.returns(Some(UploadStatus.UploadedSuccessfully))
 
         val result = underTest.checkFileUploadStatus("test-reference")(request)
 
