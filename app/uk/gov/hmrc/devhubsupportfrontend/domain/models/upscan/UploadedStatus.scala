@@ -31,7 +31,7 @@ object UploadStatus {
 
   import uk.gov.hmrc.play.json.Union
 
-  private implicit val formatFailed: OFormat[Failed]                                  = Json.format[Failed]
+  private implicit val formatFailed: OFormat[Failed] = Json.format[Failed]
 
   private implicit val formatUploadedSuccessfully: OFormat[UploadedSuccessfully.type] = OFormat(
     Reads(_ => play.api.libs.json.JsSuccess(UploadedSuccessfully)),

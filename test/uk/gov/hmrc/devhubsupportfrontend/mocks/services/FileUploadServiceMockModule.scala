@@ -20,7 +20,6 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.S3UploadError
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.UploadStatus
 import uk.gov.hmrc.devhubsupportfrontend.services.FileUploadService
 
@@ -30,6 +29,7 @@ trait FileUploadServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     def aMock: FileUploadService
 
     object MarkFileAsPosted {
+
       def succeeds() = {
         when(aMock.markFileAsPosted(*)).thenReturn(Future.successful(()))
       }
@@ -40,6 +40,7 @@ trait FileUploadServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     }
 
     object MarkFileAsRejected {
+
       def succeeds() = {
         when(aMock.markFileAsRejected(*)).thenReturn(Future.successful(()))
       }
@@ -50,6 +51,7 @@ trait FileUploadServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
     }
 
     object GetFileVerificationStatus {
+
       def returns(status: Option[UploadStatus]) = {
         when(aMock.getFileVerificationStatus(*)).thenReturn(Future.successful(status))
       }

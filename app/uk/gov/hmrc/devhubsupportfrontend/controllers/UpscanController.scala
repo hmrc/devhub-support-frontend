@@ -51,7 +51,7 @@ class UpscanController @Inject() (
   }
 
   // GET /upscan/file-posted
-  final def markFileUploadAsPosted(): Action[AnyContent] = Action.async {
+  final def markFileUploadAsPosted(): Action[AnyContent] = loggedInAction {
     implicit request =>
       Forms.UpscanUploadSuccessForm
         .bindFromRequest()
@@ -68,7 +68,7 @@ class UpscanController @Inject() (
   }
 
   // GET /upscan/file-rejected
-  final val markFileUploadAsRejected: Action[AnyContent] = Action.async { implicit request =>
+  final val markFileUploadAsRejected: Action[AnyContent] = loggedInAction { implicit request =>
     Forms.UpscanUploadErrorForm
       .bindFromRequest()
       .fold(
@@ -86,7 +86,7 @@ class UpscanController @Inject() (
   }
 
   // GET /upscan/:reference/status
-  final def checkFileUploadStatus(reference: String): Action[AnyContent] = Action.async { implicit request =>
+  final def checkFileUploadStatus(reference: String): Action[AnyContent] = loggedInAction { implicit request =>
     fileUploadService.getFileVerificationStatus(reference).map {
       case Some(verificationStatus) =>
         logger.info(
