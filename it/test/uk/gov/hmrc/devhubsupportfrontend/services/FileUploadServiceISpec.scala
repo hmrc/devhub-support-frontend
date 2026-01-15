@@ -52,7 +52,7 @@ class FileUploadServiceISpec extends AnyWordSpec
   override implicit lazy val app: Application =
     new GuiceApplicationBuilder()
       .configure(
-        "mongodb.uri" -> s"mongodb://127.0.0.1:27017/test-${this.getClass.getSimpleName}"
+        "mongodb.uri" -> s"mongodb://127.0.0.12:27017/test-${this.getClass.getSimpleName}"
       )
       .build()
 
