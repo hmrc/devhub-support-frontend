@@ -44,7 +44,7 @@ class FileUploadService @Inject() (
 
   def markFileAsRejected(s3UploadError: S3UploadError): Future[Unit] = {
     val dataKey = DataKey[UploadStatus]("status")
-    repo.put(s3UploadError.key)(dataKey, UploadStatus.Failed(s3UploadError.errorMessage, s3UploadError.errorCode)).map(_ => ())
+    repo.put(s3UploadError.key)(dataKey, UploadStatus.Failed(s3UploadError.errorCode, s3UploadError.errorMessage)).map(_ => ())
   }
 
   def getFileVerificationStatus(key: String): Future[Option[UploadStatus]] = {

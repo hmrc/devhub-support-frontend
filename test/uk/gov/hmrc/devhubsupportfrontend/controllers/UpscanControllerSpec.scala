@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
+import play.api.libs.json.Json
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import play.api.mvc.Result
@@ -26,6 +28,7 @@ import play.filters.csrf.CSRF.TokenProvider
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.UploadStatus.formatFailed
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.{S3UploadError, UploadStatus}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ThirdPartyDeveloperConnectorMockModule, UpscanInitiateConnectorMockModule}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.FileUploadServiceMockModule
@@ -182,13 +185,28 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
   "checkFileUploadStatus" when {
     "user is logged in" should {
-      "return Ok with file verification status when it exists" in new Setup with IsLoggedIn {
+      "return Ok with file verification status when it exists if file was posted successfully" in new Setup with IsLoggedIn {
         FileUploadServiceMock.GetFileVerificationStatus.returns(Some(UploadStatus.UploadedSuccessfully))
 
         val result = underTest.checkFileUploadStatus("test-reference")(request)
 
         status(result) shouldBe OK
         contentType(result) shouldBe Some("application/json")
+        FileUploadServiceMock.GetFileVerificationStatus.verifyWasCalledWith("test-reference")
+      }
+
+      "return Ok with file verification status when it exists, if file failed to upload" in new Setup with IsLoggedIn {
+        val errorCode = "EntityTooLarge"
+        val message = "Entity+Too+Large"
+
+        FileUploadServiceMock.GetFileVerificationStatus.returns(
+          Some(UploadStatus.Failed(errorCode, message)))
+
+        val result = underTest.checkFileUploadStatus("test-reference")(request)
+
+        status(result) shouldBe OK
+        contentType(result) shouldBe Some("application/json")
+        contentAsJson(result) shouldBe Json.parse(s"""{"errorCode":"$errorCode","errorMessage":"$message","uploadStatus":"Failed"}""")
         FileUploadServiceMock.GetFileVerificationStatus.verifyWasCalledWith("test-reference")
       }
 

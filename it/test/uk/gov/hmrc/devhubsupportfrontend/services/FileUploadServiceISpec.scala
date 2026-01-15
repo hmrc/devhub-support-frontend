@@ -84,7 +84,7 @@ class FileUploadServiceISpec extends AnyWordSpec
       await(underTest.markFileAsRejected(s3Error))
 
       val result = await(fileCacheRepository.get(testKey)(uk.gov.hmrc.mongo.cache.DataKey[UploadStatus]("status")))
-      result shouldBe Some(UploadStatus.Failed(s3Error.errorMessage, s3Error.errorCode))
+      result shouldBe Some(UploadStatus.Failed(s3Error.errorCode, s3Error.errorMessage))
     }
   }
 

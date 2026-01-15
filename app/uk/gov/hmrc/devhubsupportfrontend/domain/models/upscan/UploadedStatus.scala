@@ -23,8 +23,8 @@ sealed trait UploadStatus
 object UploadStatus {
 
   case class Failed(
-      message: String,
-      reason: String
+                     errorCode: String,
+                     errorMessage: String
     ) extends UploadStatus
 
   case object UploadedSuccessfully extends UploadStatus
