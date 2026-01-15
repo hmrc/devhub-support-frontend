@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Json, OFormat, OWrites, Reads}
 
 sealed trait UploadStatus
 
@@ -27,18 +27,19 @@ object UploadStatus {
       reason: String
     ) extends UploadStatus
 
-  case class UploadedSuccessfully(message: String) extends UploadStatus
+  case object UploadedSuccessfully extends UploadStatus
 
   import uk.gov.hmrc.play.json.Union
 
-  private implicit val formatFailed: OFormat[Failed]                             = Json.format[Failed]
-  private implicit val formatUploadedSuccessfully: OFormat[UploadedSuccessfully] = Json.format[UploadedSuccessfully]
+  private implicit val formatFailed: OFormat[Failed]                                  = Json.format[Failed]
+
+  private implicit val formatUploadedSuccessfully: OFormat[UploadedSuccessfully.type] = OFormat(
+    Reads(_ => play.api.libs.json.JsSuccess(UploadedSuccessfully)),
+    OWrites((_: UploadedSuccessfully.type) => Json.obj())
+  )
 
   implicit val format: OFormat[UploadStatus] = Union.from[UploadStatus]("uploadStatus")
     .and[Failed]("Failed")
-    .and[UploadedSuccessfully]("UploadedSuccessfully")
+    .and[UploadedSuccessfully.type]("UploadedSuccessfully")
     .format
 }
-
-
-

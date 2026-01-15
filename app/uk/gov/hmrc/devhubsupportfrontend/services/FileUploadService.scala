@@ -18,8 +18,11 @@ package uk.gov.hmrc.devhubsupportfrontend.services
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+
 import org.apache.pekko.actor.{ActorSystem, Scheduler}
+
 import uk.gov.hmrc.mongo.cache.DataKey
+
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.UploadStatus.UploadedSuccessfully
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.{S3UploadError, UploadStatus}
@@ -34,12 +37,9 @@ class FileUploadService @Inject() (
 
   implicit lazy val scheduler: Scheduler = actorSystem.scheduler
 
-//  def lockReleaseCheckInterval: Duration = appConfig.lockReleaseCheckInterval
-//  def lockTimeout: Duration              = appConfig.lockTimeout
-
   def markFileAsPosted(key: String): Future[Unit] = {
     val dataKey = DataKey[UploadStatus]("status")
-    repo.put(key)(dataKey, UploadedSuccessfully("")).map(_ => ())
+    repo.put(key)(dataKey, UploadedSuccessfully).map(_ => ())
   }
 
   def markFileAsRejected(s3UploadError: S3UploadError): Future[Unit] = {

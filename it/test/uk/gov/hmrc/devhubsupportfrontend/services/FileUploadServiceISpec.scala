@@ -17,13 +17,16 @@
 package uk.gov.hmrc.devhubsupportfrontend.services
 
 import scala.concurrent.ExecutionContext.Implicits.global
+
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
+
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.UploadStatus.UploadedSuccessfully
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.{S3UploadError, UploadStatus}
@@ -40,7 +43,7 @@ class FileUploadServiceISpec extends AnyWordSpec
   private val fileCacheRepository = app.injector.instanceOf[FileCacheRepository]
   private val appConfig           = app.injector.instanceOf[AppConfig]
 
-  private val underTest           = new FileUploadService(
+  private val underTest = new FileUploadService(
     fileCacheRepository,
     appConfig,
     app.injector.instanceOf[org.apache.pekko.actor.ActorSystem]
@@ -65,7 +68,7 @@ class FileUploadServiceISpec extends AnyWordSpec
       await(underTest.markFileAsPosted(testKey))
 
       val result = await(fileCacheRepository.get(testKey)(uk.gov.hmrc.mongo.cache.DataKey[UploadStatus]("status")))
-      result shouldBe Some(UploadedSuccessfully(""))
+      result shouldBe Some(UploadedSuccessfully)
     }
   }
 
@@ -93,7 +96,7 @@ class FileUploadServiceISpec extends AnyWordSpec
 
       val result = await(underTest.getFileVerificationStatus(testKey))
 
-      result shouldBe Some(UploadedSuccessfully(""))
+      result shouldBe Some(UploadedSuccessfully)
     }
 
     "return None when no status is found for a key" in {

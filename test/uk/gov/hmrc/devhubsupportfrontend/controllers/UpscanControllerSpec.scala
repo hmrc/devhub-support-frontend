@@ -26,6 +26,7 @@ import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ThirdPartyDeveloperConnectorMockModule, UpscanInitiateConnectorMockModule}
+import uk.gov.hmrc.devhubsupportfrontend.services.FileUploadService
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
 
@@ -38,7 +39,8 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       cookieSigner,
       mock[ErrorHandler],
       ThirdPartyDeveloperConnectorMock.aMock,
-      UpscanInitiateConnectorMock.aMock
+      UpscanInitiateConnectorMock.aMock,
+      mock[FileUploadService]
     )
 
     val sessionParams: Seq[(String, String)] = Seq("csrfToken" -> app.injector.instanceOf[TokenProvider].generateToken)

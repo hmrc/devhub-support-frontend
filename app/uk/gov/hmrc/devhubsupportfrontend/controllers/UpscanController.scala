@@ -18,10 +18,12 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+
 import play.api.libs.crypto.CookieSigner
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import play.filters.headers.SecurityHeadersFilter
+
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ThirdPartyDeveloperConnector, UpscanInitiateConnector}
 import uk.gov.hmrc.devhubsupportfrontend.controllers.models.Forms
@@ -58,8 +60,7 @@ class UpscanController @Inject() (
             logger.error("[markFileUploadAsPosted] Query Parameters from Upscan could not be bound to form")
             logger.debug(s"[markFileUploadAsPosted] Query Params Received: ${request.queryString}")
             Future.successful(BadRequest)
-          },
-          {
+          }, {
             logger.debug(s"[markFileUploadAsPosted success] Query Params Received: ${request.queryString}")
             s3UploadSuccess => fileUploadService.markFileAsPosted(s3UploadSuccess.key).map(_ => Created)
           }
