@@ -68,36 +68,10 @@ class UpscanController @Inject() (
   }
 
   // GET /upscan/file-rejected
-  final val markFileUploadAsRejected: Action[AnyContent] = Action.async { implicit request =>
-    Forms.UpscanUploadErrorForm
-      .bindFromRequest()
-      .fold(
-        _ => {
-          logger.error("[markFileUploadAsRejected] Query Parameters from Upscan could not be bound to form")
-          logger.debug(s"[markFileUploadAsRejected] Query Params Received: ${request.queryString}")
-          Future.successful(InternalServerError)
-        },
-        s3UploadError => {
-          logger.debug(s"[markFileUploadAsRejected success] Query Params Received: ${request.queryString}")
-          logger.debug(s"[markFileUploadAsRejected success] Form parsed: $s3UploadError")
-          fileUploadService.markFileAsRejected(s3UploadError).map { _ => Ok }
-        }
-      )
-  }
+  final val markFileUploadAsRejected: Action[AnyContent] = ???
 
   // GET /upscan/:reference/status
-  final def checkFileUploadStatus(reference: String): Action[AnyContent] = Action.async { implicit request =>
-    fileUploadService.getFileVerificationStatus(reference).map {
-      case Some(verificationStatus) =>
-        logger.info(
-          s"[checkFileVerificationStatus] UpscanRef: '$reference', Status: ${verificationStatus}"
-        )
-        Ok(Json.toJson(verificationStatus))
-      case None                     =>
-        logger.error(s"[checkFileVerificationStatus] No File exists for UpscanRef: '$reference'")
-        NotFound
-    }
-  }
+  final def checkFileUploadStatus(reference: String): Action[AnyContent] = ???
 
   def upscanSuccessRedirect: Action[AnyContent] = Action { _ =>
     overrideIframeHeaders(Ok(""))
