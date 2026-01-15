@@ -26,7 +26,7 @@ import play.filters.csrf.CSRF.TokenProvider
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.UploadStatus
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.{S3UploadError, UploadStatus}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ThirdPartyDeveloperConnectorMockModule, UpscanInitiateConnectorMockModule}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.FileUploadServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
@@ -127,6 +127,7 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         val result = underTest.markFileUploadAsPosted()(uploadPostedRequest)
 
         status(result) shouldBe CREATED
+        FileUploadServiceMock.MarkFileAsPosted.verifyWasCalledWith("test-key")
       }
 
       "return BadRequest when form binding fails" in new Setup with IsLoggedIn {
@@ -158,6 +159,8 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         val result: Future[Result] = underTest.markFileUploadAsRejected(uploadRejectedRequest)
 
         status(result) shouldBe OK
+        val expectedError = S3UploadError("test-key", "EntityTooLarge", "Entity+Too+Large")
+        FileUploadServiceMock.MarkFileAsRejected.verifyWasCalledWith(expectedError)
       }
 
       "return InternalServerError when form binding fails" in new Setup with IsLoggedIn {
@@ -186,6 +189,7 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
         status(result) shouldBe OK
         contentType(result) shouldBe Some("application/json")
+        FileUploadServiceMock.GetFileVerificationStatus.verifyWasCalledWith("test-reference")
       }
 
       "return NotFound when file verification status does not exist" in new Setup with IsLoggedIn {
@@ -194,6 +198,7 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         val result = underTest.checkFileUploadStatus("test-reference")(request)
 
         status(result) shouldBe NOT_FOUND
+        FileUploadServiceMock.GetFileVerificationStatus.verifyWasCalledWith("test-reference")
       }
     }
 

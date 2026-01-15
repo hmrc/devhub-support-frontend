@@ -20,7 +20,7 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.UploadStatus
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.{S3UploadError, UploadStatus}
 import uk.gov.hmrc.devhubsupportfrontend.services.FileUploadService
 
 trait FileUploadServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
@@ -37,6 +37,10 @@ trait FileUploadServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       def fails(exception: Throwable = new RuntimeException("Mark file as posted failed")) = {
         when(aMock.markFileAsPosted(*)).thenReturn(Future.failed(exception))
       }
+      
+      def verifyWasCalledWith(key: String) = {
+        verify(aMock).markFileAsPosted(key)
+      }
     }
 
     object MarkFileAsRejected {
@@ -48,6 +52,10 @@ trait FileUploadServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
       def fails(exception: Throwable = new RuntimeException("Mark file as rejected failed")) = {
         when(aMock.markFileAsRejected(*)).thenReturn(Future.failed(exception))
       }
+      
+      def verifyWasCalledWith(s3UploadError: S3UploadError) = {
+        verify(aMock).markFileAsRejected(s3UploadError)
+      }
     }
 
     object GetFileVerificationStatus {
@@ -58,6 +66,10 @@ trait FileUploadServiceMockModule extends MockitoSugar with ArgumentMatchersSuga
 
       def fails(exception: Throwable = new RuntimeException("Get file verification status failed")) = {
         when(aMock.getFileVerificationStatus(*)).thenReturn(Future.failed(exception))
+      }
+      
+      def verifyWasCalledWith(key: String) = {
+        verify(aMock).getFileVerificationStatus(key)
       }
     }
   }
