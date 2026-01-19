@@ -17,7 +17,10 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
+import play.api.libs.json.Json
+import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.filters.csrf.CSRF.TokenProvider
@@ -25,20 +28,23 @@ import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.{S3UploadError, UploadStatus}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ThirdPartyDeveloperConnectorMockModule, UpscanInitiateConnectorMockModule}
+import uk.gov.hmrc.devhubsupportfrontend.mocks.services.FileUploadServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
 
 class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
-  trait Setup extends UpscanInitiateConnectorMockModule with ThirdPartyDeveloperConnectorMockModule with UserBuilder with LocalUserIdTracker {
+  trait Setup extends UpscanInitiateConnectorMockModule with ThirdPartyDeveloperConnectorMockModule with FileUploadServiceMockModule with UserBuilder with LocalUserIdTracker {
 
     val underTest = new UpscanController(
       mcc,
       cookieSigner,
       mock[ErrorHandler],
       ThirdPartyDeveloperConnectorMock.aMock,
-      UpscanInitiateConnectorMock.aMock
+      UpscanInitiateConnectorMock.aMock,
+      FileUploadServiceMock.aMock
     )
 
     val sessionParams: Seq[(String, String)] = Seq("csrfToken" -> app.injector.instanceOf[TokenProvider].generateToken)
@@ -109,6 +115,79 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       contentAsString(result) shouldBe ""
       header("X-Frame-Options", result) shouldBe Some("ALLOWALL")
       header("Content-Security-Policy", result) shouldBe Some("frame-ancestors *")
+    }
+  }
+
+  "markFileUploadAsPosted" when {
+    "return Created status when file upload is marked as posted successfully" in new Setup {
+      FileUploadServiceMock.MarkFileAsPosted.succeeds()
+
+      val result = underTest.markFileUploadAsPosted()()(FakeRequest(GET, "/upscan/file-posted?key=test-key"))
+
+      status(result) shouldBe CREATED
+      FileUploadServiceMock.MarkFileAsPosted.verifyWasCalledWith("test-key")
+    }
+
+    "return BadRequest when form binding fails" in new Setup with IsLoggedIn {
+      val result = underTest.markFileUploadAsPosted()(request)
+
+      status(result) shouldBe BAD_REQUEST
+    }
+  }
+
+  "markFileUploadAsRejected" when {
+    "return Ok status when file upload is marked as rejected successfully" in new Setup {
+      FileUploadServiceMock.MarkFileAsRejected.succeeds()
+
+      val result: Future[Result] = underTest.markFileUploadAsRejected()(
+        FakeRequest(GET, "/upscan/file-posted?key=test-key&errorCode=EntityTooLarge&errorMessage=Entity+Too+Large")
+      )
+
+      status(result) shouldBe OK
+      val expectedError = S3UploadError("test-key", "EntityTooLarge", "Entity Too Large")
+      FileUploadServiceMock.MarkFileAsRejected.verifyWasCalledWith(expectedError)
+    }
+
+    "return InternalServerError when form binding fails" in new Setup {
+      val result = underTest.markFileUploadAsRejected()(FakeRequest())
+
+      status(result) shouldBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "checkFileUploadStatus" when {
+    "return Ok with file verification status when it exists if file was posted successfully" in new Setup {
+      FileUploadServiceMock.GetFileVerificationStatus.returns(Some(UploadStatus.UploadedSuccessfully))
+
+      val result = underTest.checkFileUploadStatus("test-reference")(FakeRequest())
+
+      status(result) shouldBe OK
+      contentType(result) shouldBe Some("application/json")
+      contentAsJson(result) shouldBe Json.parse(s"""{"uploadStatus":"UploadedSuccessfully"}""")
+      FileUploadServiceMock.GetFileVerificationStatus.verifyWasCalledWith("test-reference")
+    }
+
+    "return Ok with file verification status when it exists, if file failed to upload" in new Setup {
+      val errorCode = "EntityTooLarge"
+      val message   = "Entity Too Large"
+
+      FileUploadServiceMock.GetFileVerificationStatus.returns(Some(UploadStatus.Failed(errorCode, message)))
+
+      val result = underTest.checkFileUploadStatus("test-reference")(FakeRequest())
+
+      status(result) shouldBe OK
+      contentType(result) shouldBe Some("application/json")
+      contentAsJson(result) shouldBe Json.parse(s"""{"errorCode":"$errorCode","errorMessage":"$message","uploadStatus":"Failed"}""")
+      FileUploadServiceMock.GetFileVerificationStatus.verifyWasCalledWith("test-reference")
+    }
+
+    "return NotFound when file verification status does not exist" in new Setup {
+      FileUploadServiceMock.GetFileVerificationStatus.returns(None)
+
+      val result = underTest.checkFileUploadStatus("test-reference")(FakeRequest())
+
+      status(result) shouldBe NOT_FOUND
+      FileUploadServiceMock.GetFileVerificationStatus.verifyWasCalledWith("test-reference")
     }
   }
 }

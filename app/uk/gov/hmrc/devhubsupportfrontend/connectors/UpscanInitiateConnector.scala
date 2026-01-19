@@ -73,8 +73,8 @@ class UpscanInitiateConnector @Inject() (
   )
 
   def initiate()(implicit hc: HeaderCarrier): Future[UpscanInitiateResponse] = {
-    val successRedirectUrl = appConfig.devhubSupportFrontendUrl + "/devhub-support/upscan/success"
-    val errorRedirectUrl   = appConfig.devhubSupportFrontendUrl + "/devhub-support/upscan/success"
+    val successRedirectUrl = appConfig.devhubSupportFrontendUrl + "/devhub-support/upscan/file-posted"
+    val errorRedirectUrl   = appConfig.devhubSupportFrontendUrl + "/devhub-support/upscan/file-rejected"
 
     val request = UpscanInitiateRequest(
       callbackUrl = appConfig.callbackEndpointTarget,

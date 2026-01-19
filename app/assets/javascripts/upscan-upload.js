@@ -46,60 +46,50 @@
 
     function uploadToUpscan(file, fileName, row) {
         const upscanForm = document.querySelector('form[enctype="multipart/form-data"]');
-
-        // Create an iframe to handle the upload response
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.name = `upscan-upload-iframe-${Date.now()}`;
-        document.body.appendChild(iframe);
         
-        const originalTarget = upscanForm.target;
-        upscanForm.target = iframe.name;
+        // Create FormData from the upscan form
+        const formData = new FormData(upscanForm);
         
-        iframe.onload = () => {
-            // Check if file upload status row still exists - if user removed it during upload, ignore upload results
-            if (!document.body.contains(row)) {
-                document.body.removeChild(iframe);
-                upscanForm.target = originalTarget;
-                return;
+        // Submit via AJAX instead of iframe
+        fetch(upscanForm.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
             }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            // For AJAX upload, we don't get the key in the response directly.
+            // We need to poll for the status instead.
+            // Update UI to show uploading state
+            updateUploadState(row, 'UPLOADING');
             
-            try {
-                const url = new URL(iframe.contentWindow.location.href);
-                const fileKey = url.searchParams.get('key');
-                const errorCode = url.searchParams.get('errorCode');
-
-                if (errorCode) {
-                    updateUploadState(row, 'FAILED');
-                    displayUploadErrorCode(errorCode);
-                    console.error('File upload failed with error code:', errorCode, {
-                        fileName: fileName,
-                        formAction: upscanForm.action,
-                        formData: new FormData(upscanForm)
-                    });
-                } else if (fileKey) {
-                    addFileAttachment(fileKey, fileName);
-                    updateUploadState(row, 'UPLOADED', fileKey);
-                    currentFiles++;
-                    updateFileCount();
-
-                    // Refresh upscan form fields for next upload
-                    refreshUpscanKeys();
-                } else {
-                    updateUploadState(row, 'FAILED');
-                    displayUploadError('File upload failed: No file key or error code received');
-                }
-            } catch (e) {
-                console.error('Could not extract file key from upload response', e);
+            // Get the reference key from the upscan form fields that was used for the upload
+            const referenceKey = getReferenceKeyFromForm(upscanForm);
+            
+            if (referenceKey) {
+                startPolling(referenceKey, row, fileName);
+            } else {
                 updateUploadState(row, 'FAILED');
-                displayUploadError('File upload failed: Unable to process upload response');
+                displayUploadError('File upload failed: Could not determine upload reference');
             }
-            
-            document.body.removeChild(iframe);
-            upscanForm.target = originalTarget;
-        };
-        
-        HTMLFormElement.prototype.submit.call(upscanForm);
+        })
+        .catch(error => {
+            console.error('File upload failed:', error);
+            updateUploadState(row, 'FAILED');
+            displayUploadError('File upload failed: Unable to process upload response');
+        });
+    }
+
+    function getReferenceKeyFromForm(form) {
+        const keyField = form.querySelector('input[name="key"]');
+        if (keyField) {
+            return keyField.value;
+        }
+        return null;
     }
 
     function initUpscanUpload() {
@@ -165,6 +155,59 @@
             .catch(error => {
                 console.error('Failed to refresh upscan keys:', error);
             });
+    }
+
+    function startPolling(reference, row, fileName) {
+        const maxAttempts = 150; // Maximum number of polling attempts - 5 mins
+        let attempts = 0;
+        const pollInterval = 2000; // Poll every 2 seconds
+        
+        const poll = () => {
+            if (attempts >= maxAttempts) {
+                console.error('Polling timeout for reference:', reference);
+                updateUploadState(row, 'FAILED');
+                displayUploadError('File upload failed: Upload status check timed out');
+                return;
+            }
+            
+            fetch(`/devhub-support/upscan/${reference}/status`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.uploadStatus === 'UploadedSuccessfully') {
+                        addFileAttachment(reference, fileName);
+                        updateUploadState(row, 'UPLOADED', reference);
+                        currentFiles++;
+                        updateFileCount();
+                        
+                        // Refresh upscan form fields for next upload
+                        refreshUpscanKeys();
+                    } else if (data.uploadStatus === 'Failed') {
+                        updateUploadState(row, 'FAILED');
+                        displayUploadErrorCode(data.errorCode || 'Unknown error');
+                        console.error('File upload failed with error code:', errorCode, {
+                            fileName: fileName,
+                            formAction: upscanForm.action,
+                            formData: new FormData(upscanForm)
+                        });
+                    } else {
+                        attempts++;
+                        setTimeout(poll, pollInterval);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking upload status:', error);
+                    attempts++;
+                    setTimeout(poll, pollInterval);
+                });
+        };
+        
+        // Start polling immediately
+        poll();
     }
 
     function updateUpscanForm(upscanResponse) {
