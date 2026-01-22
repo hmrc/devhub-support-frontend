@@ -62,19 +62,36 @@
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            // For AJAX upload, we don't get the key in the response directly.
-            // We need to poll for the status instead.
-            // Update UI to show uploading state
-            updateUploadState(row, 'UPLOADING');
-            
-            // Get the reference key from the upscan form fields that was used for the upload
-            const referenceKey = getReferenceKeyFromForm(upscanForm);
-            
-            if (referenceKey) {
-                startPolling(referenceKey, row, fileName);
-            } else {
+
+            try {
+                const url = new URL(response.url);
+                const fileKey = url.searchParams.get('key');
+                const errorCode = url.searchParams.get('errorCode');
+
+                if (errorCode) {
+                    updateUploadState(row, 'FAILED');
+                    displayUploadErrorCode(errorCode);
+                    console.error('File upload failed with error code:', errorCode, {
+                        fileName: fileName,
+                        formAction: upscanForm.action,
+                        formData: new FormData(upscanForm)
+                    });
+                } else if (fileKey) {
+                    addFileAttachment(fileKey, fileName);
+                    updateUploadState(row, 'UPLOADED', fileKey);
+                    currentFiles++;
+                    updateFileCount();
+
+                    // Refresh upscan form fields for next upload
+                    refreshUpscanKeys();
+                } else {
+                    updateUploadState(row, 'FAILED');
+                    displayUploadError('File upload failed: No file key or error code received');
+                }
+            } catch (e) {
+                console.error('Could not extract file key from upload response', e);
                 updateUploadState(row, 'FAILED');
-                displayUploadError('File upload failed: Could not determine upload reference');
+                displayUploadError('File upload failed: Unable to process upload response');
             }
         })
         .catch(error => {
