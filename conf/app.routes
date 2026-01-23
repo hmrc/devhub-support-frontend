@@ -36,9 +36,6 @@ POST        /ticket/:tid/responseWithAttachments            uk.gov.hmrc.devhubsu
 GET         /login-restriction                              uk.gov.hmrc.devhubsupportfrontend.controllers.LoggedInRestrictionController.page()
 
 GET         /upscan/initiate                                uk.gov.hmrc.devhubsupportfrontend.controllers.UpscanController.initiateUpscan()
-GET         /upscan/success                                 uk.gov.hmrc.devhubsupportfrontend.controllers.UpscanController.upscanSuccessRedirect()
-GET         /upscan/file-posted                             uk.gov.hmrc.devhubsupportfrontend.controllers.UpscanController.markFileUploadAsPosted()
-GET         /upscan/file-rejected                           uk.gov.hmrc.devhubsupportfrontend.controllers.UpscanController.markFileUploadAsRejected()
-GET         /upscan/:reference/status                       uk.gov.hmrc.devhubsupportfrontend.controllers.UpscanController.checkFileUploadStatus(reference: String)
+GET         /upscan/result                                  uk.gov.hmrc.devhubsupportfrontend.controllers.UpscanController.upscanResultRedirect()
 
 GET         /assets/*file                                   controllers.Assets.versioned(path = "/public", file: Asset)
