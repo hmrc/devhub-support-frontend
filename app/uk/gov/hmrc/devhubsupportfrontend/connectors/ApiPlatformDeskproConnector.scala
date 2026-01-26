@@ -87,7 +87,6 @@ class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlat
   def createTicket(createRequest: CreateTicketRequest, hc: HeaderCarrier): Future[Option[String]] = metrics.record(api) {
     implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
     val createRequestJson                     = Json.toJson(createRequest)
-    logger.info(s"Sending CreateTicketRequest: $createRequestJson")
     http.post(url"${config.serviceBaseUrl}/ticket")
       .withBody(createRequestJson)
       .execute[CreateTicketResponse]
@@ -130,7 +129,6 @@ class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlat
       : Future[DeskproTicketResponseResult] = metrics.record(api) {
     implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
     val ticketResponseJson                    = Json.toJson(CreateTicketResponseRequest(userEmail, message, status, attachments))
-    logger.info(s"Sending CreateTicketResponseRequest: $ticketResponseJson")
     http.post(url"${config.serviceBaseUrl}/ticket/$ticketId/response")
       .withBody(ticketResponseJson)
       .execute[HttpResponse]
