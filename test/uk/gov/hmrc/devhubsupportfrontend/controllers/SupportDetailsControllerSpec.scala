@@ -299,16 +299,6 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         contentAsString(result) should not include (s"class=\"upload-section\"")
       }
 
-      "populate the hidden fileReference with the upscan key set in the request param" in new Setup with IsLoggedIn {
-        val upscanKey = "test-upscan-key"
-        SupportServiceMock.GetSupportFlow.succeeds()
-        UpscanInitiateConnectorMock.Initiate.succeeds()
-
-        val result = addToken(underTest.supportDetailsPageWithAttachments(Some(upscanKey)))(request)
-
-        status(result) shouldBe OK
-        contentAsString(result) should include(s"name=\"fileAttachments[0].fileReference\" value=\"$upscanKey\"")
-      }
     }
 
     "invoke submitSupportDetailsWithAttachments" should {

@@ -99,18 +99,10 @@ class SupportDetailsController @Inject() (
     }
   }
 
-  def supportDetailsPageWithAttachments(upscanKey: Option[String] = None): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
+  def supportDetailsPageWithAttachments(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
     val sessionId = extractSupportSessionIdFromCookie(request).getOrElse(SupportSessionId.random)
 
-    val form = upscanKey match {
-      case Some(key) =>
-        SupportDetailsForm.form.bind(Map(
-          "fileAttachments[0].fileReference" -> key,
-          "fileAttachments[0].fileName"      -> ""
-        ))
-      case None      =>
-        SupportDetailsForm.form
-    }
+    val form = SupportDetailsForm.form
 
     for {
       flow                   <- supportService.getSupportFlow(sessionId)
