@@ -254,15 +254,6 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         contentAsString(result) should include(s"name=\"error_action_redirect\" value=\"$upscanErrorRedirect\"")
       }
 
-      "populate the hidden fileReference with the upscan key set in the request param" in new Setup with IsLoggedIn {
-        TicketServiceMock.FetchTicket.succeeds(Some(ticket))
-        UpscanInitiateConnectorMock.Initiate.succeeds()
-
-        val result = addToken(underTest.ticketPageWithAttachments(ticketId, Some(upscanKey)))(request)
-
-        status(result) shouldBe OK
-        contentAsString(result) should include(s"name=\"fileAttachments[0].fileReference\" value=\"$upscanKey\"")
-      }
 
       "return 404 if ticket not found" in new Setup with IsLoggedIn {
         TicketServiceMock.FetchTicket.succeeds(None)

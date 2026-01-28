@@ -93,8 +93,8 @@ class TicketController @Inject() (
     }
   }
 
-  def ticketPageWithAttachments(ticketId: Int, upscanKey: Option[String] = None): Action[AnyContent] = loggedInAction { implicit request =>
-    val ticketResponseFormWithFileRef = ticketResponseForm.fill(TicketResponseForm(None, "open", "", upscanKey.map(key => List(Attachment(key, ""))).getOrElse(List.empty)))
+  def ticketPageWithAttachments(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
+    val ticketResponseFormWithFileRef = ticketResponseForm.fill(TicketResponseForm(None, "open", "", List.empty))
     val userEmail                     = request.userSession.developer.email
 
     for {
@@ -159,7 +159,7 @@ class TicketController @Inject() (
         newStatus,
         validForm.attachments
       ).map {
-        case DeskproTicketResponseSuccess  => Redirect(routes.TicketController.ticketPageWithAttachments(ticketId, None).url)
+        case DeskproTicketResponseSuccess  => Redirect(routes.TicketController.ticketPageWithAttachments(ticketId).url)
         case DeskproTicketResponseNotFound => InternalServerError
         case DeskproTicketResponseFailure  => InternalServerError
       }
