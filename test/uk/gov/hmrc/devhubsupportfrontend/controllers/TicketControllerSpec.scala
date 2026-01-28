@@ -254,7 +254,6 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
         contentAsString(result) should include(s"name=\"error_action_redirect\" value=\"$upscanErrorRedirect\"")
       }
 
-
       "return 404 if ticket not found" in new Setup with IsLoggedIn {
         TicketServiceMock.FetchTicket.succeeds(None)
         UpscanInitiateConnectorMock.Initiate.succeeds()
