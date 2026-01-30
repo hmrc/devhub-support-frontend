@@ -32,18 +32,12 @@ import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithSupportSession._
-import uk.gov.hmrc.devhubsupportfrontend.views.html.{
-  SupportPageConfirmationForHoneyPotFieldView,
-  SupportPageConfirmationView,
-  SupportPageDetailView,
-  SupportPageDetailViewWithAttachments
-}
+import uk.gov.hmrc.devhubsupportfrontend.views.html.{SupportPageConfirmationForHoneyPotFieldView, SupportPageConfirmationView, SupportPageDetailView}
 
 class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
   trait Setup extends SupportServiceMockModule with ThirdPartyDeveloperConnectorMockModule with UpscanInitiateConnectorMockModule with UserBuilder with LocalUserIdTracker {
     val supportPageDetailView                       = app.injector.instanceOf[SupportPageDetailView]
-    val supportPageDetailViewWithAttachments        = app.injector.instanceOf[SupportPageDetailViewWithAttachments]
     val supportPageConfirmationView                 = app.injector.instanceOf[SupportPageConfirmationView]
     val supportPageConfirmationForHoneyPotFieldView = app.injector.instanceOf[SupportPageConfirmationForHoneyPotFieldView]
 
@@ -55,7 +49,6 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
       UpscanInitiateConnectorMock.aMock,
       SupportServiceMock.aMock,
       supportPageDetailView,
-      supportPageDetailViewWithAttachments,
       supportPageConfirmationView,
       supportPageConfirmationForHoneyPotFieldView
     )
@@ -104,123 +97,6 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
   }
 
   "SupportDetailsController" when {
-    "invoke supportDetailsPage" should {
-      "render the new support details page" in new Setup with IsLoggedIn {
-        SupportServiceMock.GetSupportFlow.succeeds()
-
-        val result = addToken(underTest.supportDetailsPage())(request)
-
-        status(result) shouldBe OK
-        contentAsString(result) should include("Your website")
-      }
-    }
-
-    "invoke submitSupportDetails" should {
-      "submit new request with name, email & comments from form" in new Setup {
-        val request = FakeRequest()
-          .withSession(sessionParams: _*)
-          .withFormUrlEncodedBody(
-            "fullName"     -> fullName,
-            "emailAddress" -> emailAddress,
-            "details"      -> details
-          )
-        SupportServiceMock.GetSupportFlow.succeeds()
-        SupportServiceMock.SubmitTicket.succeeds()
-
-        val result = addToken(underTest.submitSupportDetails())(request)
-
-        status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/devhub-support/confirmation")
-      }
-
-      "create support ticket when request with name, email, comments and url (honeypot field) on form and user is logged in" in new Setup with IsLoggedIn {
-        val newRequest = request
-          .withSession(sessionParams: _*)
-          .withFormUrlEncodedBody(
-            "fullName"     -> fullName,
-            "emailAddress" -> emailAddress,
-            "details"      -> details,
-            "url"          -> honeypotUrl
-          )
-        SupportServiceMock.GetSupportFlow.succeeds()
-        SupportServiceMock.SubmitTicket.succeeds()
-
-        val result = addToken(underTest.submitSupportDetails())(newRequest)
-
-        status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/devhub-support/confirmation")
-      }
-
-      "not create support ticket but show dummy confirmation page when url (honeypot field) on form and user is not logged in" in new Setup {
-        val request = FakeRequest()
-          .withSession(sessionParams: _*)
-          .withFormUrlEncodedBody(
-            "fullName"     -> fullName,
-            "emailAddress" -> emailAddress,
-            "details"      -> details,
-            "url"          -> honeypotUrl
-          )
-        SupportServiceMock.GetSupportFlow.succeeds()
-
-        val result = addToken(underTest.submitSupportDetails())(request)
-
-        status(result) shouldBe OK
-        contentAsString(result) should include("We've sent you a confirmation email")
-        contentAsString(result) should include("Your request will be sent to the right team as quickly as possible")
-        contentAsString(result) should include("We'll send an email to your email address whenever there's an update")
-      }
-
-      "submit request with name, email and 3000 characters including \r\n details returns success" in new Setup {
-        val request = FakeRequest()
-          .withSession(sessionParams: _*)
-          .withFormUrlEncodedBody(
-            "fullName"     -> fullName,
-            "emailAddress" -> emailAddress,
-            "details"      -> "A\r\n" * 1500
-          )
-        SupportServiceMock.GetSupportFlow.succeeds()
-        SupportServiceMock.SubmitTicket.succeeds()
-
-        val result = addToken(underTest.submitSupportDetails())(request)
-
-        status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/devhub-support/confirmation")
-      }
-
-      "submit request with name, email and invalid details returns BAD_REQUEST" in new Setup {
-        val request = FakeRequest()
-          .withSession(sessionParams: _*)
-          .withFormUrlEncodedBody(
-            "fullName"     -> fullName,
-            "emailAddress" -> emailAddress,
-            "details"      -> "A+++, good como  puedo iniciar, would buy again"
-          )
-        SupportServiceMock.GetSupportFlow.succeeds()
-        SupportServiceMock.SubmitTicket.succeeds()
-
-        val result = addToken(underTest.submitSupportDetails())(request)
-
-        status(result) shouldBe 400
-      }
-
-      "submit request with name, email, details and invalid team member email returns BAD_REQUEST" in new Setup {
-        val request = FakeRequest()
-          .withSession(sessionParams: _*)
-          .withFormUrlEncodedBody(
-            "fullName"               -> fullName,
-            "emailAddress"           -> emailAddress,
-            "details"                -> validDetails,
-            "teamMemberEmailAddress" -> "abc"
-          )
-        SupportServiceMock.GetSupportFlow.succeeds()
-        SupportServiceMock.SubmitTicket.succeeds()
-
-        val result = addToken(underTest.submitSupportDetails())(request)
-
-        status(result) shouldBe 400
-      }
-    }
-
     "invoke supportConfirmationPage" should {
       "succeed when session exists" in new Setup with IsLoggedIn {
         val requestWithSupportCookie = request.withSupportSession(underTest)(supportSessionId)
@@ -246,7 +122,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         SupportServiceMock.GetSupportFlow.succeeds()
         UpscanInitiateConnectorMock.Initiate.succeeds()
 
-        val result = addToken(underTest.supportDetailsPageWithAttachments())(request)
+        val result = addToken(underTest.supportDetailsPage())(request)
 
         status(result) shouldBe OK
         contentAsString(result) should include("Add files to your support request")
@@ -268,7 +144,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
           )
         )
 
-        val result = addToken(underTest.supportDetailsPageWithAttachments())(request)
+        val result = addToken(underTest.supportDetailsPage())(request)
 
         status(result) shouldBe OK
         contentAsString(result) should include(s"form action=\"$upscanPostTarget\"")
@@ -293,7 +169,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
           )
         )
 
-        val result = addToken(underTest.supportDetailsPageWithAttachments())(request)
+        val result = addToken(underTest.supportDetailsPage())(request)
 
         status(result) shouldBe OK
         contentAsString(result) should not include (s"class=\"upload-section\"")
@@ -301,8 +177,8 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
 
     }
 
-    "invoke submitSupportDetailsWithAttachments" should {
-      "redirect to login when new request with name, email, comments and attachments from form when not logged in" in new Setup with NotLoggedIn {
+    "invoke submitSupportDetails" should {
+      "redirect to login when not logged in" in new Setup with NotLoggedIn {
         val supportFlow = SupportFlow(SupportSessionId.random, SupportData.UsingAnApi.id)
         val newRequest  = request
           .withFormUrlEncodedBody(
@@ -314,7 +190,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
           )
         SupportServiceMock.GetSupportFlow.succeeds(supportFlow)
 
-        val result = addToken(underTest.submitSupportDetailsWithAttachments())(newRequest)
+        val result = addToken(underTest.submitSupportDetails())(newRequest)
 
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/developer/login")
@@ -334,7 +210,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         SupportServiceMock.GetSupportFlow.succeeds(supportFlow)
         SupportServiceMock.SubmitTicket.succeeds()
 
-        val result = addToken(underTest.submitSupportDetailsWithAttachments())(newRequest)
+        val result = addToken(underTest.submitSupportDetails())(newRequest)
 
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/devhub-support/confirmation")
@@ -366,7 +242,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         SupportServiceMock.GetSupportFlow.succeeds()
         SupportServiceMock.SubmitTicket.succeeds()
 
-        val result = addToken(underTest.submitSupportDetailsWithAttachments())(newRequest)
+        val result = addToken(underTest.submitSupportDetails())(newRequest)
 
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/devhub-support/confirmation")
@@ -382,7 +258,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
           )
         SupportServiceMock.GetSupportFlow.succeeds()
 
-        val result = addToken(underTest.submitSupportDetailsWithAttachments())(newRequest)
+        val result = addToken(underTest.submitSupportDetails())(newRequest)
 
         status(result) shouldBe OK
         contentAsString(result) should include("We've sent you a confirmation email")
@@ -402,7 +278,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         SupportServiceMock.GetSupportFlow.succeeds()
         SupportServiceMock.SubmitTicket.succeeds()
 
-        val result = addToken(underTest.submitSupportDetailsWithAttachments())(newRequest)
+        val result = addToken(underTest.submitSupportDetails())(newRequest)
 
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/devhub-support/confirmation")
@@ -420,7 +296,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         SupportServiceMock.GetSupportFlow.succeeds()
         UpscanInitiateConnectorMock.Initiate.succeeds()
 
-        val result = addToken(underTest.submitSupportDetailsWithAttachments())(request)
+        val result = addToken(underTest.submitSupportDetails())(request)
 
         status(result) shouldBe 400
       }
@@ -438,7 +314,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
         SupportServiceMock.GetSupportFlow.succeeds()
         UpscanInitiateConnectorMock.Initiate.succeeds()
 
-        val result = addToken(underTest.submitSupportDetailsWithAttachments())(request)
+        val result = addToken(underTest.submitSupportDetails())(request)
 
         status(result) shouldBe 400
       }

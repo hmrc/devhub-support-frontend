@@ -16,12 +16,13 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.{CharacterCount => CC}
+@import views.html.helper.CSPNonce
 
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
-@import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportDetailsForm
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData
 @import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportFlow
+@import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services._
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
 
 @this(
@@ -32,9 +33,17 @@
         govukCharacterCount: GovukCharacterCount
 )
 
-@(loggedInSession: Option[UserSession], form: Form[SupportDetailsForm], supportFlow: SupportFlow)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[SupportDetailsForm], supportFlow: SupportFlow, upscanInitiateResponse: UpscanInitiateResponse)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+
 @hiddenIfLoggedIn = {
 @loggedInSession.map(_ => " hidden").getOrElse("")
+}
+
+@loggedIn = @{
+    loggedInSession match {
+        case Some(_) => true
+        case None => false
+    }
 }
 
 @makingACallHeading = {
@@ -99,6 +108,10 @@
 @generalApplicationQuery = {
     <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Tell us about your query</h1>
     <p class="govuk-body">Provide as much information as you can so that we can help you as quickly as possible.</p>
+}
+
+@additionalScripts = {
+  <script @CSPNonce.attr src='@routes.Assets.versioned("javascripts/upscan-upload.js")'></script>
 }
     
 @formFields = {
@@ -203,6 +216,7 @@
     loggedInSession = loggedInSession,
     form = Some(form)
 ) {
+    <div id="upload-context" data-context-type="support-request"></div>
     <span class="govuk-caption-l">Support</span>
 
     @{
@@ -235,12 +249,44 @@
         //$COVERAGE-ON$
     }
 
-    @helper.form(action = routes.SupportDetailsController.submitSupportDetails()) {
+    @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.SupportDetailsController.submitSupportDetails(), 'id -> "details-form") {
         @helper.CSRF.formField
+        
+        @for(index <- form("fileAttachments").indexes) {
+          <input type="hidden" name="fileAttachments[@index].fileReference" value="@{form(s"fileAttachments[$index].fileReference").value.getOrElse("")}">
+          <input type="hidden" name="fileAttachments[@index].fileName" value="@{form(s"fileAttachments[$index].fileName").value.getOrElse("")}">
+        }
+        
         @govukFieldset(Fieldset(
             legend = None,
             html = formFields
         ))
+
+        @* Display-only file upload section, so that it appears above main form submit buttons.
+        The upscan form cannot be inside the main form (nested forms are not allowed)
+        The real upscan form is below the main form, and the selected file to upload is copied over by javascript *@
+      @if(loggedIn){
+        <div class="upload-section" style="display: none;" id="upscan-section">
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-!-font-weight-bold" for="file-upload-1">
+                    Add files to your support request
+                </label>
+                <div id="file-upload-1-hint" class="govuk-hint">
+                    Accepted file types are:
+                    <ul>
+                        <li>image (jpeg, jpg, png)</li>
+                        <li>pdf</li>
+                        <li>text files (doc, docx, txt, csv)</li>
+                        <li>Spreadsheets (xls, xlsx)</li>
+                    </ul>
+                </div>
+                
+                <p class="govuk-body" aria-live="polite"><span id="files-uploaded">0</span> of a maximum of 5 files uploaded</p>
+                <input class="govuk-file-upload" id="file-upload-1" type="file"  accept=".xls,.xlsx, .jpg, .jpeg,.png, .doc, .docx, .txt, .csv, .pdf">
+                <dl class="govuk-summary-list govuk-summary-list--long-key govuk-!-margin-top-4" id="upload-summary"></dl>
+            </div>
+        </div>
+      }
 
         @govukButton(
             Button(
@@ -250,4 +296,17 @@
             )
         )
     }
-}
+
+    @if(loggedIn) {
+        @* Real upscan form (hidden) The selected file to upload is copied over by javascript from the file upload section above *@
+        <form action="@upscanInitiateResponse.postTarget" method="post" enctype="multipart/form-data" id="upscan-form" style="display: none;">
+            @for(field <- upscanInitiateResponse.formFields) {
+                <input type="hidden" name="@field._1" value="@field._2"/>
+            }
+            <input type="file" name="file" id="upscan-file-input">
+        </form>
+
+    @additionalScripts
+    }
+    }
+

@@ -16,8 +16,6 @@ POST        /api/private-api/cds-check                      uk.gov.hmrc.devhubsu
 GET         /api/private-api/cds-access-not-required        uk.gov.hmrc.devhubsupportfrontend.controllers.CheckCdsAccessIsRequiredController.cdsAccessIsNotRequiredPage()
 GET         /details                                        uk.gov.hmrc.devhubsupportfrontend.controllers.SupportDetailsController.supportDetailsPage()
 POST        /details                                        uk.gov.hmrc.devhubsupportfrontend.controllers.SupportDetailsController.submitSupportDetails()
-GET         /details/withAttachments                        uk.gov.hmrc.devhubsupportfrontend.controllers.SupportDetailsController.supportDetailsPageWithAttachments()
-POST        /details/withAttachments                        uk.gov.hmrc.devhubsupportfrontend.controllers.SupportDetailsController.submitSupportDetailsWithAttachments()
 GET         /signing-in                                     uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithSigningInController.page()
 POST        /signing-in                                     uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithSigningInController.submit()
 GET         /signing-in/remove-access-codes                 uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithSigningInController.removeAccessCodesPage()
@@ -29,9 +27,7 @@ GET         /flow/:flowId                                   uk.gov.hmrc.devhubsu
 
 GET         /tickets                                        uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketListPage(resolved: Boolean ?=false)
 GET         /ticket/:tid                                    uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketPage(tid: Int)
-GET         /ticket/:tid/withAttachments                    uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketPageWithAttachments(tid: Int)
 POST        /ticket/:tid/response                           uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.submitTicketResponse(tid: Int)
-POST        /ticket/:tid/responseWithAttachments            uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.submitTicketResponseWithAttachments(tid: Int)
 
 GET         /login-restriction                              uk.gov.hmrc.devhubsupportfrontend.controllers.LoggedInRestrictionController.page()
 

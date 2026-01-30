@@ -73,8 +73,7 @@ class TicketController @Inject() (
     upscanInitiateConnector: UpscanInitiateConnector,
     ticketService: TicketService,
     ticketListView: TicketListView,
-    ticketView: TicketView,
-    ticketViewWithAttachments: TicketViewWithAttachments
+    ticketView: TicketView
   )(implicit val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
@@ -87,13 +86,6 @@ class TicketController @Inject() (
   }
 
   def ticketPage(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
-    ticketService.fetchTicket(ticketId).map {
-      case Some(ticket) if ticket.personEmail == request.userSession.developer.email => Ok(ticketView(ticketResponseForm, Some(request.userSession), ticket))
-      case _                                                                         => NotFound
-    }
-  }
-
-  def ticketPageWithAttachments(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
     val ticketResponseFormWithFileRef = ticketResponseForm.fill(TicketResponseForm(None, "open", "", List.empty))
     val userEmail                     = request.userSession.developer.email
 
@@ -102,7 +94,7 @@ class TicketController @Inject() (
       upscanInitiateResponse <- upscanInitiateConnector.initiate()
     } yield (maybeTicket, upscanInitiateResponse) match {
       case (Some(ticket), upscanResponse) if ticket.personEmail == userEmail =>
-        Ok(ticketViewWithAttachments(ticketResponseFormWithFileRef, Some(request.userSession), ticket, upscanResponse))
+        Ok(ticketView(ticketResponseFormWithFileRef, Some(request.userSession), ticket, upscanResponse))
       case _                                                                 =>
         NotFound
     }
@@ -113,34 +105,8 @@ class TicketController @Inject() (
 
     def errors(errors: Form[TicketResponseForm]) =
       ticketService.fetchTicket(ticketId).map {
-        case Some(ticket) if ticket.personEmail == request.userSession.developer.email => Ok(ticketView(errors, Some(request.userSession), ticket))
-        case _                                                                         => NotFound
-      }
-
-    def handleValidForm(validForm: TicketResponseForm) = {
-
-      val newStatus = validForm.action match {
-        case "send"  => "awaiting_agent"
-        case "close" => "resolved"
-      }
-
-      ticketService.createResponse(ticketId, request.email, validForm.response.get, validForm.status, request.displayedName, newStatus, validForm.attachments).map {
-        case DeskproTicketResponseSuccess  => Redirect(routes.TicketController.ticketListPage().url)
-        case DeskproTicketResponseNotFound => InternalServerError
-        case DeskproTicketResponseFailure  => InternalServerError
-      }
-    }
-
-    requestForm.fold(errors, handleValidForm)
-  }
-
-  def submitTicketResponseWithAttachments(ticketId: Int): Action[AnyContent] = loggedInAction { implicit request =>
-    val requestForm: Form[TicketResponseForm] = ticketResponseForm.bindFromRequest()
-
-    def errors(errors: Form[TicketResponseForm]) =
-      ticketService.fetchTicket(ticketId).map {
         case Some(ticket) if ticket.personEmail == request.userSession.developer.email =>
-          Ok(ticketViewWithAttachments(errors, Some(request.userSession), ticket, UpscanInitiateResponse(UpscanFileReference(""), "", Map.empty)))
+          Ok(ticketView(errors, Some(request.userSession), ticket, UpscanInitiateResponse(UpscanFileReference(""), "", Map.empty)))
         case _                                                                         => NotFound
       }
 
@@ -159,7 +125,7 @@ class TicketController @Inject() (
         newStatus,
         validForm.attachments
       ).map {
-        case DeskproTicketResponseSuccess  => Redirect(routes.TicketController.ticketPageWithAttachments(ticketId).url)
+        case DeskproTicketResponseSuccess  => Redirect(routes.TicketController.ticketPage(ticketId).url)
         case DeskproTicketResponseNotFound => InternalServerError
         case DeskproTicketResponseFailure  => InternalServerError
       }
