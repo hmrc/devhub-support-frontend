@@ -47,15 +47,13 @@ class SupportDetailsController @Inject() (
   def supportDetailsPage(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
     val sessionId = extractSupportSessionIdFromCookie(request).getOrElse(SupportSessionId.random)
 
-    val form = SupportDetailsForm.form
-
     for {
       flow                   <- supportService.getSupportFlow(sessionId)
       upscanInitiateResponse <- upscanInitiateConnector.initiate()
     } yield Ok(
       supportPageDetailView(
         fullyloggedInDeveloper,
-        form,
+        SupportDetailsForm.form,
         flow,
         upscanInitiateResponse
       )
