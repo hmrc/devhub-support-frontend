@@ -55,7 +55,7 @@
   loggedInSession = loggedInSession,
 ) {
   <div id="upload-context" data-context-type="ticket" data-ticket-id="@ticket.id"></div>
-  <h1 class="govuk-heading-l">@{ticket.subject} - @{ticket.ref} - TEST WITH ATTACHMENTS</h1>
+  <h1 class="govuk-heading-l">@{ticket.subject} - @{ticket.ref}/h1>
 
   @defining(DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mm a").withZone(ZoneId.of("Europe/London")).withLocale(Locale.UK)) { dateFormatter =>
       @govukTable(Table(
