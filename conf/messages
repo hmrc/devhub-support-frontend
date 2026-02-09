@@ -64,3 +64,7 @@ ticketdetails.messagehistory=Message history
 ticketdetails.response.required=Enter a response
 ticketdetails.resolvedticketmessage1=This support request has been resolved.
 ticketdetails.resolvedticketmessage2=You can reopen it by sending a new message.
+
+ticketresolved.title=Support request {0} has been resolved
+ticketresolved.panel.title=Support request has been resolved
+ticketresolved.emailsent=We've sent you a confirmation email.

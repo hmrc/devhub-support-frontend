@@ -37,8 +37,9 @@ import uk.gov.hmrc.devhubsupportfrontend.views.html._
 class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
   trait Setup extends TicketServiceMockModule with ThirdPartyDeveloperConnectorMockModule with UpscanInitiateConnectorMockModule with UserBuilder with LocalUserIdTracker {
-    val ticketListView = app.injector.instanceOf[TicketListView]
-    val ticketView     = app.injector.instanceOf[TicketView]
+    val ticketListView         = app.injector.instanceOf[TicketListView]
+    val ticketView             = app.injector.instanceOf[TicketView]
+    val ticketConfirmationView = app.injector.instanceOf[ClosedTicketConfirmationView]
 
     val underTest = new TicketController(
       mcc,
@@ -48,7 +49,8 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
       UpscanInitiateConnectorMock.aMock,
       TicketServiceMock.aMock,
       ticketListView,
-      ticketView
+      ticketView,
+      ticketConfirmationView
     )
 
     val ticketId: Int = 4232
@@ -340,6 +342,47 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe Some("/developer/login")
+      }
+    }
+  }
+
+  "Show closed ticket confirmation page" when {
+    "invoke closedTicketConfirmationPage" should {
+      "render the confirmation page" in new Setup with IsLoggedIn {
+        TicketServiceMock.FetchTicket.succeeds(Some(ticket))
+
+        val result = addToken(underTest.closedTicketConfirmationPage(ticketId))(request)
+
+        status(result) shouldBe OK
+        contentAsString(result) should include(s"Support request ${ticket.ref} has been resolved")
+        contentAsString(result) should include("support ticket dashboard")
+      }
+
+      "return 404 if ticket not found" in new Setup with IsLoggedIn {
+        TicketServiceMock.FetchTicket.succeeds(None)
+
+        val result = addToken(underTest.closedTicketConfirmationPage(ticketId))(request)
+
+        status(result) shouldBe NOT_FOUND
+      }
+
+      "return 404 if user email is different from person email in ticket" in new Setup with IsLoggedIn {
+        val ticketDiffPersonEmail = ticket.copy(personEmail = LaxEmailAddress("bob@example.com"))
+        TicketServiceMock.FetchTicket.succeeds(Some(ticketDiffPersonEmail))
+
+        val result = addToken(underTest.closedTicketConfirmationPage(ticketId))(request)
+
+        status(result) shouldBe NOT_FOUND
+      }
+
+      "render the confirmation page for non-logged-in user" in new Setup with NotLoggedIn {
+        TicketServiceMock.FetchTicket.succeeds(Some(ticket))
+
+        val result = addToken(underTest.closedTicketConfirmationPage(ticketId))(request)
+
+        status(result) shouldBe OK
+        contentAsString(result) should include(s"Support request ${ticket.ref} has been resolved")
+        contentAsString(result) should not include ("support ticket dashboard")
       }
     }
   }
