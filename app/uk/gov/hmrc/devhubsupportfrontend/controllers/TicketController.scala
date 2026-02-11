@@ -27,6 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ThirdPartyDeveloperConnector, UpscanInitiateConnector}
+import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services.{UpscanFileReference, UpscanInitiateResponse}
 import uk.gov.hmrc.devhubsupportfrontend.services._
 import uk.gov.hmrc.devhubsupportfrontend.views.html._
@@ -73,7 +74,8 @@ class TicketController @Inject() (
     upscanInitiateConnector: UpscanInitiateConnector,
     ticketService: TicketService,
     ticketListView: TicketListView,
-    ticketView: TicketView
+    ticketView: TicketView,
+    ticketConfirmationView: ClosedTicketConfirmationView
   )(implicit val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
@@ -125,13 +127,27 @@ class TicketController @Inject() (
         newStatus,
         validForm.attachments
       ).map {
-        case DeskproTicketResponseSuccess  => Redirect(routes.TicketController.ticketPage(ticketId).url)
+        case DeskproTicketResponseSuccess  =>
+          if (validForm.action == "close") {
+            Redirect(routes.TicketController.closedTicketConfirmationPage(ticketId).url)
+          } else {
+            Redirect(routes.TicketController.ticketPage(ticketId).url)
+          }
         case DeskproTicketResponseNotFound => InternalServerError
         case DeskproTicketResponseFailure  => InternalServerError
       }
     }
 
     requestForm.fold(errors, handleValidForm)
+  }
+
+  def closedTicketConfirmationPage(ticketId: Int): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request: MaybeUserRequest[AnyContent] =>
+    ticketService.fetchTicket(ticketId).map {
+      case Some(ticket) if request.userSession.isEmpty || ticket.personEmail == request.userSession.map(_.developer.email).get =>
+        Ok(ticketConfirmationView(ticket, request.userSession))
+      case _                                                                                                                   =>
+        NotFound
+    }
   }
 
 }
