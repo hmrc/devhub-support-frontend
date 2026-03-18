@@ -249,7 +249,7 @@
         //$COVERAGE-ON$
     }
 
-    @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.SupportDetailsController.submitSupportDetails(), 'id -> "details-form") {
+    @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.SupportDetailsController.submitSupportDetails(), Symbol("id") -> "details-form") {
         @helper.CSRF.formField
         
         @for(index <- form("fileAttachments").indexes) {
