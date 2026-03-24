@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.services
 
-import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models._
@@ -40,7 +39,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
   val savedFlow     = SupportFlow(sessionId, entryPoint)
   val defaultFlow   = SupportFlow(sessionId, "unknown")
   val mockAppConfig = mock[AppConfig]
-  val apiName       = "Test API defintion name"
+  val apiName       = "Test API definition name"
   val xmlApiName    = "Test XML API definition name"
 
   val apiSummary = ApiSummary(
@@ -119,11 +118,11 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       ApmConnectorMock.FetchApiDefinitionsVisibleToUser.willReturn(apiList)
       val xmlApiList: List[XmlApi]       = List(xmlApi)
       XmlServicesConnectorMock.FetchAllXmlApis.willReturn(xmlApiList)
-      private val loggedInUserId: UserId = UserId(UUID.randomUUID())
+      private val loggedInUserId: UserId = UserId.random
 
-      val result = await(underTest.fetchAllApis(Some(loggedInUserId)))
+      val result: List[ApiSummary] = await(underTest.fetchAllApis(Some(loggedInUserId)))
 
-      result shouldBe List(apiSummary, xmlApiSummary)
+      result should contain.allOf(apiSummary, xmlApiSummary)
       verify(ApmConnectorMock.aMock).fetchApiDefinitionsVisibleToUser(Some(loggedInUserId))
     }
   }

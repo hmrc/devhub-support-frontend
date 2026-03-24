@@ -4,7 +4,7 @@ object AppDependencies {
 
   private val bootstrapVersion = "10.7.0"
   private val hmrcMongoVersion = "2.12.0"
-  private val apiDomainVersion = "0.22.0"
+  private val apiDomainVersion = "1.0.0"
   private val tpdDomainVersion = "0.15.0"
 
   val compile = Seq(
@@ -22,7 +22,7 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "bootstrap-test-play-30"                 % bootstrapVersion,
     "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-30"                % hmrcMongoVersion,
     "org.jsoup"               %  "jsoup"                                  % "1.22.1",
-    "uk.gov.hmrc"             %% "api-platform-test-api-domain"           % apiDomainVersion,
+    "uk.gov.hmrc"             %% "api-platform-api-domain-fixtures"       % apiDomainVersion,
     "uk.gov.hmrc"             %% "api-platform-test-tpd-domain"           % tpdDomainVersion
   ).map(_ % "test")
 
