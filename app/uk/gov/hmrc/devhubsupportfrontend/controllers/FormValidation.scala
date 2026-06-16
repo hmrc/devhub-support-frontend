@@ -20,7 +20,7 @@ import cats.data.NonEmptyList
 import org.apache.commons.validator.routines.EmailValidator
 
 import play.api.data.Forms._
-import play.api.data.Mapping
+import play.api.data.{Forms, Mapping}
 
 trait FormValidation {
 
@@ -51,7 +51,8 @@ trait FormValidation {
         .verifying(s"$messagePrefix.error.maxLength.field", s => s.trim.length <= maxLength)
     )
 
-  private val emailValidator = EmailValidator.getInstance()
+  private val emailValidator     = EmailValidator.getInstance()
+  lazy val DefaultMaxLength: Int = 320
 
   def emailValidator(fieldName: String, messagePrefix: String): Tuple2[String, Mapping[String]] =
     (
@@ -72,6 +73,12 @@ trait FormValidation {
     default(text, "")
       .verifying("please.select.an.option", s => options.contains(s))
 
+  def emailValidator(maxLength: Int = DefaultMaxLength): Mapping[String] = {
+    Forms.text
+      .verifying("emailaddress.error.not.valid.field", email => emailValidator.isValid(email) || email.isEmpty)
+      .verifying("emailaddress.error.maxLength.field", email => email.length <= maxLength)
+      .verifying("emailaddress.error.required.field", email => email.nonEmpty)
+  }
 }
 
 object FormValidation extends FormValidation

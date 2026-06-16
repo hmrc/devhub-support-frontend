@@ -310,4 +310,20 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       AuditServiceMock.ExplicitAudit.verifyCalledWith(auditAction)
     }
   }
+
+  "report a technical problem" should {
+    "succeed when ticket created" in new Setup {
+      val fullName              = "test name"
+      val email                 = "email@test.com"
+      val whatYouWereDoing      = "What I was doing"
+      val whatDoYouNeedHelpWith = "Need help with"
+
+      ApiPlatformDeskproConnectorMock.CreateTicket.succeeds()
+      AuditServiceMock.ExplicitAudit.succeeds()
+
+      val result = await(underTest.reportTechnicalProblem(fullName, email, whatYouWereDoing, whatDoYouNeedHelpWith))
+
+      result shouldBe "test"
+    }
+  }
 }

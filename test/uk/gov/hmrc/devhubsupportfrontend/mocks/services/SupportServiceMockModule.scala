@@ -62,6 +62,13 @@ trait SupportServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
       def succeeds(flow: SupportFlow = SupportFlow(SupportSessionId.random, SupportData.MakingAnApiCall.id)) = when(aMock.createFlow(*, *)).thenReturn(successful(flow))
     }
 
+    object ReportTechnicalProblem {
+      def succeeds() = when(aMock.reportTechnicalProblem(*, *, *, *)(*)).thenReturn(successful("ticket-ref"))
+
+      def verifyCalledWith(fullName: String, email: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String) = {
+        verify(aMock).reportTechnicalProblem(eqTo(fullName), eqTo(email), eqTo(whatWereYouDoing), eqTo(whatDoYouNeedHelpWith))(*)
+      }
+    }
   }
 
   object SupportServiceMock extends AbstractSupportServiceMock {
