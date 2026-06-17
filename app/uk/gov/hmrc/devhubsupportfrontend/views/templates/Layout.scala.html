@@ -56,7 +56,8 @@
   crumbs: Seq[Crumb] = Seq.empty,
   loggedInSession: Option[UserSession] = None,
   form: Option[Form[_]] = None,
-  twoThirds: Boolean = true
+  twoThirds: Boolean = true,
+  showReportTechnicalProblem: Boolean = true
 )(
   contentBlock: Html
 )(implicit request: RequestHeader, messages: Messages)
@@ -160,9 +161,11 @@
 
   <br />
   <br />
-  <a href="/devhub-support/report-technical-problem?service=third-party-developer&referrerUrl=@{helper.urlEncode(request.uri)}" class="govuk-link govuk-link--no-visited-state">
-    Is this page not working properly?
-  </a>
+  @if(showReportTechnicalProblem) {
+    <a href="/devhub-support/report-technical-problem?service=third-party-developer&referrerUrl=@{helper.urlEncode(request.uri)}" class="govuk-link govuk-link--no-visited-state">
+      Is this page not working properly?
+    </a>
+  }
 }
 
 @footerBlock = {
