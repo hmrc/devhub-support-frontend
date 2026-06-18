@@ -150,4 +150,21 @@ class SupportService @Inject() (
       flow            <- flowRepository.saveFlow(supportFlow.copy(referenceNumber = ticketReference, emailAddress = Some(ticket.email)))
     } yield flow
   }
+
+  def reportTechnicalProblem(fullName: String, email: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String)(implicit hc: HeaderCarrier): Future[String] = {
+    val message = s"<strong>What were you doing?</strong><br>${whatWereYouDoing}<br><br><strong>What do you need help with?</strong><br>${whatDoYouNeedHelpWith}"
+    val ticket  = ApiPlatformDeskproConnector.CreateTicketRequest(
+      fullName = fullName,
+      email = email,
+      subject = "Get help with a technical problem",
+      message = message,
+      supportReason = Some("Report Technical Problem"),
+      reasonKey = Some("report-technical-problem"),
+      apiName = None
+    )
+    for {
+      ticketReference <- deskproConnector.createTicket(ticket, hc)
+      _                = auditService.explicitAudit(CreateTicketAuditAction(ticket))
+    } yield ticketReference.getOrElse("UNKNOWN")
+  }
 }

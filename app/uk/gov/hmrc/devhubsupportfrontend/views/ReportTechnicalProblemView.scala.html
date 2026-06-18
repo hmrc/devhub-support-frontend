@@ -1,0 +1,124 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.{CharacterCount => CC}
+@import views.html.helper.CSPNonce
+
+@import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
+@import uk.gov.hmrc.devhubsupportfrontend.controllers.ReportTechnicalProblemController.ReportTechnicalProblemForm
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
+
+@this(
+        layout: Layout,
+        govukButton: GovukButton,
+        govukInput: GovukInput,
+        govukFieldset: GovukFieldset,
+        govukTextarea: GovukTextarea
+)
+
+@(loggedInSession: Option[UserSession], form: Form[ReportTechnicalProblemForm])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+
+
+@layout(
+    pageTitle = "Get help with a technical problem",
+    backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
+    loggedInSession = loggedInSession,
+    form = Some(form),
+    showReportTechnicalProblem = false
+) {
+    <h1 class="govuk-heading-xl">Get help with a technical problem</h1>
+
+    <p class="govuk-body">Only use this form to report technical problems.</p>
+
+    <p class="govuk-body">Do not include any personal or financial information. For example, your National Insurance or credit card numbers.</p>
+
+    @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.ReportTechnicalProblemController.action(), Symbol("id") -> "details-form") {
+        @helper.CSRF.formField
+
+        @govukInput(
+            Input(
+                id = "fullName",
+                name = "fullName",
+                label = Label(
+                    isPageHeading = true,
+                    classes = "govuk-label--s",
+                    content = Text("Full name")
+                ),
+                classes = "govuk-!-width-full",
+                value = form("fullName").value.orElse(loggedInSession.map(_.developer.displayedName)),
+                errorMessage = form.error("fullName").map(e => ErrorMessage(content = Text(messages(e.message))))
+            )
+        )
+
+        @govukInput(
+            Input(
+                id = "emailAddress",
+                name = "emailAddress",
+                label = Label(
+                    isPageHeading = true,
+                    classes = "govuk-label--s",
+                    content = Text("Email address")
+                ),
+                classes = "govuk-!-width-full",
+                value = form("emailAddress").value.orElse(loggedInSession.map(_.developer.email.text)),
+                errorMessage = form.error("emailAddress").map(e => ErrorMessage(content = Text(messages(e.message))))
+            )
+        )
+
+        @govukTextarea(Textarea(
+            id = "whatWereYouDoing",
+            name = "whatWereYouDoing",
+            label = Label(
+                isPageHeading = true,
+                classes = "govuk-label--s",
+                content = Text("What were you doing?")
+            ),
+            value = form("whatWereYouDoing").value,
+            hint = Some(
+                Hint(
+                    content = Text("You can enter up to 1000 characters")
+                )
+            ),
+            errorMessage = form.error("whatWereYouDoing").map(e => ErrorMessage(content = Text(messages(e.message))))
+        ))    
+
+        @govukTextarea(Textarea(
+            id = "whatDoYouNeedHelpWith",
+            name = "whatDoYouNeedHelpWith",
+            label = Label(
+                isPageHeading = true,
+                classes = "govuk-label--s",
+                content = Text("What do you need help with?")
+            ),
+            value = form("whatDoYouNeedHelpWith").value,
+            hint = Some(
+                Hint(
+                    content = Text("You can enter up to 1000 characters")
+                )
+            ),
+            errorMessage = form.error("whatDoYouNeedHelpWith").map(e => ErrorMessage(content = Text(messages(e.message))))
+        ))    
+
+        @govukButton(
+            Button(
+                id = Some("send"),
+                content = Text("Send"),
+                preventDoubleClick = Some(true)
+            )
+        )
+    }
+}
