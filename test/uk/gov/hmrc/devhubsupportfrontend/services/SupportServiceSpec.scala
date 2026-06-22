@@ -313,15 +313,18 @@ class SupportServiceSpec extends AsyncHmrcSpec {
 
   "report a technical problem" should {
     "succeed when ticket created" in new Setup {
-      val fullName              = "test name"
-      val email                 = "email@test.com"
-      val whatYouWereDoing      = "What I was doing"
-      val whatDoYouNeedHelpWith = "Need help with"
+      val fullName: String              = "test name"
+      val email: String                 = "email@test.com"
+      val whatYouWereDoing: String      = "What I was doing"
+      val whatDoYouNeedHelpWith: String = "Need help with"
+      val referrerUrl: Option[String]   = Some("referrer")
+      val userAgent: Option[String]     = None
+      val sessionId: Option[String]     = None
 
       ApiPlatformDeskproConnectorMock.CreateTicket.succeeds()
       AuditServiceMock.ExplicitAudit.succeeds()
 
-      val result = await(underTest.reportTechnicalProblem(fullName, email, whatYouWereDoing, whatDoYouNeedHelpWith))
+      val result = await(underTest.reportTechnicalProblem(fullName, email, whatYouWereDoing, whatDoYouNeedHelpWith, referrerUrl, userAgent, sessionId))
 
       result shouldBe "test"
     }

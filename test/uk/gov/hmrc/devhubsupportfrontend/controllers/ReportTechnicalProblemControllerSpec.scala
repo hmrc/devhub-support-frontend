@@ -52,10 +52,11 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
     val sessionParams: Seq[(String, String)] = Seq("csrfToken" -> app.injector.instanceOf[TokenProvider].generateToken)
     val supportSessionId                     = SupportSessionId.random
 
-    val fullName              = "Peter Smith"
-    val emailAddress          = "peter@example.com"
-    val whatWereYouDoing      = "I was trying to check the status of my application"
-    val whatDoYouNeedHelpWith = "Help me SDST, you're my only hope"
+    val fullName: String              = "Peter Smith"
+    val emailAddress: String          = "peter@example.com"
+    val whatWereYouDoing: String      = "I was trying to check the status of my application"
+    val whatDoYouNeedHelpWith: String = "Help me SDST, you're my only hope"
+    val referrerUrl: String           = "referrerUrl"
   }
 
   trait IsLoggedIn {
@@ -93,7 +94,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
         val requestWithSupportCookie = request.withSupportSession(underTest)(supportSessionId)
         SupportServiceMock.GetSupportFlow.succeeds()
 
-        val result = addToken(underTest.page())(requestWithSupportCookie)
+        val result = addToken(underTest.page(Some("referrerUrl")))(requestWithSupportCookie)
 
         status(result) shouldBe OK
         contentAsString(result) should include("Get help with a technical problem")
@@ -102,7 +103,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
       "succeed when session does not exist" in new Setup {
         val request = FakeRequest()
 
-        val result = addToken(underTest.page())(request)
+        val result = addToken(underTest.page(None))(request)
 
         status(result) shouldBe OK
         contentAsString(result) should include("Get help with a technical problem")
@@ -116,7 +117,8 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
             "fullName"              -> fullName,
             "emailAddress"          -> emailAddress,
             "whatWereYouDoing"      -> whatWereYouDoing,
-            "whatDoYouNeedHelpWith" -> whatDoYouNeedHelpWith
+            "whatDoYouNeedHelpWith" -> whatDoYouNeedHelpWith,
+            "referrerUrl"           -> referrerUrl
           )
         SupportServiceMock.ReportTechnicalProblem.succeeds()
 
@@ -125,7 +127,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe Some("/devhub-support/report-technical-problem-confirm/ticket-ref")
 
-        SupportServiceMock.ReportTechnicalProblem.verifyCalledWith(fullName, emailAddress, whatWereYouDoing, whatDoYouNeedHelpWith)
+        SupportServiceMock.ReportTechnicalProblem.verifyCalledWith(fullName, emailAddress, whatWereYouDoing, whatDoYouNeedHelpWith, Some(referrerUrl), None, Some(sessionId.toString()))
       }
 
       "submit new request with no name or email" in new Setup with IsLoggedIn {

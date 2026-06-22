@@ -151,7 +151,16 @@ class SupportService @Inject() (
     } yield flow
   }
 
-  def reportTechnicalProblem(fullName: String, email: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String)(implicit hc: HeaderCarrier): Future[String] = {
+  def reportTechnicalProblem(
+      fullName: String,
+      email: String,
+      whatWereYouDoing: String,
+      whatDoYouNeedHelpWith: String,
+      referrerUrl: Option[String],
+      userAgent: Option[String],
+      sessionId: Option[String]
+    )(implicit hc: HeaderCarrier
+    ): Future[String] = {
     val message = s"<strong>What were you doing?</strong><br>${whatWereYouDoing}<br><br><strong>What do you need help with?</strong><br>${whatDoYouNeedHelpWith}"
     val ticket  = ApiPlatformDeskproConnector.CreateTicketRequest(
       fullName = fullName,
@@ -160,7 +169,10 @@ class SupportService @Inject() (
       message = message,
       supportReason = Some("Report Technical Problem"),
       reasonKey = Some("report-technical-problem"),
-      apiName = None
+      apiName = None,
+      referrer = referrerUrl,
+      userAgent = userAgent,
+      sessionId = sessionId
     )
     for {
       ticketReference <- deskproConnector.createTicket(ticket, hc)

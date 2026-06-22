@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, nonEmptyText}
+import play.api.data.Forms.{mapping, nonEmptyText, optional, text}
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
@@ -31,7 +31,7 @@ import uk.gov.hmrc.devhubsupportfrontend.views.html.{ReportTechnicalProblemConfi
 
 object ReportTechnicalProblemController {
 
-  case class ReportTechnicalProblemForm(fullName: String, emailAddress: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String)
+  case class ReportTechnicalProblemForm(fullName: String, emailAddress: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String, referrerUrl: Option[String] = None)
 
   object ReportTechnicalProblemForm {
 
@@ -40,7 +40,8 @@ object ReportTechnicalProblemController {
         "fullName"              -> nonEmptyText,
         "emailAddress"          -> FormValidation.emailValidator(),
         "whatWereYouDoing"      -> nonEmptyText,
-        "whatDoYouNeedHelpWith" -> nonEmptyText
+        "whatDoYouNeedHelpWith" -> nonEmptyText,
+        "referrerUrl"           -> optional(text)
       )(ReportTechnicalProblemForm.apply)(ReportTechnicalProblemForm.unapply)
     )
   }
@@ -62,18 +63,24 @@ class ReportTechnicalProblemController @Inject() (
   import ReportTechnicalProblemController._
   val reportTechnicalProblemForm: Form[ReportTechnicalProblemForm] = ReportTechnicalProblemForm.form
 
-  def page(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
-    Future.successful(Ok(reportTechnicalProblemView(fullyloggedInDeveloper, reportTechnicalProblemForm)))
+  def page(referrerUrl: Option[String]): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
+    Future.successful(Ok(reportTechnicalProblemView(fullyloggedInDeveloper, reportTechnicalProblemForm, referrerUrl)))
   }
 
   def action(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
     reportTechnicalProblemForm.bindFromRequest().fold(
       formWithErrors => {
-        Future.successful(BadRequest(reportTechnicalProblemView(fullyloggedInDeveloper, formWithErrors)))
+        Future.successful(BadRequest(reportTechnicalProblemView(fullyloggedInDeveloper, formWithErrors, None)))
       },
       data => {
-        supportService.reportTechnicalProblem(data.fullName, data.emailAddress, data.whatWereYouDoing, data.whatDoYouNeedHelpWith).map(ref =>
-          Redirect(routes.ReportTechnicalProblemController.confirmationPage(ref))
+        val userAgent = request.headers.get("User-Agent")
+        val sessionId = request.userSession match {
+          case Some(session) => Some(session.sessionId.toString())
+          case _             => None
+        }
+        supportService.reportTechnicalProblem(data.fullName, data.emailAddress, data.whatWereYouDoing, data.whatDoYouNeedHelpWith, data.referrerUrl, userAgent, sessionId).map(
+          ref =>
+            Redirect(routes.ReportTechnicalProblemController.confirmationPage(ref))
         )
       }
     )
