@@ -156,6 +156,7 @@ class SupportService @Inject() (
       email: String,
       whatWereYouDoing: String,
       whatDoYouNeedHelpWith: String,
+      service: Option[String],
       referrerUrl: Option[String],
       userAgent: Option[String],
       sessionId: Option[String]
@@ -170,6 +171,7 @@ class SupportService @Inject() (
       supportReason = Some("Report Technical Problem"),
       reasonKey = Some("report-technical-problem"),
       apiName = None,
+      service = service,
       referrer = referrerUrl,
       userAgent = userAgent,
       sessionId = sessionId

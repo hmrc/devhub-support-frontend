@@ -315,8 +315,9 @@ class SupportServiceSpec extends AsyncHmrcSpec {
     "succeed when ticket created" in new Setup {
       val fullName: String              = "test name"
       val email: String                 = "email@test.com"
-      val whatYouWereDoing: String      = "What I was doing"
+      val whatWereYouDoing: String      = "What I was doing"
       val whatDoYouNeedHelpWith: String = "Need help with"
+      val service: Option[String]       = Some("third-party-developer")
       val referrerUrl: Option[String]   = Some("referrer")
       val userAgent: Option[String]     = None
       val sessionId: Option[String]     = None
@@ -324,9 +325,26 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       ApiPlatformDeskproConnectorMock.CreateTicket.succeeds()
       AuditServiceMock.ExplicitAudit.succeeds()
 
-      val result = await(underTest.reportTechnicalProblem(fullName, email, whatYouWereDoing, whatDoYouNeedHelpWith, referrerUrl, userAgent, sessionId))
+      val result = await(underTest.reportTechnicalProblem(fullName, email, whatWereYouDoing, whatDoYouNeedHelpWith, service, referrerUrl, userAgent, sessionId))
 
       result shouldBe "test"
+
+      val createTicketRequest = CreateTicketRequest(
+        fullName = fullName,
+        email = email,
+        subject = "Get help with a technical problem",
+        message = s"<strong>What were you doing?</strong><br>${whatWereYouDoing}<br><br><strong>What do you need help with?</strong><br>${whatDoYouNeedHelpWith}",
+        supportReason = Some("Report Technical Problem"),
+        reasonKey = Some("report-technical-problem"),
+        service = service,
+        referrer = referrerUrl,
+        sessionId = sessionId,
+        userAgent = userAgent
+      )
+      val auditAction         = CreateTicketAuditAction(createTicketRequest)
+
+      ApiPlatformDeskproConnectorMock.CreateTicket.verifyCalledWith(createTicketRequest)
+      AuditServiceMock.ExplicitAudit.verifyCalledWith(auditAction)
     }
   }
 }

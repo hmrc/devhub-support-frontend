@@ -30,7 +30,7 @@
         govukTextarea: GovukTextarea
 )
 
-@(loggedInSession: Option[UserSession], form: Form[ReportTechnicalProblemForm], referrerUrl: Option[String])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[ReportTechnicalProblemForm], service: Option[String], referrerUrl: Option[String])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 
 @layout(
@@ -49,6 +49,7 @@
     @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.ReportTechnicalProblemController.action(), Symbol("id") -> "details-form") {
         @helper.CSRF.formField
 
+        <input type='hidden' name='service' value='@form("service").value.orElse(service)'>
         <input type='hidden' name='referrerUrl' value='@form("referrerUrl").value.orElse(referrerUrl)'>
 
         @govukInput(

@@ -31,7 +31,14 @@ import uk.gov.hmrc.devhubsupportfrontend.views.html.{ReportTechnicalProblemConfi
 
 object ReportTechnicalProblemController {
 
-  case class ReportTechnicalProblemForm(fullName: String, emailAddress: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String, referrerUrl: Option[String] = None)
+  case class ReportTechnicalProblemForm(
+      fullName: String,
+      emailAddress: String,
+      whatWereYouDoing: String,
+      whatDoYouNeedHelpWith: String,
+      service: Option[String],
+      referrerUrl: Option[String] = None
+    )
 
   object ReportTechnicalProblemForm {
 
@@ -41,6 +48,7 @@ object ReportTechnicalProblemController {
         "emailAddress"          -> FormValidation.emailValidator(),
         "whatWereYouDoing"      -> nonEmptyText,
         "whatDoYouNeedHelpWith" -> nonEmptyText,
+        "service"               -> optional(text),
         "referrerUrl"           -> optional(text)
       )(ReportTechnicalProblemForm.apply)(ReportTechnicalProblemForm.unapply)
     )
@@ -63,14 +71,14 @@ class ReportTechnicalProblemController @Inject() (
   import ReportTechnicalProblemController._
   val reportTechnicalProblemForm: Form[ReportTechnicalProblemForm] = ReportTechnicalProblemForm.form
 
-  def page(referrerUrl: Option[String]): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
-    Future.successful(Ok(reportTechnicalProblemView(fullyloggedInDeveloper, reportTechnicalProblemForm, referrerUrl)))
+  def page(service: Option[String], referrerUrl: Option[String]): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
+    Future.successful(Ok(reportTechnicalProblemView(fullyloggedInDeveloper, reportTechnicalProblemForm, service, referrerUrl)))
   }
 
   def action(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
     reportTechnicalProblemForm.bindFromRequest().fold(
       formWithErrors => {
-        Future.successful(BadRequest(reportTechnicalProblemView(fullyloggedInDeveloper, formWithErrors, None)))
+        Future.successful(BadRequest(reportTechnicalProblemView(fullyloggedInDeveloper, formWithErrors, None, None)))
       },
       data => {
         val userAgent = request.headers.get("User-Agent")
@@ -78,9 +86,17 @@ class ReportTechnicalProblemController @Inject() (
           case Some(session) => Some(session.sessionId.toString())
           case _             => None
         }
-        supportService.reportTechnicalProblem(data.fullName, data.emailAddress, data.whatWereYouDoing, data.whatDoYouNeedHelpWith, data.referrerUrl, userAgent, sessionId).map(
-          ref =>
-            Redirect(routes.ReportTechnicalProblemController.confirmationPage(ref))
+        supportService.reportTechnicalProblem(
+          data.fullName,
+          data.emailAddress,
+          data.whatWereYouDoing,
+          data.whatDoYouNeedHelpWith,
+          data.service,
+          data.referrerUrl,
+          userAgent,
+          sessionId
+        ).map(ref =>
+          Redirect(routes.ReportTechnicalProblemController.confirmationPage(ref))
         )
       }
     )
