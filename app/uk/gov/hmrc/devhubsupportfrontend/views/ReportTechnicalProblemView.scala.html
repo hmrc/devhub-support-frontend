@@ -27,7 +27,7 @@
         govukButton: GovukButton,
         govukInput: GovukInput,
         govukFieldset: GovukFieldset,
-        govukTextarea: GovukTextarea
+        govukCharacterCount: GovukCharacterCount
 )
 
 @(loggedInSession: Option[UserSession], form: Form[ReportTechnicalProblemForm], service: Option[String], referrerUrl: Option[String])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
@@ -82,7 +82,7 @@
             )
         )
 
-        @govukTextarea(Textarea(
+        @govukCharacterCount(CC(
             id = "whatWereYouDoing",
             name = "whatWereYouDoing",
             label = Label(
@@ -91,15 +91,11 @@
                 content = Text("What were you doing?")
             ),
             value = form("whatWereYouDoing").value,
-            hint = Some(
-                Hint(
-                    content = Text("You can enter up to 1000 characters")
-                )
-            ),
+            maxLength = Some(1000),
             errorMessage = form.error("whatWereYouDoing").map(e => ErrorMessage(content = Text(messages(e.message))))
         ))    
 
-        @govukTextarea(Textarea(
+        @govukCharacterCount(CC(
             id = "whatDoYouNeedHelpWith",
             name = "whatDoYouNeedHelpWith",
             label = Label(
@@ -108,11 +104,7 @@
                 content = Text("What do you need help with?")
             ),
             value = form("whatDoYouNeedHelpWith").value,
-            hint = Some(
-                Hint(
-                    content = Text("You can enter up to 1000 characters")
-                )
-            ),
+            maxLength = Some(1000),
             errorMessage = form.error("whatDoYouNeedHelpWith").map(e => ErrorMessage(content = Text(messages(e.message))))
         ))    
 

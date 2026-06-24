@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, nonEmptyText, optional, text}
+import play.api.data.Forms.{mapping, optional, text}
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
@@ -44,10 +44,28 @@ object ReportTechnicalProblemController {
 
     def form: Form[ReportTechnicalProblemForm] = Form(
       mapping(
-        "fullName"              -> nonEmptyText,
+        "fullName"              -> text
+          .verifying(
+            "reportproblem.fullname.error.required",
+            fullname => fullname.nonEmpty
+          )
+          .verifying(
+            "reportproblem.fullname.error.length",
+            fullname => fullname.length <= 70
+          ),
         "emailAddress"          -> FormValidation.emailValidator(),
-        "whatWereYouDoing"      -> nonEmptyText,
-        "whatDoYouNeedHelpWith" -> nonEmptyText,
+        "whatWereYouDoing"      -> text
+          .verifying(
+            "reportproblem.whatwereyoudoing.error.required",
+            whatwereyoudoing => whatwereyoudoing.nonEmpty
+          )
+          .verifying("reportproblem.whatwereyoudoing.error.length", whatwereyoudoing => whatwereyoudoing.length <= 1000),
+        "whatDoYouNeedHelpWith" -> text
+          .verifying(
+            "reportproblem.whatdoyouneedhelpwith.error.required",
+            whatDoYouNeedHelpWith => whatDoYouNeedHelpWith.nonEmpty
+          )
+          .verifying("reportproblem.whatdoyouneedhelpwith.error.length", whatDoYouNeedHelpWith => whatDoYouNeedHelpWith.length <= 1000),
         "service"               -> optional(text),
         "referrerUrl"           -> optional(text)
       )(ReportTechnicalProblemForm.apply)(ReportTechnicalProblemForm.unapply)

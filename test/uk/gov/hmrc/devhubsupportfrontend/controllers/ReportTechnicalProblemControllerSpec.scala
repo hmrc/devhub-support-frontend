@@ -141,11 +141,30 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
         )
       }
 
-      "submit new request with no name or email" in new Setup with IsLoggedIn {
+      "submit new request with no name, email or details" in new Setup with IsLoggedIn {
         val newRequest = request
           .withFormUrlEncodedBody(
             "fullName"              -> "",
             "emailAddress"          -> "",
+            "whatWereYouDoing"      -> "",
+            "whatDoYouNeedHelpWith" -> ""
+          )
+        SupportServiceMock.ReportTechnicalProblem.succeeds()
+
+        val result = addToken(underTest.action())(newRequest)
+
+        status(result) shouldBe BAD_REQUEST
+        contentAsString(result) should include("Enter your full name")
+        contentAsString(result) should include("Enter your email address")
+        contentAsString(result) should include("Enter details of what you were doing")
+        contentAsString(result) should include("Enter details of what went wrong")
+      }
+
+      "submit new request with invalid name and email" in new Setup with IsLoggedIn {
+        val newRequest = request
+          .withFormUrlEncodedBody(
+            "fullName"              -> "12345678901234567890123456789012345678901234567890123456789012345678901",
+            "emailAddress"          -> "invalidemailaddress",
             "whatWereYouDoing"      -> whatWereYouDoing,
             "whatDoYouNeedHelpWith" -> whatDoYouNeedHelpWith
           )
@@ -154,8 +173,8 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
         val result = addToken(underTest.action())(newRequest)
 
         status(result) shouldBe BAD_REQUEST
-        contentAsString(result) should include("This field is required")
-        contentAsString(result) should include("Enter your email address")
+        contentAsString(result) should include("Full name cannot be longer than 70 characters")
+        contentAsString(result) should include("Enter an email address in the correct format, like name@example.com")
       }
     }
 
