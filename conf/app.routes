@@ -25,7 +25,7 @@ POST        /app                                            uk.gov.hmrc.devhubsu
 GET         /app/giving-team-member-access                  uk.gov.hmrc.devhubsupportfrontend.controllers.HelpWithApplicationsController.givingTeamMembersAccess()
 GET         /flow/:flowId                                   uk.gov.hmrc.devhubsupportfrontend.controllers.GoToSupportFlowController.goToFlow(flowId: String)
 
-GET         /report-technical-problem                       uk.gov.hmrc.devhubsupportfrontend.controllers.ReportTechnicalProblemController.page(service: Option[String], referrerUrl: Option[String])
+GET         /report-technical-problem                       uk.gov.hmrc.devhubsupportfrontend.controllers.ReportTechnicalProblemController.page(service: Option[String], referrer: Option[String])
 POST        /report-technical-problem                       uk.gov.hmrc.devhubsupportfrontend.controllers.ReportTechnicalProblemController.action()
 GET         /report-technical-problem-confirm/:ref          uk.gov.hmrc.devhubsupportfrontend.controllers.ReportTechnicalProblemController.confirmationPage(ref: String)
 

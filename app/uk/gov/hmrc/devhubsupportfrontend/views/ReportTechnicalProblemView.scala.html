@@ -30,7 +30,7 @@
         govukCharacterCount: GovukCharacterCount
 )
 
-@(loggedInSession: Option[UserSession], form: Form[ReportTechnicalProblemForm], service: Option[String], referrerUrl: Option[String])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[ReportTechnicalProblemForm], service: Option[String], referrer: Option[String])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 
 @layout(
@@ -50,7 +50,7 @@
         @helper.CSRF.formField
 
         <input type='hidden' name='service' value='@form("service").value.orElse(service)'>
-        <input type='hidden' name='referrerUrl' value='@form("referrerUrl").value.orElse(referrerUrl)'>
+        <input type='hidden' name='referrer' value='@form("referrer").value.orElse(referrer)'>
 
         @govukInput(
             Input(

@@ -157,7 +157,7 @@ class SupportService @Inject() (
       whatWereYouDoing: String,
       whatDoYouNeedHelpWith: String,
       service: Option[String],
-      referrerUrl: Option[String],
+      referrer: Option[String],
       userAgent: Option[String],
       sessionId: Option[String]
     )(implicit hc: HeaderCarrier
@@ -172,7 +172,7 @@ class SupportService @Inject() (
       reasonKey = Some("report-technical-problem"),
       apiName = None,
       service = service,
-      referrer = referrerUrl,
+      referrer = referrer,
       userAgent = userAgent,
       sessionId = sessionId
     )

@@ -57,7 +57,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
     val whatWereYouDoing: String      = "I was trying to check the status of my application"
     val whatDoYouNeedHelpWith: String = "Help me SDST, you're my only hope"
     val service: String               = "third-party-developer"
-    val referrerUrl: String           = "referrerUrl"
+    val referrer: String              = "referrer"
   }
 
   trait IsLoggedIn {
@@ -119,7 +119,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
             "emailAddress"          -> emailAddress,
             "whatWereYouDoing"      -> whatWereYouDoing,
             "whatDoYouNeedHelpWith" -> whatDoYouNeedHelpWith,
-            "referrerUrl"           -> referrerUrl,
+            "referrer"              -> referrer,
             "service"               -> service
           )
         SupportServiceMock.ReportTechnicalProblem.succeeds()
@@ -135,7 +135,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
           whatWereYouDoing,
           whatDoYouNeedHelpWith,
           Some(service),
-          Some(referrerUrl),
+          Some(referrer),
           None,
           Some(sessionId.toString())
         )

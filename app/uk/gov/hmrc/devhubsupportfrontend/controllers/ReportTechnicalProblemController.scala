@@ -37,7 +37,7 @@ object ReportTechnicalProblemController {
       whatWereYouDoing: String,
       whatDoYouNeedHelpWith: String,
       service: Option[String],
-      referrerUrl: Option[String] = None
+      referrer: Option[String] = None
     )
 
   object ReportTechnicalProblemForm {
@@ -67,7 +67,7 @@ object ReportTechnicalProblemController {
           )
           .verifying("reportproblem.whatdoyouneedhelpwith.error.length", whatDoYouNeedHelpWith => whatDoYouNeedHelpWith.length <= 1000),
         "service"               -> optional(text),
-        "referrerUrl"           -> optional(text)
+        "referrer"              -> optional(text)
       )(ReportTechnicalProblemForm.apply)(ReportTechnicalProblemForm.unapply)
     )
   }
@@ -89,8 +89,8 @@ class ReportTechnicalProblemController @Inject() (
   import ReportTechnicalProblemController._
   val reportTechnicalProblemForm: Form[ReportTechnicalProblemForm] = ReportTechnicalProblemForm.form
 
-  def page(service: Option[String], referrerUrl: Option[String]): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
-    Future.successful(Ok(reportTechnicalProblemView(fullyloggedInDeveloper, reportTechnicalProblemForm, service, referrerUrl)))
+  def page(service: Option[String], referrer: Option[String]): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
+    Future.successful(Ok(reportTechnicalProblemView(fullyloggedInDeveloper, reportTechnicalProblemForm, service, referrer)))
   }
 
   def action(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
@@ -110,7 +110,7 @@ class ReportTechnicalProblemController @Inject() (
           data.whatWereYouDoing,
           data.whatDoYouNeedHelpWith,
           data.service,
-          data.referrerUrl,
+          data.referrer,
           userAgent,
           sessionId
         ).map(ref =>

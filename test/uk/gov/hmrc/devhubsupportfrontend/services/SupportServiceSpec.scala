@@ -318,14 +318,14 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       val whatWereYouDoing: String      = "What I was doing"
       val whatDoYouNeedHelpWith: String = "Need help with"
       val service: Option[String]       = Some("third-party-developer")
-      val referrerUrl: Option[String]   = Some("referrer")
+      val referrer: Option[String]      = Some("referrerUrl")
       val userAgent: Option[String]     = None
       val sessionId: Option[String]     = None
 
       ApiPlatformDeskproConnectorMock.CreateTicket.succeeds()
       AuditServiceMock.ExplicitAudit.succeeds()
 
-      val result = await(underTest.reportTechnicalProblem(fullName, email, whatWereYouDoing, whatDoYouNeedHelpWith, service, referrerUrl, userAgent, sessionId))
+      val result = await(underTest.reportTechnicalProblem(fullName, email, whatWereYouDoing, whatDoYouNeedHelpWith, service, referrer, userAgent, sessionId))
 
       result shouldBe "test"
 
@@ -337,7 +337,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
         supportReason = Some("Report Technical Problem"),
         reasonKey = Some("report-technical-problem"),
         service = service,
-        referrer = referrerUrl,
+        referrer = referrer,
         sessionId = sessionId,
         userAgent = userAgent
       )
