@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, nonEmptyText}
+import play.api.data.Forms.{mapping, optional, text}
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
@@ -31,16 +31,43 @@ import uk.gov.hmrc.devhubsupportfrontend.views.html.{ReportTechnicalProblemConfi
 
 object ReportTechnicalProblemController {
 
-  case class ReportTechnicalProblemForm(fullName: String, emailAddress: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String)
+  case class ReportTechnicalProblemForm(
+      fullName: String,
+      emailAddress: String,
+      whatWereYouDoing: String,
+      whatDoYouNeedHelpWith: String,
+      service: Option[String],
+      referrer: Option[String] = None
+    )
 
   object ReportTechnicalProblemForm {
 
     def form: Form[ReportTechnicalProblemForm] = Form(
       mapping(
-        "fullName"              -> nonEmptyText,
+        "fullName"              -> text
+          .verifying(
+            "reportproblem.fullname.error.required",
+            fullname => fullname.nonEmpty
+          )
+          .verifying(
+            "reportproblem.fullname.error.length",
+            fullname => fullname.length <= 70
+          ),
         "emailAddress"          -> FormValidation.emailValidator(),
-        "whatWereYouDoing"      -> nonEmptyText,
-        "whatDoYouNeedHelpWith" -> nonEmptyText
+        "whatWereYouDoing"      -> text
+          .verifying(
+            "reportproblem.whatwereyoudoing.error.required",
+            whatwereyoudoing => whatwereyoudoing.nonEmpty
+          )
+          .verifying("reportproblem.whatwereyoudoing.error.length", whatwereyoudoing => whatwereyoudoing.length <= 1000),
+        "whatDoYouNeedHelpWith" -> text
+          .verifying(
+            "reportproblem.whatdoyouneedhelpwith.error.required",
+            whatDoYouNeedHelpWith => whatDoYouNeedHelpWith.nonEmpty
+          )
+          .verifying("reportproblem.whatdoyouneedhelpwith.error.length", whatDoYouNeedHelpWith => whatDoYouNeedHelpWith.length <= 1000),
+        "service"               -> optional(text),
+        "referrer"              -> optional(text)
       )(ReportTechnicalProblemForm.apply)(ReportTechnicalProblemForm.unapply)
     )
   }
@@ -62,17 +89,31 @@ class ReportTechnicalProblemController @Inject() (
   import ReportTechnicalProblemController._
   val reportTechnicalProblemForm: Form[ReportTechnicalProblemForm] = ReportTechnicalProblemForm.form
 
-  def page(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
-    Future.successful(Ok(reportTechnicalProblemView(fullyloggedInDeveloper, reportTechnicalProblemForm)))
+  def page(service: Option[String], referrer: Option[String]): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
+    Future.successful(Ok(reportTechnicalProblemView(fullyloggedInDeveloper, reportTechnicalProblemForm, service, referrer)))
   }
 
   def action(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
     reportTechnicalProblemForm.bindFromRequest().fold(
       formWithErrors => {
-        Future.successful(BadRequest(reportTechnicalProblemView(fullyloggedInDeveloper, formWithErrors)))
+        Future.successful(BadRequest(reportTechnicalProblemView(fullyloggedInDeveloper, formWithErrors, None, None)))
       },
       data => {
-        supportService.reportTechnicalProblem(data.fullName, data.emailAddress, data.whatWereYouDoing, data.whatDoYouNeedHelpWith).map(ref =>
+        val userAgent = request.headers.get("User-Agent")
+        val sessionId = request.userSession match {
+          case Some(session) => Some(session.sessionId.toString())
+          case _             => None
+        }
+        supportService.reportTechnicalProblem(
+          data.fullName,
+          data.emailAddress,
+          data.whatWereYouDoing,
+          data.whatDoYouNeedHelpWith,
+          data.service,
+          data.referrer,
+          userAgent,
+          sessionId
+        ).map(ref =>
           Redirect(routes.ReportTechnicalProblemController.confirmationPage(ref))
         )
       }

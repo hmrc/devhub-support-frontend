@@ -48,6 +48,10 @@ object ApiPlatformDeskproConnector {
       supportReason: Option[String] = None,
       reasonKey: Option[String] = None,
       teamMemberEmail: Option[String] = None,
+      service: Option[String] = None,
+      referrer: Option[String] = None,
+      sessionId: Option[String] = None,
+      userAgent: Option[String] = None,
       attachments: List[Attachment] = List.empty
     )
 

@@ -68,3 +68,10 @@ ticketdetails.resolvedticketmessage2=You can reopen it by sending a new message.
 ticketresolved.title=Support request {0} has been resolved
 ticketresolved.panel.title=Support request has been resolved
 ticketresolved.emailsent=We've sent you a confirmation email.
+
+reportproblem.fullname.error.required=Enter your full name
+reportproblem.fullname.error.length=Full name cannot be longer than 70 characters
+reportproblem.whatwereyoudoing.error.required=Enter details of what you were doing
+reportproblem.whatwereyoudoing.error.length=You can enter up to 1000 characters
+reportproblem.whatdoyouneedhelpwith.error.required=Enter details of what went wrong
+reportproblem.whatdoyouneedhelpwith.error.length=You can enter up to 1000 characters

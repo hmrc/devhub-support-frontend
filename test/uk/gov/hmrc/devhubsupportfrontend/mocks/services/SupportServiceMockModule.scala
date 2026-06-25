@@ -63,10 +63,28 @@ trait SupportServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
     }
 
     object ReportTechnicalProblem {
-      def succeeds() = when(aMock.reportTechnicalProblem(*, *, *, *)(*)).thenReturn(successful("ticket-ref"))
+      def succeeds() = when(aMock.reportTechnicalProblem(*, *, *, *, *, *, *, *)(*)).thenReturn(successful("ticket-ref"))
 
-      def verifyCalledWith(fullName: String, email: String, whatWereYouDoing: String, whatDoYouNeedHelpWith: String) = {
-        verify(aMock).reportTechnicalProblem(eqTo(fullName), eqTo(email), eqTo(whatWereYouDoing), eqTo(whatDoYouNeedHelpWith))(*)
+      def verifyCalledWith(
+          fullName: String,
+          email: String,
+          whatWereYouDoing: String,
+          whatDoYouNeedHelpWith: String,
+          service: Option[String],
+          referrerUrl: Option[String],
+          userAgent: Option[String],
+          sessionId: Option[String]
+        ) = {
+        verify(aMock).reportTechnicalProblem(
+          eqTo(fullName),
+          eqTo(email),
+          eqTo(whatWereYouDoing),
+          eqTo(whatDoYouNeedHelpWith),
+          eqTo(service),
+          eqTo(referrerUrl),
+          eqTo(userAgent),
+          eqTo(sessionId)
+        )(*)
       }
     }
   }

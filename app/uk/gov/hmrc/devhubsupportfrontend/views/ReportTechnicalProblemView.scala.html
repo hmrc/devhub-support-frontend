@@ -27,10 +27,10 @@
         govukButton: GovukButton,
         govukInput: GovukInput,
         govukFieldset: GovukFieldset,
-        govukTextarea: GovukTextarea
+        govukCharacterCount: GovukCharacterCount
 )
 
-@(loggedInSession: Option[UserSession], form: Form[ReportTechnicalProblemForm])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[ReportTechnicalProblemForm], service: Option[String], referrer: Option[String])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
 
 @layout(
@@ -48,6 +48,9 @@
 
     @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.ReportTechnicalProblemController.action(), Symbol("id") -> "details-form") {
         @helper.CSRF.formField
+
+        <input type='hidden' name='service' value='@form("service").value.orElse(service)'>
+        <input type='hidden' name='referrer' value='@form("referrer").value.orElse(referrer)'>
 
         @govukInput(
             Input(
@@ -79,7 +82,7 @@
             )
         )
 
-        @govukTextarea(Textarea(
+        @govukCharacterCount(CC(
             id = "whatWereYouDoing",
             name = "whatWereYouDoing",
             label = Label(
@@ -88,15 +91,11 @@
                 content = Text("What were you doing?")
             ),
             value = form("whatWereYouDoing").value,
-            hint = Some(
-                Hint(
-                    content = Text("You can enter up to 1000 characters")
-                )
-            ),
+            maxLength = Some(1000),
             errorMessage = form.error("whatWereYouDoing").map(e => ErrorMessage(content = Text(messages(e.message))))
         ))    
 
-        @govukTextarea(Textarea(
+        @govukCharacterCount(CC(
             id = "whatDoYouNeedHelpWith",
             name = "whatDoYouNeedHelpWith",
             label = Label(
@@ -105,11 +104,7 @@
                 content = Text("What do you need help with?")
             ),
             value = form("whatDoYouNeedHelpWith").value,
-            hint = Some(
-                Hint(
-                    content = Text("You can enter up to 1000 characters")
-                )
-            ),
+            maxLength = Some(1000),
             errorMessage = form.error("whatDoYouNeedHelpWith").map(e => ErrorMessage(content = Text(messages(e.message))))
         ))    
 
