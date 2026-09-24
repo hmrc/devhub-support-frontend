@@ -181,4 +181,33 @@ class SupportService @Inject() (
       _                = auditService.explicitAudit(CreateTicketAuditAction(ticket))
     } yield ticketReference.getOrElse("UNKNOWN")
   }
+
+  def giveFeedback(
+      fullName: String,
+      email: String,
+      whatWereYouDoing: String,
+      feedback: String,
+      userAgent: Option[String],
+      sessionId: Option[String]
+    )(implicit hc: HeaderCarrier
+    ): Future[String] = {
+    val message = s"<strong>What were you doing?</strong><br>${whatWereYouDoing}<br><br><strong>How do you feel about your experience today?</strong><br>${feedback}"
+    val ticket  = ApiPlatformDeskproConnector.CreateTicketRequest(
+      fullName = fullName,
+      email = email,
+      subject = "Give feedback",
+      message = message,
+      supportReason = Some("Developer Hub Feedback"),
+      reasonKey = Some("developer-hub-feedback"),
+      apiName = None,
+      service = None,
+      referrer = None,
+      userAgent = userAgent,
+      sessionId = sessionId
+    )
+    for {
+      ticketReference <- deskproConnector.createTicket(ticket, hc)
+      _                = auditService.explicitAudit(CreateTicketAuditAction(ticket))
+    } yield ticketReference.getOrElse("UNKNOWN")
+  }
 }

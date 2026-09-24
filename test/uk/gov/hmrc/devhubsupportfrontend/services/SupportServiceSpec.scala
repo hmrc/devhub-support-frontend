@@ -347,4 +347,37 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       AuditServiceMock.ExplicitAudit.verifyCalledWith(auditAction)
     }
   }
+
+  "give feedback" should {
+    "succeed when ticket created" in new Setup {
+      val fullName: String          = "test name"
+      val email: String             = "email@test.com"
+      val whatWereYouDoing: String  = "What I was doing"
+      val feedback: String          = "Couldn't figure out how to do it"
+      val userAgent: Option[String] = None
+      val sessionId: Option[String] = None
+
+      ApiPlatformDeskproConnectorMock.CreateTicket.succeeds()
+      AuditServiceMock.ExplicitAudit.succeeds()
+
+      val result = await(underTest.giveFeedback(fullName, email, whatWereYouDoing, feedback, userAgent, sessionId))
+
+      result shouldBe "test"
+
+      val createTicketRequest = CreateTicketRequest(
+        fullName = fullName,
+        email = email,
+        subject = "Give feedback",
+        message = s"<strong>What were you doing?</strong><br>${whatWereYouDoing}<br><br><strong>How do you feel about your experience today?</strong><br>${feedback}",
+        supportReason = Some("Developer Hub Feedback"),
+        reasonKey = Some("developer-hub-feedback"),
+        sessionId = sessionId,
+        userAgent = userAgent
+      )
+      val auditAction         = CreateTicketAuditAction(createTicketRequest)
+
+      ApiPlatformDeskproConnectorMock.CreateTicket.verifyCalledWith(createTicketRequest)
+      AuditServiceMock.ExplicitAudit.verifyCalledWith(auditAction)
+    }
+  }
 }
