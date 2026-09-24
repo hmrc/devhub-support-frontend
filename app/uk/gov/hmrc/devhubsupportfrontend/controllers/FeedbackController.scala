@@ -44,7 +44,7 @@ object FeedbackController {
       mapping(
         "whatWereYouDoing" -> text
           .verifying(
-            "reportproblem.whatwereyoudoing.error.required",
+            "feedback.whatwereyoudoing.error.required",
             whatwereyoudoing => whatwereyoudoing.nonEmpty
           )
           .verifying("feedback.whatwereyoudoing.error.length", whatwereyoudoing => whatwereyoudoing.length <= 1000),
@@ -53,7 +53,7 @@ object FeedbackController {
             "feedback.feedback.error.required",
             feedback => feedback.nonEmpty
           )
-          .verifying("reportproblem.feedback.error.length", feedback => feedback.length <= 1000),
+          .verifying("feedback.feedback.error.length", feedback => feedback.length <= 1000),
         "url"              -> optional(text)
       )(FeedbackForm.apply)(FeedbackForm.unapply)
     )
