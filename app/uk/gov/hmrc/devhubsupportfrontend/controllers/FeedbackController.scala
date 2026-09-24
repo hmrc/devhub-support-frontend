@@ -87,7 +87,7 @@ class FeedbackController @Inject() (
       },
       data => {
         if (fullyloggedInDeveloper.isEmpty && data.url.isDefined) {
-          logger.warn(s"Honeypot field triggered via 'Feedback' support form")
+          logger.warn("Honeypot field triggered via 'Feedback' support form")
           val sessionId = extractSupportSessionIdFromCookie(request).getOrElse(SupportSessionId.random)
           Future.successful(withSupportCookie(Ok(feedbackConfirmationView(fullyloggedInDeveloper)), sessionId))
         } else {
