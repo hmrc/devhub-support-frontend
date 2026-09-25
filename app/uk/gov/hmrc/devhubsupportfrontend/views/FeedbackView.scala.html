@@ -1,0 +1,90 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.{CharacterCount => CC}
+@import views.html.helper.CSPNonce
+
+@import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
+@import uk.gov.hmrc.devhubsupportfrontend.controllers.FeedbackController.FeedbackForm
+@import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
+
+@this(
+        layout: Layout,
+        govukButton: GovukButton,
+        govukInput: GovukInput,
+        govukFieldset: GovukFieldset,
+        govukCharacterCount: GovukCharacterCount
+)
+
+@(loggedInSession: Option[UserSession], form: Form[FeedbackForm])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+
+@layout(
+    pageTitle = "Give feedback",
+    backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
+    loggedInSession = loggedInSession,
+    form = Some(form),
+    showGiveFeedback = false
+) {
+    <h1 class="govuk-heading-xl">Give feedback</h1>
+
+    <p class="govuk-body">We use your feedback to improve our services.</p>
+
+    <p class="govuk-body">Do not include any personal or financial information. For example, your National Insurance or credit card numbers.</p>
+
+    @helper.form(action = uk.gov.hmrc.devhubsupportfrontend.controllers.routes.FeedbackController.action(), Symbol("id") -> "details-form") {
+        @helper.CSRF.formField
+
+        @govukCharacterCount(CC(
+            id = "whatWereYouDoing",
+            name = "whatWereYouDoing",
+            label = Label(
+                isPageHeading = true,
+                classes = "govuk-label--s",
+                content = Text("What were you trying to do on the Developer Hub today?")
+            ),
+            value = form("whatWereYouDoing").value,
+            maxLength = Some(1000),
+            errorMessage = form.error("whatWereYouDoing").map(e => ErrorMessage(content = Text(messages(e.message))))
+        ))    
+
+        @govukCharacterCount(CC(
+            id = "feedback",
+            name = "feedback",
+            label = Label(
+                isPageHeading = true,
+                classes = "govuk-label--s",
+                content = Text("How do you feel about your experience today?")
+            ),
+            value = form("feedback").value,
+            maxLength = Some(1000),
+            errorMessage = form.error("feedback").map(e => ErrorMessage(content = Text(messages(e.message))))
+        ))
+
+        <div class="url-field-wrapper">
+            <label for="website-url">Your website</label>
+            <input type="text" id="website-url" name="url" tabindex="-1" autocomplete="nope" />
+        </div>
+
+        @govukButton(
+            Button(
+                id = Some("send"),
+                content = Text("Send feedback"),
+                preventDoubleClick = Some(true)
+            )
+        )
+    }
+}

@@ -29,6 +29,10 @@ GET         /report-technical-problem                       uk.gov.hmrc.devhubsu
 POST        /report-technical-problem                       uk.gov.hmrc.devhubsupportfrontend.controllers.ReportTechnicalProblemController.action()
 GET         /report-technical-problem-confirm/:ref          uk.gov.hmrc.devhubsupportfrontend.controllers.ReportTechnicalProblemController.confirmationPage(ref: String)
 
+GET         /feedback                                       uk.gov.hmrc.devhubsupportfrontend.controllers.FeedbackController.page()
+POST        /feedback                                       uk.gov.hmrc.devhubsupportfrontend.controllers.FeedbackController.action()
+GET         /feedback-confirm                               uk.gov.hmrc.devhubsupportfrontend.controllers.FeedbackController.confirmationPage()
+
 GET         /tickets                                        uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketListPage(resolved: Boolean ?=false)
 GET         /ticket/:tid                                    uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.ticketPage(tid: Int)
 POST        /ticket/:tid/response                           uk.gov.hmrc.devhubsupportfrontend.controllers.TicketController.submitTicketResponse(tid: Int)

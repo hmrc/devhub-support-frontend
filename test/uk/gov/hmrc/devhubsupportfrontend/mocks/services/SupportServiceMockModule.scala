@@ -87,6 +87,28 @@ trait SupportServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
         )(*)
       }
     }
+
+    object GiveFeedback {
+      def succeeds() = when(aMock.giveFeedback(*, *, *, *, *, *)(*)).thenReturn(successful("ticket-ref"))
+
+      def verifyCalledWith(
+          fullName: String,
+          email: String,
+          whatWereYouDoing: String,
+          feedback: String,
+          userAgent: Option[String],
+          sessionId: Option[String]
+        ) = {
+        verify(aMock).giveFeedback(
+          eqTo(fullName),
+          eqTo(email),
+          eqTo(whatWereYouDoing),
+          eqTo(feedback),
+          eqTo(userAgent),
+          eqTo(sessionId)
+        )(*)
+      }
+    }
   }
 
   object SupportServiceMock extends AbstractSupportServiceMock {

@@ -75,3 +75,8 @@ reportproblem.whatwereyoudoing.error.required=Enter details of what you were doi
 reportproblem.whatwereyoudoing.error.length=You can enter up to 1000 characters
 reportproblem.whatdoyouneedhelpwith.error.required=Enter details of what went wrong
 reportproblem.whatdoyouneedhelpwith.error.length=You can enter up to 1000 characters
+
+feedback.whatwereyoudoing.error.required=Enter details of what you were doing
+feedback.whatwereyoudoing.error.length=You can enter up to 1000 characters
+feedback.feedback.error.required=Enter details of your experience
+feedback.feedback.error.length=You can enter up to 1000 characters
