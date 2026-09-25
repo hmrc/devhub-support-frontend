@@ -28,10 +28,10 @@
 
 @(loggedInSession: Option[UserSession])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
-
 @layout(
   pageTitle = "Thank you for your feedback",
-  loggedInSession = loggedInSession
+  loggedInSession = loggedInSession,
+  showGiveFeedback = false
 ) {
     <h1 class="govuk-heading-xl">Thank you for your feedback</h1>
 

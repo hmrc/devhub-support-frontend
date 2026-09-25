@@ -32,12 +32,12 @@
 
 @(loggedInSession: Option[UserSession], form: Form[FeedbackForm])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
-
 @layout(
     pageTitle = "Give feedback",
     backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
     loggedInSession = loggedInSession,
-    form = Some(form)
+    form = Some(form),
+    showGiveFeedback = false
 ) {
     <h1 class="govuk-heading-xl">Give feedback</h1>
 

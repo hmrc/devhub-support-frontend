@@ -56,7 +56,8 @@
   loggedInSession: Option[UserSession] = None,
   form: Option[Form[_]] = None,
   twoThirds: Boolean = true,
-  showReportTechnicalProblem: Boolean = true
+  showReportTechnicalProblem: Boolean = true,
+  showGiveFeedback: Boolean = true
 )(
   contentBlock: Html
 )(implicit request: RequestHeader, messages: Messages)
@@ -133,7 +134,9 @@
 }
 
 @beforeContentBlock = {
-  @feedbackBannerBlock
+  @if(showGiveFeedback) {
+    @feedbackBannerBlock
+  }
   <div class="before-content-banner">
     @breadcrumbs(crumbs: _*)
     @buildABackLink(backLink)
