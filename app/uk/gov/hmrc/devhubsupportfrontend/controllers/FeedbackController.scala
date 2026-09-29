@@ -96,14 +96,9 @@ class FeedbackController @Inject() (
             case Some(session) => Some(session.sessionId.toString())
             case _             => None
           }
-          val fullName  = request.userSession match {
-            case Some(session) => s"${session.developer.firstName} ${session.developer.lastName}"
-            case _             => "feedback"
-          }
-          val email     = request.userSession match {
-            case Some(session) => session.developer.email.text
-            case _             => "feedback@developerhub.gov.uk"
-          }
+          // Note - always use the 'dummy' user, even when logged in.
+          val fullName  = "feedback"
+          val email     = "feedback@developerhub.gov.uk"
 
           supportService.giveFeedback(
             fullName,

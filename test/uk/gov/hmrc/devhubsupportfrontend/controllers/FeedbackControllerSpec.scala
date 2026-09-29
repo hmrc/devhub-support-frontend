@@ -52,8 +52,8 @@ class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     val sessionParams: Seq[(String, String)] = Seq("csrfToken" -> app.injector.instanceOf[TokenProvider].generateToken)
     val supportSessionId                     = SupportSessionId.random
 
-    val fullName: String         = "John Doe"
-    val emailAddress: String     = "something@example.com"
+    val fullName: String         = "feedback"
+    val emailAddress: String     = "feedback@developerhub.gov.uk"
     val whatWereYouDoing: String = "I was trying to check the status of my application"
     val feedback: String         = "Couldn't figure it out"
     val honeypotUrl              = "It's a trap"
