@@ -23,18 +23,23 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import play.api.Application
 import play.api.i18n.MessagesApi
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.mongo.play.PlayMongoModule
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
+import uk.gov.hmrc.devhubsupportfrontend.mocks.repositories.SupportFlowRepositoryMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.ErrorHandlerMock
+import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
 import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec
 
 class BaseControllerSpec
     extends AsyncHmrcSpec
     with GuiceOneAppPerSuite
-    with ErrorHandlerMock {
+    with ErrorHandlerMock
+    with SupportFlowRepositoryMockModule {
 
   implicit val appConfig: AppConfig = mock[AppConfig]
 
@@ -49,6 +54,8 @@ class BaseControllerSpec
 
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
+      .disable[PlayMongoModule]
+      .overrides(bind[SupportFlowRepository].toInstance(SupportFlowRepositoryMock.aMock))
       .configure(("metrics.jvm", false))
       .build()
 }

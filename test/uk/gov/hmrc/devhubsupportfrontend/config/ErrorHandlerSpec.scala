@@ -19,16 +19,23 @@ package uk.gov.hmrc.devhubsupportfrontend.config
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import play.api.Application
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
+import uk.gov.hmrc.mongo.play.PlayMongoModule
 
+import uk.gov.hmrc.devhubsupportfrontend.mocks.repositories.SupportFlowRepositoryMockModule
+import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
 import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec
 
 class ErrorHandlerSpec extends AsyncHmrcSpec
-    with GuiceOneAppPerSuite {
+    with GuiceOneAppPerSuite
+    with SupportFlowRepositoryMockModule {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
+      .disable[PlayMongoModule]
+      .overrides(bind[SupportFlowRepository].toInstance(SupportFlowRepositoryMock.aMock))
       .build()
 
   private val fakeRequest = FakeRequest("GET", "/")

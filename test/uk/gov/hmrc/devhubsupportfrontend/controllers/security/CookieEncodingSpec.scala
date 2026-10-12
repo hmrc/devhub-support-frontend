@@ -25,15 +25,21 @@ import play.api.mvc.Cookie
 import play.api.test.FakeRequest
 import play.api.{Application, Mode}
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSessionId
+import uk.gov.hmrc.mongo.play.PlayMongoModule
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ConnectorMetrics, NoopConnectorMetrics}
+import uk.gov.hmrc.devhubsupportfrontend.mocks.repositories.SupportFlowRepositoryMockModule
+import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
 import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec
 
-class CookieEncodingSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite {
+class CookieEncodingSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite
+    with SupportFlowRepositoryMockModule {
 
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
+      .disable[PlayMongoModule]
+      .overrides(bind[SupportFlowRepository].toInstance(SupportFlowRepositoryMock.aMock))
       .overrides(bind[ConnectorMetrics].to[NoopConnectorMetrics])
       .in(Mode.Test)
       .build()

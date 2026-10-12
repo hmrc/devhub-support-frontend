@@ -26,7 +26,10 @@ import play.api.{Application => PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models._
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.mongo.play.PlayMongoModule
 
+import uk.gov.hmrc.devhubsupportfrontend.mocks.repositories.SupportFlowRepositoryMockModule
+import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
 import uk.gov.hmrc.devhubsupportfrontend.stubs.XmlServicesStub
 import uk.gov.hmrc.devhubsupportfrontend.utils.WireMockExtensions
 
@@ -35,7 +38,8 @@ class XmlServicesConnectorIntegrationSpec
     with GuiceOneAppPerSuite
     with WireMockExtensions
     with FixedClock
-    with EitherValues {
+    with EitherValues
+    with SupportFlowRepositoryMockModule {
 
   private val stubConfig = Configuration(
     "microservice.services.api-platform-xml-services.port" -> stubPort
@@ -43,6 +47,8 @@ class XmlServicesConnectorIntegrationSpec
 
   override def fakeApplication(): PlayApplication =
     GuiceApplicationBuilder()
+      .disable[PlayMongoModule]
+      .overrides(bind[SupportFlowRepository].toInstance(SupportFlowRepositoryMock.aMock))
       .configure(stubConfig)
       .overrides(bind[ConnectorMetrics].to[NoopConnectorMetrics])
       .in(Mode.Test)

@@ -27,16 +27,20 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.mongo.play.PlayMongoModule
 
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{DeskproAttachment, DeskproMessage, DeskproTicket}
+import uk.gov.hmrc.devhubsupportfrontend.mocks.repositories.SupportFlowRepositoryMockModule
+import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
 import uk.gov.hmrc.devhubsupportfrontend.stubs.ApiPlatformDeskproStub
 import uk.gov.hmrc.devhubsupportfrontend.utils.WireMockExtensions
 
 class ApiPlatformDeskproConnectorIntegrationSpec
     extends BaseConnectorIntegrationSpec
     with GuiceOneAppPerSuite
-    with WireMockExtensions {
+    with WireMockExtensions
+    with SupportFlowRepositoryMockModule {
 
   private val stubConfig = Configuration(
     "microservice.services.api-platform-deskpro.port" -> stubPort
@@ -44,6 +48,8 @@ class ApiPlatformDeskproConnectorIntegrationSpec
 
   override def fakeApplication(): PlayApplication =
     GuiceApplicationBuilder()
+      .disable[PlayMongoModule]
+      .overrides(bind[SupportFlowRepository].toInstance(SupportFlowRepositoryMock.aMock))
       .configure(stubConfig)
       .overrides(bind[ConnectorMetrics].to[NoopConnectorMetrics])
       .in(Mode.Test)
