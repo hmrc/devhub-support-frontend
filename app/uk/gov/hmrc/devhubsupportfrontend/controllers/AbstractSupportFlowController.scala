@@ -80,7 +80,7 @@ abstract class AbstractSupportFlowController[F, E](
     }
   }
 
-  def otherValidation(flow: SupportFlow, extraData: E, form: Form[F]): Form[F] = {
+  def otherValidation(extraData: E, form: Form[F]): Form[F] = {
     form
   }
 
@@ -89,7 +89,7 @@ abstract class AbstractSupportFlowController[F, E](
       extraData().flatMap { extras =>
         performAsyncActionIfFlowValid(flow) { validFlow =>
           def handleInvalidForm(formWithErrors: Form[F]) = successful(BadRequest(pageContents(validFlow, formWithErrors, extras)))
-          otherValidation(flow, extras, form().bindFromRequest()).fold(handleInvalidForm, form => onValidForm(validFlow, form)(using request))
+          otherValidation(extras, form().bindFromRequest()).fold(handleInvalidForm, form => onValidForm(validFlow, form)(using request))
         }
       }
     }

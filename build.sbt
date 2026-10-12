@@ -25,12 +25,6 @@ lazy val microservice = Project("devhub-support-frontend", file("."))
     Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-eT")
   )
   .settings(CodeCoverageSettings.settings: _*)
-    .settings(
-      routesImport ++= Seq(
-        "uk.gov.hmrc.devhubsupportfrontend.controllers.models.*",
-        "uk.gov.hmrc.apiplatform.modules.common.domain.models.*",
-    )
-  )
   .settings(
     TwirlKeys.templateImports ++= Seq(
       "uk.gov.hmrc.hmrcfrontend.views.html.components.*",

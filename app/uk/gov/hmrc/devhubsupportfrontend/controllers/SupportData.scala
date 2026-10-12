@@ -97,11 +97,6 @@ object SupportData {
     val text = "Giving a team member access to a software application"
   }
 
-  case object GeneralApplicationDetails extends ApiSecondaryChoice {
-    val id   = "general-application-details"
-    val text = "General application details"
-  }
-
   case object ChooseADifferentAPI {
     val id   = "different-api"
     val text = "A different API"

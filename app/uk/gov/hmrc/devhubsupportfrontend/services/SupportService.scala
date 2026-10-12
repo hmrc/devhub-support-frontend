@@ -20,10 +20,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
-import uk.gov.hmrc.apiplatform.modules.common.services.{ApplicationLogger, EitherTHelper}
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
+import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApiPlatformDeskproConnector, ApmConnector, XmlServicesConnector}
 import uk.gov.hmrc.devhubsupportfrontend.controllers.*
 import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData.SupportDataChoice
@@ -36,13 +35,9 @@ class SupportService @Inject() (
     deskproConnector: ApiPlatformDeskproConnector,
     xmlServicesConnector: XmlServicesConnector,
     flowRepository: SupportFlowRepository,
-    config: AppConfig,
     auditService: AuditService
   )(using val ec: ExecutionContext
   ) extends ApplicationLogger {
-
-  val ET = EitherTHelper.make[Throwable]
-  val ES = EitherTHelper.make[UpstreamErrorResponse]
 
   private def fetchSupportFlow(sessionId: SupportSessionId): Future[SupportFlow] = {
     flowRepository.fetchBySessionId(sessionId) map {

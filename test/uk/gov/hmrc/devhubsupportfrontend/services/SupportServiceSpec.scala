@@ -22,7 +22,6 @@ import uk.gov.hmrc.apiplatform.modules.apis.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApiContext, ApiContextData, UserId}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.CreateTicketRequest
 import uk.gov.hmrc.devhubsupportfrontend.connectors.XmlApi
 import uk.gov.hmrc.devhubsupportfrontend.controllers.{ApplyForPrivateApiAccessForm, SupportData, SupportDetailsForm}
@@ -34,13 +33,12 @@ import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec
 
 class SupportServiceSpec extends AsyncHmrcSpec {
 
-  val sessionId     = SupportSessionId.random
-  val entryPoint    = SupportData.UsingAnApi.id
-  val savedFlow     = SupportFlow(sessionId, entryPoint)
-  val defaultFlow   = SupportFlow(sessionId, "unknown")
-  val mockAppConfig = mock[AppConfig]
-  val apiName       = "Test API definition name"
-  val xmlApiName    = "Test XML API definition name"
+  val sessionId   = SupportSessionId.random
+  val entryPoint  = SupportData.UsingAnApi.id
+  val savedFlow   = SupportFlow(sessionId, entryPoint)
+  val defaultFlow = SupportFlow(sessionId, "unknown")
+  val apiName     = "Test API definition name"
+  val xmlApiName  = "Test XML API definition name"
 
   val apiSummary = ApiSummary(
     ServiceNameData.serviceName,
@@ -71,7 +69,6 @@ class SupportServiceSpec extends AsyncHmrcSpec {
       ApiPlatformDeskproConnectorMock.aMock,
       XmlServicesConnectorMock.aMock,
       SupportFlowRepositoryMock.aMock,
-      mockAppConfig,
       AuditServiceMock.aMock
     )
     SupportFlowRepositoryMock.SaveFlow.thenReturnSuccess

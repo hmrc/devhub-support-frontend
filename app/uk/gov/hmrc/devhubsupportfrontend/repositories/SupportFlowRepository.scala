@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.repositories
 
-import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,14 +26,12 @@ import org.mongodb.scala.model.{IndexModel, IndexOptions, UpdateOptions, Updates
 
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
 
 object SupportFlowRepository {
   import play.api.libs.json.*
-  given dateFormat: Format[Instant]            = MongoJavatimeFormats.instantFormat
   given formatSupportFlow: Format[SupportFlow] = Json.format[SupportFlow]
 }
 

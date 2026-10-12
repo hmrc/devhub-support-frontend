@@ -22,14 +22,11 @@
 
 @this(
   layout: Layout,
-  govukRadios: GovukRadios,
   govukButton : GovukButton,
   govukInput : GovukInput,
-  govukSelect : GovukSelect,
-  govukDetails : GovukDetails
-)
+  govukDetails : GovukDetails)
 
-@(loggedInSession: Option[UserSession], maybeChosenApiName: Option[String], form: Form[ApplyForPrivateApiAccessForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], maybeChosenApiName: Option[String], form: Form[ApplyForPrivateApiAccessForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages)
 
 @buildApplicationIdHtml() = {
   <p>You must set up a software application to generate an application ID.</p>

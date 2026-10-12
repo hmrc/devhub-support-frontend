@@ -34,17 +34,6 @@ import uk.gov.hmrc.devhubsupportfrontend.views.html.*
 
 object TicketController {
 
-  case class FilterForm(
-      status: Option[String] = Some("open")
-    )
-
-  val filterForm: Form[FilterForm] = Form(
-    mapping(
-      "status" -> optional(text)
-        .verifying("ticketlist.status.no.choice.field", _.isDefined)
-    )(FilterForm.apply)(f => Some(f.status))
-  )
-
   case class TicketResponseForm(
       response: Option[String],
       status: String,

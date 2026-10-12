@@ -63,7 +63,7 @@ class ChooseAPrivateApiController @Inject() (
     flow.copy(privateApi = choice)
 
   def updateFlowAndRedirect(flowFn: SupportFlow => SupportFlow)(redirectTo: Call)(flow: SupportFlow) = {
-    supportService.updateWithDelta(flowFn)(flow).map { newFlow =>
+    supportService.updateWithDelta(flowFn)(flow).map { _ =>
       Redirect(redirectTo)
     }
   }
@@ -73,9 +73,9 @@ class ChooseAPrivateApiController @Inject() (
 
   def onValidForm(flow: SupportFlow, form: ChooseAPrivateApiForm)(using request: MaybeUserRequest[AnyContent]): Future[Result] =
     form.chosenApiName match {
-      case c @ SupportData.ChooseADifferentAPI.id => updateFlowAndRedirect(chooseADifferentAPI)(routes.ApplyForPrivateApiAccessController.page())(flow)
-      case c @ SupportData.ChooseCDS.id           => updateFlowAndRedirect(chooseCDS)(routes.CheckCdsAccessIsRequiredController.page())(flow)
-      case _                                      => throw new RuntimeException("Validation failed to eliminate bad data during Form processing")
+      case SupportData.ChooseADifferentAPI.id => updateFlowAndRedirect(chooseADifferentAPI)(routes.ApplyForPrivateApiAccessController.page())(flow)
+      case SupportData.ChooseCDS.id           => updateFlowAndRedirect(chooseCDS)(routes.CheckCdsAccessIsRequiredController.page())(flow)
+      case _                                  => throw new RuntimeException("Validation failed to eliminate bad data during Form processing")
     }
 
   def form(): Form[ChooseAPrivateApiForm] = ChooseAPrivateApiForm.form

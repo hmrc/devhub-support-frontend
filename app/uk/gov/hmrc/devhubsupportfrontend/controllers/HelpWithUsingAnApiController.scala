@@ -54,7 +54,7 @@ object HelpWithUsingAnApiController {
 
   def chooseNone()(flow: SupportFlow) = flow.copy(subSelection = Some(SupportData.NoneOfTheAbove.id))
 
-  def choosePrivateApi(form: HelpWithUsingAnApiForm)(flow: SupportFlow) =
+  def choosePrivateApi()(flow: SupportFlow) =
     flow.copy(subSelection = Some(SupportData.PrivateApiDocumentation.id))
 }
 
@@ -88,12 +88,12 @@ class HelpWithUsingAnApiController @Inject() (
     )
 
   def updateFlowAndRedirect(flowFn: SupportFlow => SupportFlow)(redirectTo: Call)(flow: SupportFlow) = {
-    supportService.updateWithDelta(flowFn)(flow).map { newFlow =>
+    supportService.updateWithDelta(flowFn)(flow).map { _ =>
       Redirect(redirectTo)
     }
   }
 
-  override def otherValidation(flow: SupportFlow, extraData: List[ApiSummary], form: Form[HelpWithUsingAnApiForm]): Form[HelpWithUsingAnApiForm] = {
+  override def otherValidation(extraData: List[ApiSummary], form: Form[HelpWithUsingAnApiForm]): Form[HelpWithUsingAnApiForm] = {
     def validate(fieldName: String) = {
       val matchesApiName = form(fieldName).value
         .filter(_.nonEmpty)
@@ -114,7 +114,7 @@ class HelpWithUsingAnApiController @Inject() (
       case SupportData.MakingAnApiCall.id         => updateFlowAndRedirect(chooseMakingCall(form))(routes.SupportDetailsController.supportDetailsPage())(flow)
       case SupportData.GettingExamples.id         => updateFlowAndRedirect(chooseGettingExamples(form))(routes.SupportDetailsController.supportDetailsPage())(flow)
       case SupportData.ReportingDocumentation.id  => updateFlowAndRedirect(chooseReporting(form))(routes.SupportDetailsController.supportDetailsPage())(flow)
-      case SupportData.PrivateApiDocumentation.id => updateFlowAndRedirect(choosePrivateApi(form))(routes.ChooseAPrivateApiController.page())(flow)
+      case SupportData.PrivateApiDocumentation.id => updateFlowAndRedirect(choosePrivateApi())(routes.ChooseAPrivateApiController.page())(flow)
       case SupportData.NoneOfTheAbove.id          => updateFlowAndRedirect(chooseNone())(routes.SupportDetailsController.supportDetailsPage())(flow)
       case _                                      => throw new RuntimeException("Validation failed to eliminate bad data during Form processing")
     }

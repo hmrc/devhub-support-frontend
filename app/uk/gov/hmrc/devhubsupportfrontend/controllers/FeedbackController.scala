@@ -107,7 +107,7 @@ class FeedbackController @Inject() (
             data.feedback,
             userAgent,
             sessionId
-          ).map(ref =>
+          ).map(_ =>
             Redirect(routes.FeedbackController.confirmationPage())
           )
         }

@@ -130,10 +130,9 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
       }
 
       "work for choosePrivateApi" in {
-        val form = HelpWithUsingAnApiForm("ignored", None, None, None)
         val flow = SupportFlow(supportSessionId, "untouched")
 
-        val result = HelpWithUsingAnApiController.choosePrivateApi(form)(flow)
+        val result = HelpWithUsingAnApiController.choosePrivateApi()(flow)
 
         result.entrySelection shouldBe "untouched"
         result.subSelection.value shouldBe SupportData.PrivateApiDocumentation.id

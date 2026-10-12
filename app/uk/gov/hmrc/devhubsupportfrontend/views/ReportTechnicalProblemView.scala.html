@@ -26,11 +26,9 @@
         layout: Layout,
         govukButton: GovukButton,
         govukInput: GovukInput,
-        govukFieldset: GovukFieldset,
-        govukCharacterCount: GovukCharacterCount
-)
+        govukCharacterCount: GovukCharacterCount)
 
-@(loggedInSession: Option[UserSession], form: Form[ReportTechnicalProblemForm], service: Option[String], referrer: Option[String])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[ReportTechnicalProblemForm], service: Option[String], referrer: Option[String])(implicit request: play.api.mvc.RequestHeader, messages: Messages)
 
 
 @layout(

@@ -17,26 +17,16 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers.models
 
 import play.api.mvc.*
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.tpd.core.domain.models.User
-import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.{LoggedInState, UserSession}
+import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 
 class UserRequest[A](val userSession: UserSession, val msgRequest: MessagesRequest[A]) extends MessagesRequest[A](msgRequest, msgRequest.messagesApi) {
-  lazy val sessionId = userSession.sessionId
-
-  lazy val developer: User              = userSession.developer
-  lazy val userId: UserId               = developer.userId
-  lazy val email: LaxEmailAddress       = developer.email
-  lazy val loggedInState: LoggedInState = userSession.loggedInState
+  lazy val developer: User        = userSession.developer
+  lazy val email: LaxEmailAddress = developer.email
 
   lazy val displayedName: String = developer.displayedName
 
-  lazy val loggedInName: Option[String] =
-    if (loggedInState.isLoggedIn) {
-      Some(displayedName)
-    } else {
-      None
-    }
 }
 
 class MaybeUserRequest[A](val userSession: Option[UserSession], request: MessagesRequest[A]) extends MessagesRequest[A](request, request.messagesApi)

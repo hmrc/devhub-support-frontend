@@ -25,8 +25,6 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 @Singleton
 class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig) extends ServicesConfig(config) {
 
-  val welshLanguageSupportEnabled: Boolean = getConfigDefaulted("features.welsh-language-support", false)
-
   val serviceName = "HMRC Developer Hub"
 
   val feedbackSurveyUrl = getString("feedbackBanner.generic.surveyUrl")
@@ -42,7 +40,6 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
   lazy val apiDocumentationFrontendUrl: String     = internalPlatformHost.getOrElse("http://localhost:9680")
   lazy val thirdPartyDeveloperFrontendUrl: String  = internalPlatformHost.getOrElse("http://localhost:9685")
   lazy val devhubSupportFrontendUrl: String        = internalPlatformHost.getOrElse("http://localhost:9695")
-  lazy val reportProblemHost: String               = internalPlatformHost.getOrElse("http://localhost:9250")
 
   lazy val keepAliveUrl: String = s"$thirdPartyDeveloperFrontendUrl/developer/keep-alive"
   lazy val logOutUrl: String    = s"$thirdPartyDeveloperFrontendUrl/developer/logout"
@@ -57,9 +54,8 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   val enforceLogin: Boolean = getConfigDefaulted("enforce-login", false)
 
-  lazy val initiateV2Url            = servicesConfig.baseUrl("upscan-initiate") + "/upscan/v2/initiate"
-  lazy val uploadRedirectTargetBase = loadConfig("upload-redirect-target-base")
-  lazy val callbackEndpointTarget   = loadConfig("upscan.callback-endpoint")
+  lazy val initiateV2Url          = servicesConfig.baseUrl("upscan-initiate") + "/upscan/v2/initiate"
+  lazy val callbackEndpointTarget = loadConfig("upscan.callback-endpoint")
 
   private def getConfigDefaulted[A](key: String, default: => A)(using loader: ConfigLoader[A]): A = config.getOptional[A](key)(using loader).getOrElse(default)
 

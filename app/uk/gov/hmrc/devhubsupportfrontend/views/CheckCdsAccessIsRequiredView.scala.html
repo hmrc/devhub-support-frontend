@@ -24,12 +24,9 @@
 @this(
   layout: Layout,
   govukRadios: GovukRadios,
-  govukButton : GovukButton,
-  govukInput : GovukInput,
-  govukSelect : GovukSelect
-)
+  govukButton : GovukButton)
 
-@(loggedInSession: Option[UserSession], form: Form[CheckCdsAccessIsRequiredForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[CheckCdsAccessIsRequiredForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages)
 
 @layout(
   pageTitle = "Do you intend to build software to integrate with the Customs Declarations Service (CDS)?",

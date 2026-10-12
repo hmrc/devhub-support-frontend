@@ -42,8 +42,6 @@ trait FormValidation {
     def ~>[T](nextFragment: String) = new FormAndFieldSyntax(nextFragment :: fragments)
   }
 
-  def textValidator: (String, String) => Tuple2[String, Mapping[String]] = requiredLimitedTextValidator(30)
-
   def requiredLimitedTextValidator(maxLength: Int)(fieldName: String, messagePrefix: String): Tuple2[String, Mapping[String]] =
     (
       fieldName -> default(text, "")

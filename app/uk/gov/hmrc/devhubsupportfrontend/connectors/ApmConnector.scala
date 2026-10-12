@@ -30,7 +30,7 @@ object ApmConnector {
 }
 
 @Singleton
-class ApmConnector @Inject() (http: HttpClientV2, config: ApmConnector.Config, metrics: ConnectorMetrics)(using ec: ExecutionContext) {
+class ApmConnector @Inject() (http: HttpClientV2, config: ApmConnector.Config)(using ec: ExecutionContext) {
 
   val api = API("api-platform-microservice")
 

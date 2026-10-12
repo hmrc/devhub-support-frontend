@@ -39,7 +39,7 @@
 )
 
 
-@(form: Form[TicketResponseForm], loggedInSession: Option[UserSession], ticket: DeskproTicket,upscanInitiateResponse: UpscanInitiateResponse)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(form: Form[TicketResponseForm], loggedInSession: Option[UserSession], ticket: DeskproTicket,upscanInitiateResponse: UpscanInitiateResponse)(implicit request: play.api.mvc.RequestHeader, messages: Messages)
 
 @buildHistoryLinkHtml(text: String) = {
   <a href='#history' class='govuk-link govuk-link--no-visited-state'>@{text}</a>
