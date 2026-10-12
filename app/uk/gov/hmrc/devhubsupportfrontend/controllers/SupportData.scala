@@ -28,74 +28,28 @@ object SupportData {
     val text = "General Issue"
   }
 
-  sealed trait PrimaryChoice extends SupportDataChoice {}
-
-  case object FindingAnApi extends PrimaryChoice {
-    val id   = "finding-an-api"
-    val text = "Finding an API to build my software"
+  enum PrimaryChoice(val id: String, val text: String) extends SupportDataChoice {
+    case FindingAnApi         extends PrimaryChoice("finding-an-api", "Finding an API to build my software")
+    case UsingAnApi           extends PrimaryChoice("using-an-api", "Using an API")
+    case SigningIn            extends PrimaryChoice("signing-into-account", "Signing in to my account")
+    case SettingUpApplication extends PrimaryChoice("setting-up-application", "Setting up or managing a software application")
+    case NoneOfTheAbove       extends PrimaryChoice("none-of-the-above", "None of these")
   }
 
-  case object UsingAnApi extends PrimaryChoice {
-    val id   = "using-an-api"
-    val text = "Using an API"
+  export PrimaryChoice.*
+
+  enum ApiSecondaryChoice(val id: String, val text: String) extends SupportDataChoice {
+    case MakingAnApiCall               extends ApiSecondaryChoice("making-an-api-call", "Making an API call")
+    case GettingExamples               extends ApiSecondaryChoice("getting-examples", "Viewing examples of errors, payloads or schemas")
+    case ReportingDocumentation        extends ApiSecondaryChoice("reporting-documentation", "Reporting inaccurate or missing API information")
+    case PrivateApiDocumentation       extends ApiSecondaryChoice("private-api-documentation", "Accessing private API documentation")
+    case ForgottenPassword             extends ApiSecondaryChoice("forgotten-password", "I've forgotten my password")
+    case AccessCodes                   extends ApiSecondaryChoice("access-codes", "I cannot receive access codes for 2FA")
+    case CompletingTermsOfUseAgreement extends ApiSecondaryChoice("completing-terms-of-use", "Completing the terms of use agreement")
+    case GivingTeamMemberAccess        extends ApiSecondaryChoice("giving-team-member-access", "Giving a team member access to a software application")
   }
 
-  case object SigningIn extends PrimaryChoice {
-    val id   = "signing-into-account"
-    val text = "Signing in to my account"
-  }
-
-  case object SettingUpApplication extends PrimaryChoice {
-    val id   = "setting-up-application"
-    val text = "Setting up or managing a software application"
-  }
-
-  case object NoneOfTheAbove extends PrimaryChoice {
-    val id   = "none-of-the-above"
-    val text = "None of these"
-  }
-
-  sealed trait ApiSecondaryChoice extends SupportDataChoice {}
-
-  case object MakingAnApiCall extends ApiSecondaryChoice {
-    val id   = "making-an-api-call"
-    val text = "Making an API call"
-  }
-
-  case object GettingExamples extends ApiSecondaryChoice {
-    val id   = "getting-examples"
-    val text = "Viewing examples of errors, payloads or schemas"
-  }
-
-  case object ReportingDocumentation extends ApiSecondaryChoice {
-    val id   = "reporting-documentation"
-    val text = "Reporting inaccurate or missing API information"
-  }
-
-  case object PrivateApiDocumentation extends ApiSecondaryChoice {
-    val id   = "private-api-documentation"
-    val text = "Accessing private API documentation"
-  }
-
-  case object ForgottenPassword extends ApiSecondaryChoice {
-    val id   = "forgotten-password"
-    val text = "I've forgotten my password"
-  }
-
-  case object AccessCodes extends ApiSecondaryChoice {
-    val id   = "access-codes"
-    val text = "I cannot receive access codes for 2FA"
-  }
-
-  case object CompletingTermsOfUseAgreement extends ApiSecondaryChoice {
-    val id   = "completing-terms-of-use"
-    val text = "Completing the terms of use agreement"
-  }
-
-  case object GivingTeamMemberAccess extends ApiSecondaryChoice {
-    val id   = "giving-team-member-access"
-    val text = "Giving a team member access to a software application"
-  }
+  export ApiSecondaryChoice.*
 
   case object ChooseADifferentAPI {
     val id   = "different-api"

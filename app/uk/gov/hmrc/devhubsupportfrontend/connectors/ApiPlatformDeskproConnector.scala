@@ -61,15 +61,17 @@ object ApiPlatformDeskproConnector {
 
   case class CreateTicketResponseRequest(userEmail: LaxEmailAddress, message: String, status: String, attachments: List[Attachment] = List.empty)
 
-  sealed trait DeskproTicketCloseResult
-  object DeskproTicketCloseSuccess  extends DeskproTicketCloseResult
-  object DeskproTicketCloseNotFound extends DeskproTicketCloseResult
-  object DeskproTicketCloseFailure  extends DeskproTicketCloseResult
+  enum DeskproTicketCloseResult {
+    case DeskproTicketCloseSuccess, DeskproTicketCloseNotFound, DeskproTicketCloseFailure
+  }
 
-  sealed trait DeskproTicketResponseResult
-  object DeskproTicketResponseSuccess  extends DeskproTicketResponseResult
-  object DeskproTicketResponseNotFound extends DeskproTicketResponseResult
-  object DeskproTicketResponseFailure  extends DeskproTicketResponseResult
+  export DeskproTicketCloseResult.*
+
+  enum DeskproTicketResponseResult {
+    case DeskproTicketResponseSuccess, DeskproTicketResponseNotFound, DeskproTicketResponseFailure
+  }
+
+  export DeskproTicketResponseResult.*
 
   case class GetTicketsByEmailRequest(email: LaxEmailAddress, status: Option[String] = None)
 
