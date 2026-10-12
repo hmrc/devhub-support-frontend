@@ -27,7 +27,7 @@ object ThirdPartyDeveloperStub {
 
   object FetchSession {
 
-    def succeeds(sessionId: UserSessionId, userId: UserId, userEmail: LaxEmailAddress, nowAsText: String): StubMapping = {
+    def succeeds(sessionId: UserSessionId, userId: UserId, userEmail: LaxEmailAddress, nowAsText: String, loggedInState: String = "LOGGED_IN"): StubMapping = {
       stubFor(
         get(urlPathEqualTo(s"/session/$sessionId"))
           .willReturn(
@@ -36,7 +36,7 @@ object ThirdPartyDeveloperStub {
               .withHeader("Content-Type", "application/json")
               .withBody(s"""{
                            |  "sessionId": "$sessionId",
-                           |  "loggedInState": "LOGGED_IN",
+                           |  "loggedInState": "$loggedInState",
                            |    "developer": {
                            |      "userId":"$userId",
                            |      "email":"${userEmail.text}",

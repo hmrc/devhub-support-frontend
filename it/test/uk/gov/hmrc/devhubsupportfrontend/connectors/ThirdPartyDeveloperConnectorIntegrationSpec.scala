@@ -73,6 +73,16 @@ class ThirdPartyDeveloperConnectorIntegrationSpec extends BaseConnectorIntegrati
       result shouldBe Some(UserSession(sessionId, loggedInState = LoggedInState.LoggedIn, buildTrackedUser(userEmail)))
     }
 
+    "return a session that is part logged in enabling MFA" in new Setup {
+      ThirdPartyDeveloperStub.FetchSession.succeeds(sessionId, userId, userEmail, nowAsText, loggedInState = "PART_LOGGED_IN_ENABLING_MFA")
+
+      val result = await(underTest.fetchSession(sessionId))
+
+      result shouldBe Some(UserSession(sessionId, loggedInState = LoggedInState.PartLoggedInEnablingMFA, buildTrackedUser(userEmail)))
+      result.value.loggedInState.isPartLoggedInEnablingMFA shouldBe true
+      result.value.loggedInState.isLoggedIn shouldBe false
+    }
+
     "not return a session when a session does not exist" in new Setup {
       ThirdPartyDeveloperStub.FetchSession.failsToFindSession(sessionId)
 
