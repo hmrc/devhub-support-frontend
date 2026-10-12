@@ -18,11 +18,11 @@ package uk.gov.hmrc.devhubsupportfrontend.connectors
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application, Configuration, Mode}
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress.StringSyntax
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress.StringSyntax.toLaxEmail
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.{LoggedInState, UserSession, UserSessionId}
@@ -70,7 +70,7 @@ class ThirdPartyDeveloperConnectorIntegrationSpec extends BaseConnectorIntegrati
 
       private val result = await(underTest.fetchSession(sessionId))
 
-      result shouldBe Some(UserSession(sessionId, loggedInState = LoggedInState.LOGGED_IN, buildTrackedUser(userEmail)))
+      result shouldBe Some(UserSession(sessionId, loggedInState = LoggedInState.LoggedIn, buildTrackedUser(userEmail)))
     }
 
     "not return a session when a session does not exist" in new Setup {

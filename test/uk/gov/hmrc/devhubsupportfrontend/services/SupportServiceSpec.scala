@@ -18,7 +18,7 @@ package uk.gov.hmrc.devhubsupportfrontend.services
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import uk.gov.hmrc.apiplatform.modules.apis.domain.models._
+import uk.gov.hmrc.apiplatform.modules.apis.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{ApiContext, ApiContextData, UserId}
 import uk.gov.hmrc.http.HeaderCarrier
 

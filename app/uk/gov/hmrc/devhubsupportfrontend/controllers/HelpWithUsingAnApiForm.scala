@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
-import uk.gov.voa.play.form.ConditionalMappings._
+import uk.gov.voa.play.form.ConditionalMappings.*
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 
 import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData.{GettingExamples, MakingAnApiCall, NoneOfTheAbove, PrivateApiDocumentation, ReportingDocumentation}
 
@@ -33,6 +33,6 @@ object HelpWithUsingAnApiForm extends FormValidation {
       MakingAnApiCall.id + "-api-name"        -> mandatoryIf(isEqual("choice", MakingAnApiCall.id), nonEmptyText),
       GettingExamples.id + "-api-name"        -> mandatoryIf(isEqual("choice", GettingExamples.id), nonEmptyText),
       ReportingDocumentation.id + "-api-name" -> mandatoryIf(isEqual("choice", ReportingDocumentation.id), nonEmptyText)
-    )(HelpWithUsingAnApiForm.apply)(HelpWithUsingAnApiForm.unapply)
+    )(HelpWithUsingAnApiForm.apply)(h => Some((h.choice, h.apiNameForCall, h.apiNameForExamples, h.apiNameForReporting)))
   )
 }

@@ -19,7 +19,7 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 import cats.data.NonEmptyList
 import org.apache.commons.validator.routines.EmailValidator
 
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.data.{Forms, Mapping}
 
 trait FormValidation {

@@ -21,9 +21,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.Logging
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.{UserSession, UserSessionId}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{SessionId => _, StringContextOps, _}
+import uk.gov.hmrc.http.{SessionId as _, StringContextOps, *}
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 

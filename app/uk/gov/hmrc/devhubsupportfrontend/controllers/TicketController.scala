@@ -20,17 +20,17 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.libs.crypto.CookieSigner
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.*
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ThirdPartyDeveloperConnector, UpscanInitiateConnector}
 import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.upscan.services.{UpscanFileReference, UpscanInitiateResponse}
-import uk.gov.hmrc.devhubsupportfrontend.services._
-import uk.gov.hmrc.devhubsupportfrontend.views.html._
+import uk.gov.hmrc.devhubsupportfrontend.services.*
+import uk.gov.hmrc.devhubsupportfrontend.views.html.*
 
 object TicketController {
 
@@ -42,7 +42,7 @@ object TicketController {
     mapping(
       "status" -> optional(text)
         .verifying("ticketlist.status.no.choice.field", _.isDefined)
-    )(FilterForm.apply)(FilterForm.unapply)
+    )(FilterForm.apply)(f => Some(f.status))
   )
 
   case class TicketResponseForm(
@@ -60,8 +60,8 @@ object TicketController {
       "fileAttachments" -> list(mapping(
         "fileReference" -> text,
         "fileName"      -> text
-      )(Attachment.apply)(Attachment.unapply)).transform[List[Attachment]](_.filter(_.fileReference.nonEmpty), identity)
-    )(TicketResponseForm.apply)(TicketResponseForm.unapply)
+      )(Attachment.apply)(a => Some((a.fileReference, a.fileName)))).transform[List[Attachment]](_.filter(_.fileReference.nonEmpty), identity)
+    )(TicketResponseForm.apply)(t => Some((t.response, t.status, t.action, t.attachments)))
   )
 }
 

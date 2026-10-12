@@ -25,7 +25,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
-import uk.gov.hmrc.devhubsupportfrontend.services._
+import uk.gov.hmrc.devhubsupportfrontend.services.*
 
 @Singleton
 class GoToSupportFlowController @Inject() (

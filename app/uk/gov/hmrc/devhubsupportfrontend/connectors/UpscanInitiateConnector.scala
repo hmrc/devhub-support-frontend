@@ -22,7 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.json.{Format, Json, Reads}
 import play.api.libs.ws.writeableOf_JsValue
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 

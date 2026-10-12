@@ -25,9 +25,9 @@ import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApiPlatformDeskproConnector, ApmConnector, XmlServicesConnector}
+import uk.gov.hmrc.devhubsupportfrontend.controllers.*
 import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData.SupportDataChoice
-import uk.gov.hmrc.devhubsupportfrontend.controllers._
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, _}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, *}
 import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
 
 @Singleton

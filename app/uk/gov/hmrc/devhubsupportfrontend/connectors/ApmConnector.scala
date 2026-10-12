@@ -20,8 +20,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ApiDefinition
-import uk.gov.hmrc.apiplatform.modules.common.domain.models._
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.*
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 

@@ -21,9 +21,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.http.Status.{NOT_FOUND, OK}
 import play.api.libs.json.{Format, Json, OFormat}
+import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpResponse, StringContextOps}
 

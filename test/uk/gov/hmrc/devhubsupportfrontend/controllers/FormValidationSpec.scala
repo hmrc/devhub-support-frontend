@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.data.{Form, FormError, Mapping}
 import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 

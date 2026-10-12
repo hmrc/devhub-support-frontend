@@ -21,7 +21,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import org.jsoup.Jsoup
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ServiceNameData
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApiContextData
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
@@ -31,7 +31,7 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.{ApiSummary, SupportFlow,
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession.*
 import uk.gov.hmrc.devhubsupportfrontend.views.html.SupportEnquiryInitialChoiceView
 
 class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with WithCSRFAddToken {

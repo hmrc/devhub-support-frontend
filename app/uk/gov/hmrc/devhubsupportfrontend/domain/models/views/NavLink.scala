@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.domain.models.views
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.controllers.routes

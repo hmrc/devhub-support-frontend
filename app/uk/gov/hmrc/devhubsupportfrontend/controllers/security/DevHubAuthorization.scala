@@ -20,27 +20,24 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import cats.data.OptionT
 
-import play.api.mvc._
+import play.api.mvc.*
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.{LoggedInState, UserSession, UserSessionId}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
 
-import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.controllers.models.{MaybeUserRequest, UserRequest}
-import uk.gov.hmrc.devhubsupportfrontend.controllers.{BaseController, _}
+import uk.gov.hmrc.devhubsupportfrontend.controllers.{BaseController, *}
 
 trait DevHubAuthorization extends FrontendHeaderCarrierProvider with CookieEncoding {
   self: BaseController =>
 
   val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector
 
-  implicit val appConfig: AppConfig
-
   object DeveloperSessionFilter {
     type Type = UserSession => Boolean
 
-    val onlyTrueIfLoggedInFilter: DeveloperSessionFilter.Type = _.loggedInState == LoggedInState.LOGGED_IN
+    val onlyTrueIfLoggedInFilter: DeveloperSessionFilter.Type = _.loggedInState == LoggedInState.LoggedIn
   }
 
   def maybeAtLeastPartLoggedInEnablingMfa(body: MaybeUserRequest[AnyContent] => Future[Result])(implicit ec: ExecutionContext): Action[AnyContent] =

@@ -22,7 +22,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.*
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.DeskproTicket
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ApiPlatformDeskproConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec

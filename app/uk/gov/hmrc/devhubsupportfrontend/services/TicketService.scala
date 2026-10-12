@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.{Attachment, DeskproTicketResponseResult}
-import uk.gov.hmrc.devhubsupportfrontend.domain.models._
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.*
 
 @Singleton
 class TicketService @Inject() (
