@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
+import scala.annotation.unused
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
 
@@ -80,7 +81,7 @@ abstract class AbstractSupportFlowController[F, E](
     }
   }
 
-  def otherValidation(extraData: E, form: Form[F]): Form[F] = {
+  def otherValidation(@unused extraData: E, form: Form[F]): Form[F] = {
     form
   }
 
