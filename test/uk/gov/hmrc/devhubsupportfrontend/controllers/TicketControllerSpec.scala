@@ -234,7 +234,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     "invoke submitTicketResponse" should {
       "return to the tickets list when response submitted successfully" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "status"   -> statusOpen,
             "action"   -> actionSend,
             "response" -> response
@@ -269,7 +269,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       "pass the fileReference to the ticket service" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "status"                           -> statusOpen,
             "action"                           -> actionSend,
             "response"                         -> response,
@@ -295,7 +295,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       "return 500 if ticket not found" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "status"   -> statusOpen,
             "action"   -> actionSend,
             "response" -> response
@@ -317,7 +317,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       "return 500 if submit response failed" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "status"   -> statusOpen,
             "action"   -> actionSend,
             "response" -> response

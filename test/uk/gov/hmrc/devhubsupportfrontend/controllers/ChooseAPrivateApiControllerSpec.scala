@@ -102,7 +102,7 @@ class ChooseAPrivateApiControllerSpec extends BaseControllerSpec with WithCSRFAd
 
     "invoke submitChoiceOfPrivateApi" should {
       "submit new valid request from form for a different API choice" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "apiName" -> SupportData.ChooseADifferentAPI.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -114,7 +114,7 @@ class ChooseAPrivateApiControllerSpec extends BaseControllerSpec with WithCSRFAd
       }
 
       "submit new valid request from form for CDS choice" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "apiName" -> SupportData.ChooseCDS.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -126,7 +126,7 @@ class ChooseAPrivateApiControllerSpec extends BaseControllerSpec with WithCSRFAd
       }
 
       "submit invalid request returns BAD_REQUEST" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "bobbins" -> SupportData.ChooseADifferentAPI.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -137,7 +137,7 @@ class ChooseAPrivateApiControllerSpec extends BaseControllerSpec with WithCSRFAd
       }
 
       "submit valid request but no session" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "apiName" -> SupportData.ChooseCDS.id
         )
         SupportServiceMock.GetSupportFlow.succeeds()

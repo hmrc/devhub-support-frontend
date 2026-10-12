@@ -131,7 +131,7 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
     "invoking submit" should {
       "redirect to the new help with using an api page when the 'Using an API' option is selected" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody("initialChoice" -> SupportData.UsingAnApi.id)
+          .withMethod("POST").withFormUrlEncodedBody("initialChoice" -> SupportData.UsingAnApi.id)
 
         val result = addToken(underTest.submit())(formRequest)
 
@@ -141,7 +141,7 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
 
       "redirect to the generic support details page when any other option is selected" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody("initialChoice" -> SupportData.FindingAnApi.id)
+          .withMethod("POST").withFormUrlEncodedBody("initialChoice" -> SupportData.FindingAnApi.id)
 
         val result = addToken(underTest.submit())(formRequest)
 
@@ -151,7 +151,7 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
 
       "submit invalid request returns BAD_REQUEST" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "xyz" -> "blah"
           )
 

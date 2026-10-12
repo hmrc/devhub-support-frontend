@@ -113,7 +113,7 @@ class HelpWithApplicationsControllerSpec extends BaseControllerSpec with WithCSR
     "invoke submit" should {
       "redirect to the generic support details page when Completing Terms Of Use Agreement is selected" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody("choice" -> SupportData.CompletingTermsOfUseAgreement.id)
+          .withMethod("POST").withFormUrlEncodedBody("choice" -> SupportData.CompletingTermsOfUseAgreement.id)
 
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
         SupportServiceMock.UpdateWithDelta.succeeds()
@@ -126,7 +126,7 @@ class HelpWithApplicationsControllerSpec extends BaseControllerSpec with WithCSR
 
       "redirect to the giving team member access page when Giving a Team Member Access  is selected" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody("choice" -> SupportData.GivingTeamMemberAccess.id)
+          .withMethod("POST").withFormUrlEncodedBody("choice" -> SupportData.GivingTeamMemberAccess.id)
 
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
         SupportServiceMock.UpdateWithDelta.succeeds()
@@ -139,7 +139,7 @@ class HelpWithApplicationsControllerSpec extends BaseControllerSpec with WithCSR
 
       "redirect to the generic support details page when None of these is selected" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody("choice" -> SupportData.NoneOfTheAbove.id)
+          .withMethod("POST").withFormUrlEncodedBody("choice" -> SupportData.NoneOfTheAbove.id)
 
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
         SupportServiceMock.UpdateWithDelta.succeeds()

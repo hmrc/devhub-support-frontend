@@ -123,7 +123,7 @@ class CheckCdsAccessIsRequiredControllerSpec extends BaseControllerSpec with Wit
     "invoke submit" should {
       "submit new valid request from form with CDS" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "confirmCdsIntegration" -> "yes"
           )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -136,7 +136,7 @@ class CheckCdsAccessIsRequiredControllerSpec extends BaseControllerSpec with Wit
 
       "submit new valid request from form with CDS but choosing No" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "confirmCdsIntegration" -> "no"
           )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -149,7 +149,7 @@ class CheckCdsAccessIsRequiredControllerSpec extends BaseControllerSpec with Wit
 
       "submit invalid request returns BAD_REQUEST" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "xyz" -> "yes"
           )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -162,7 +162,7 @@ class CheckCdsAccessIsRequiredControllerSpec extends BaseControllerSpec with Wit
 
       "submit valid request but no session" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "confirmCdsIntegration" -> "yes"
           )
 

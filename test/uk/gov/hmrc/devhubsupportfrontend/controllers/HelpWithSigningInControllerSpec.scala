@@ -118,7 +118,7 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
 
     "invoke submit" should {
       "submit new valid request from form for 'Forgotten Password' choice" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "choice" -> SupportData.ForgottenPassword.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -130,7 +130,7 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
       }
 
       "submit new valid request from form for 'Access Codes' choice" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "choice" -> SupportData.AccessCodes.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -142,7 +142,7 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
       }
 
       "submit new valid request from form for 'None of these' choice" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "choice" -> SupportData.NoneOfTheAbove.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -154,7 +154,7 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
       }
 
       "submit invalid request returns BAD_REQUEST" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "bobbins" -> SupportData.AccessCodes.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -165,7 +165,7 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
       }
 
       "submit valid request but no session" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "choice" -> SupportData.AccessCodes.id
         )
         SupportServiceMock.GetSupportFlow.succeeds()

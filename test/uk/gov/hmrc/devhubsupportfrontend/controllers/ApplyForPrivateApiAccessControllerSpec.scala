@@ -117,7 +117,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
 
     "invoke submit" should {
       "submit new valid request from form" in new Setup with IsLoggedIn {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "fullName"      -> "Bob",
           "emailAddress"  -> "bob@example.com",
           "organisation"  -> "org",
@@ -133,7 +133,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
       }
 
       "create new support ticket when valid request with url (honeypot field) on form and user is logged in" in new Setup with IsLoggedIn {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "fullName"      -> "Bob",
           "emailAddress"  -> "bob@example.com",
           "organisation"  -> "org",
@@ -151,7 +151,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
 
       "not create new ticket but show dummy confirmation page when url (honeypot field) on form and user not logged in" in new Setup with NotLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"      -> "Bob",
             "emailAddress"  -> "bob@example.com",
             "organisation"  -> "org",
@@ -170,7 +170,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
       }
 
       "submit invalid request returns BAD_REQUEST" in new Setup with IsLoggedIn {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "fullName"      -> "Bob",
           "emailAddress"  -> "bob@example.com",
           "applicationId" -> "123456"
@@ -183,7 +183,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
       }
 
       "submit valid request but no session" in new Setup with IsLoggedIn {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "fullName"      -> "Bob",
           "emailAddress"  -> "bob@example.com",
           "organisation"  -> "org",

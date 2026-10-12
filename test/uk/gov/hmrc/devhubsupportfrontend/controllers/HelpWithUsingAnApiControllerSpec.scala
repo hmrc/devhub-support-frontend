@@ -177,7 +177,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
         SupportServiceMock.UpdateWithDelta.succeeds()
 
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "choice"                                            -> SupportData.MakingAnApiCall.id,
             SupportData.MakingAnApiCall.id + "-api-name"        -> apiName,
             SupportData.GettingExamples.id + "-api-name"        -> "ignored",
@@ -194,7 +194,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
         SupportServiceMock.UpdateWithDelta.succeeds()
 
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "choice"                                            -> SupportData.GettingExamples.id,
             SupportData.MakingAnApiCall.id + "-api-name"        -> "ignored",
             SupportData.GettingExamples.id + "-api-name"        -> apiName,
@@ -210,7 +210,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
         SupportServiceMock.UpdateWithDelta.succeeds()
 
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "choice"                                            -> SupportData.ReportingDocumentation.id,
             SupportData.MakingAnApiCall.id + "-api-name"        -> "ignored",
             SupportData.GettingExamples.id + "-api-name"        -> "ignored",
@@ -227,7 +227,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
         SupportServiceMock.UpdateWithDelta.succeeds()
 
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "choice"                                            -> SupportData.PrivateApiDocumentation.id,
             SupportData.MakingAnApiCall.id + "-api-name"        -> "ignored",
             SupportData.GettingExamples.id + "-api-name"        -> "ignored",
@@ -242,7 +242,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
       "handle bad request" in new Setup {
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
 
-        val formRequest = request.withFormUrlEncodedBody("choice" -> "random stuff")
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody("choice" -> "random stuff")
 
         val result = addToken(underTest.submit())(formRequest)
 
@@ -250,7 +250,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
       }
 
       "submit valid request but no session" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "choice"                                            -> SupportData.ReportingDocumentation.id,
           SupportData.MakingAnApiCall.id + "-api-name"        -> "ignored",
           SupportData.GettingExamples.id + "-api-name"        -> "ignored",

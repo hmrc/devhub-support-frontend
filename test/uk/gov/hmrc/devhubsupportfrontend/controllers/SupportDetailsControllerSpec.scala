@@ -181,7 +181,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
       "redirect to login when not logged in" in new Setup with NotLoggedIn {
         val supportFlow = SupportFlow(SupportSessionId.random, SupportData.UsingAnApi.id)
         val newRequest  = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
             "details"                          -> details,
@@ -200,7 +200,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
       "submit new request with name, email, comments and attachments from form when logged in" in new Setup with IsLoggedIn {
         val supportFlow = SupportFlow(SupportSessionId.random, SupportData.UsingAnApi.id)
         val newRequest  = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
             "details"                          -> details,
@@ -231,7 +231,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
 
       "create support ticket when request with attachments and url (honeypot field) on form and user is logged in" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
             "details"                          -> details,
@@ -250,7 +250,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
 
       "not create support ticket but show dummy confirmation page when url (honeypot field) on form and user is not logged in" in new Setup with NotLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"     -> fullName,
             "emailAddress" -> emailAddress,
             "details"      -> details,
@@ -268,7 +268,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
 
       "submit request with attachments and 3000 characters including \r\n details returns success" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
             "details"                          -> "A\r\n" * 1500,
@@ -286,7 +286,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
 
       "submit request with attachments and invalid details returns BAD_REQUEST" in new Setup with IsPartLoggedInEnablingMFA {
         request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
             "details"                          -> "A+++, good como  puedo iniciar, would buy again",
@@ -303,7 +303,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
 
       "submit request with attachments, details and invalid team member email returns BAD_REQUEST" in new Setup with IsPartLoggedInEnablingMFA {
         request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
             "details"                          -> validDetails,

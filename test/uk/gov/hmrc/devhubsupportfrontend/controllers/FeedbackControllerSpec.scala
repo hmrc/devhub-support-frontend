@@ -113,7 +113,7 @@ class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     "invoke action" should {
       "submit new request with comments" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "whatWereYouDoing" -> whatWereYouDoing,
             "feedback"         -> feedback
           )
@@ -136,7 +136,7 @@ class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       "submit new request with no details" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "whatWereYouDoing" -> "",
             "feedback"         -> ""
           )
@@ -151,7 +151,7 @@ class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       "submit new request when honeypot field filled in but logged in" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "whatWereYouDoing" -> whatWereYouDoing,
             "feedback"         -> feedback,
             "url"              -> honeypotUrl
@@ -175,7 +175,7 @@ class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       "show dummy confirmation page when honeypot field filled in but not logged in" in new Setup with NotLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "whatWereYouDoing" -> whatWereYouDoing,
             "feedback"         -> feedback,
             "url"              -> honeypotUrl

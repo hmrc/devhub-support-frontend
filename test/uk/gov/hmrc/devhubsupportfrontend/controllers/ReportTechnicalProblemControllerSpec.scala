@@ -117,7 +117,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
     "invoke action" should {
       "submit new request with name, email, comments" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"              -> fullName,
             "emailAddress"          -> emailAddress,
             "whatWereYouDoing"      -> whatWereYouDoing,
@@ -146,7 +146,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
 
       "submit new request with no name, email or details" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"              -> "",
             "emailAddress"          -> "",
             "whatWereYouDoing"      -> "",
@@ -165,7 +165,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
 
       "submit new request with invalid name and email" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"              -> "12345678901234567890123456789012345678901234567890123456789012345678901",
             "emailAddress"          -> "invalidemailaddress",
             "whatWereYouDoing"      -> whatWereYouDoing,
@@ -182,7 +182,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
 
       "submit new request when honeypot field filled in but logged in" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"              -> fullName,
             "emailAddress"          -> emailAddress,
             "whatWereYouDoing"      -> whatWereYouDoing,
@@ -212,7 +212,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
 
       "show dummy confirmation page when honeypot field filled in but not logged in" in new Setup with NotLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"              -> fullName,
             "emailAddress"          -> emailAddress,
             "whatWereYouDoing"      -> whatWereYouDoing,
