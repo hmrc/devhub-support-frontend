@@ -24,7 +24,6 @@ import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.{UserSession, U
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{SessionId => _, StringContextOps, _}
-import uk.gov.hmrc.play.http.metrics.common.API
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 

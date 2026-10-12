@@ -13,7 +13,6 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "play-frontend-hmrc-play-30"             % "13.15.0",
     "uk.gov.hmrc.mongo"       %% "hmrc-mongo-play-30"                     % hmrcMongoVersion,
     "commons-validator"       %  "commons-validator"                      % "1.10.1",
-    "uk.gov.hmrc"             %% "http-metrics"                           % "2.9.0",
     "uk.gov.hmrc"             %% "api-platform-common-domain"             % commonDomainVersion,
     "uk.gov.hmrc"             %% "api-platform-api-domain"                % apiDomainVersion,
     "uk.gov.hmrc"             %% "api-platform-tpd-domain"                % tpdDomainVersion,
