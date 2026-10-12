@@ -152,8 +152,8 @@ case class ResultSet(lastUpdated: Instant)
 
 object ResultSet {
   import play.api.libs.json.Json
-  implicit val dateFormat: Format[Instant]         = MongoJavatimeFormats.instantFormat
-  implicit val resultSetFormat: OFormat[ResultSet] = Json.format[ResultSet]
+  given dateFormat: Format[Instant]         = MongoJavatimeFormats.instantFormat
+  given resultSetFormat: OFormat[ResultSet] = Json.format[ResultSet]
 
   def apply(lastUpdated: Instant) = new ResultSet(lastUpdated)
 }

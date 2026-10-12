@@ -56,8 +56,8 @@ class ApmConnectorIntegrationSpec
       .build()
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val underTest                  = app.injector.instanceOf[ApmConnector]
+    given hc: HeaderCarrier = HeaderCarrier()
+    val underTest           = app.injector.instanceOf[ApmConnector]
 
   }
 

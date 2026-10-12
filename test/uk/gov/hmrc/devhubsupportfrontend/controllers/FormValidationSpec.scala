@@ -22,7 +22,7 @@ import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 
 class FormValidationSpec extends HmrcSpec {
 
-  import FormValidation._
+  import FormValidation.*
 
   case class TestForm(value: String)
 

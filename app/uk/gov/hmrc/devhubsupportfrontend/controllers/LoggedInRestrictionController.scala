@@ -33,7 +33,7 @@ class LoggedInRestrictionController @Inject() (
     val errorHandler: ErrorHandler,
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     enforceLoginNoticeView: EnforceLoginNoticeView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends BaseController(mcc) {
 

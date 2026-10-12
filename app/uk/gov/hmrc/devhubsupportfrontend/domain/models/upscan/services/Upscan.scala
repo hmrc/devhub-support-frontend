@@ -23,7 +23,7 @@ case class UpscanFileReference(
   )
 
 object UpscanFileReference {
-  implicit val format: Format[UpscanFileReference] = Json.format[UpscanFileReference]
+  given format: Format[UpscanFileReference] = Json.format[UpscanFileReference]
 }
 
 case class UpscanInitiateResponse(
@@ -33,5 +33,5 @@ case class UpscanInitiateResponse(
   )
 
 object UpscanInitiateResponse {
-  implicit val format: Format[UpscanInitiateResponse] = Json.format[UpscanInitiateResponse]
+  given format: Format[UpscanInitiateResponse] = Json.format[UpscanInitiateResponse]
 }

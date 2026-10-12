@@ -34,7 +34,7 @@ class GoToSupportFlowController @Inject() (
     val errorHandler: ErrorHandler,
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     supportService: SupportService
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
 

@@ -61,7 +61,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
     ApiContext("Xml Api context")
   )
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  given hc: HeaderCarrier = HeaderCarrier()
 
   trait Setup extends ApmConnectorMockModule with SupportFlowRepositoryMockModule with ApiPlatformDeskproConnectorMockModule with AuditServiceMockModule
       with XmlServicesConnectorMockModule {

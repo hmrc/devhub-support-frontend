@@ -40,8 +40,8 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
     val removeAccessCodesView  = app.injector.instanceOf[RemoveAccessCodesView]
 
     lazy val request = FakeRequest()
-      .withSupport(underTest)(supportSessionId)
-      .withUser(underTest)(sessionId)
+      .withSupport(using underTest)(supportSessionId)
+      .withUser(using underTest)(sessionId)
 
     val underTest        = new HelpWithSigningInController(
       mcc,

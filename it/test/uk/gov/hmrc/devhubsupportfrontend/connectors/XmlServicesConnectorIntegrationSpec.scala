@@ -55,8 +55,8 @@ class XmlServicesConnectorIntegrationSpec
       .build()
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val underTest                  = app.injector.instanceOf[XmlServicesConnector]
+    given hc: HeaderCarrier = HeaderCarrier()
+    val underTest           = app.injector.instanceOf[XmlServicesConnector]
 
   }
 

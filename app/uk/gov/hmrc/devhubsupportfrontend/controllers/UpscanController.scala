@@ -34,7 +34,7 @@ class UpscanController @Inject() (
     val errorHandler: ErrorHandler,
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     upscanInitiateConnector: UpscanInitiateConnector
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
 

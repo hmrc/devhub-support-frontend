@@ -46,8 +46,8 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
     val helpWithUsingAnApiView = app.injector.instanceOf[HelpWithUsingAnApiView]
 
     lazy val request = FakeRequest()
-      .withSupport(underTest)(supportSessionId)
-      .withUser(underTest)(sessionId)
+      .withSupport(using underTest)(supportSessionId)
+      .withUser(using underTest)(sessionId)
 
     val underTest = new HelpWithUsingAnApiController(
       mcc,
@@ -63,10 +63,10 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
 
-    def apiListShouldBeHidden(block: String)(implicit dom: Document) =
+    def apiListShouldBeHidden(block: String)(using dom: Document) =
       dom.getElementById("conditional-" + block).classNames should contain("govuk-radios__conditional--hidden")
 
-    def apiListShouldBeVisible(block: String)(implicit dom: Document) =
+    def apiListShouldBeVisible(block: String)(using dom: Document) =
       dom.getElementById("conditional-" + block).classNames should not(contain("govuk-radios__conditional--hidden"))
 
     val apiSummary = ApiSummary(
@@ -148,7 +148,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
         val result = addToken(underTest.page())(request)
 
         status(result) shouldBe OK
-        implicit val dom: Document = Jsoup.parse(contentAsString(result))
+        given dom: Document = Jsoup.parse(contentAsString(result))
         apiListShouldBeHidden(SupportData.MakingAnApiCall.id)
         apiListShouldBeHidden(SupportData.GettingExamples.id)
         apiListShouldBeHidden(SupportData.ReportingDocumentation.id)

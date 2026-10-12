@@ -68,8 +68,8 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withSupport(underTest)(supportSessionId)
-      .withUser(underTest)(sessionId)
+      .withSupport(using underTest)(supportSessionId)
+      .withUser(using underTest)(sessionId)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
   }

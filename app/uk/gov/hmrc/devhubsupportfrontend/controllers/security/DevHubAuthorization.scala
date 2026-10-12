@@ -40,7 +40,7 @@ trait DevHubAuthorization extends FrontendHeaderCarrierProvider with CookieEncod
     val onlyTrueIfLoggedInFilter: DeveloperSessionFilter.Type = _.loggedInState == LoggedInState.LoggedIn
   }
 
-  def maybeAtLeastPartLoggedInEnablingMfa(body: MaybeUserRequest[AnyContent] => Future[Result])(implicit ec: ExecutionContext): Action[AnyContent] =
+  def maybeAtLeastPartLoggedInEnablingMfa(body: MaybeUserRequest[AnyContent] => Future[Result])(using ec: ExecutionContext): Action[AnyContent] =
     Action.async { implicit request: MessagesRequest[AnyContent] =>
       def getMaybeUserRequest(maybeUserSession: Option[UserSession]): Future[Result] = {
         if (appConfig.enforceLogin && maybeUserSession.isEmpty) {
@@ -59,7 +59,7 @@ trait DevHubAuthorization extends FrontendHeaderCarrierProvider with CookieEncod
       def refine[A](msgRequest: MessagesRequest[A]): Future[Either[Result, UserRequest[A]]] = {
         lazy val loginRedirect = Redirect(s"${appConfig.thirdPartyDeveloperFrontendUrl}/developer/login")
 
-        implicit val request = msgRequest
+        given request: MessagesRequest[A] = msgRequest
 
         OptionT(loadSession)
           .filter(filter)
@@ -74,14 +74,14 @@ trait DevHubAuthorization extends FrontendHeaderCarrierProvider with CookieEncod
       loggedInActionRefiner().invokeBlock(request, block)
     }
 
-  private[security] def loadSession[A](implicit request: Request[A]): Future[Option[UserSession]] = {
+  private[security] def loadSession[A](using request: Request[A]): Future[Option[UserSession]] = {
     (for {
       sessionId <- extractUserSessionIdFromCookie(request)
     } yield fetchDeveloperSession(sessionId))
       .getOrElse(Future.successful(None))
   }
 
-  private def fetchDeveloperSession[A](sessionId: UserSessionId)(implicit hc: HeaderCarrier): Future[Option[UserSession]] = {
+  private def fetchDeveloperSession[A](sessionId: UserSessionId)(using hc: HeaderCarrier): Future[Option[UserSession]] = {
     thirdPartyDeveloperConnector.fetchSession(sessionId)
   }
 }

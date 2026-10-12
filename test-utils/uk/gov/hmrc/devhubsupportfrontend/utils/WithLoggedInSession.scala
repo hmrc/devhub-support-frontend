@@ -26,11 +26,11 @@ object WithLoggedInSession {
 
   implicit class AuthFakeRequest[A](fakeRequest: FakeRequest[A]) {
 
-    def withUser(implicit cookieEncoding: CookieEncoding): UserSessionId => FakeRequest[A] = { id =>
+    def withUser(using cookieEncoding: CookieEncoding): UserSessionId => FakeRequest[A] = { id =>
       fakeRequest.withCookies(cookieEncoding.createUserCookie(id))
     }
 
-    def withSupport(implicit cookieEncoding: CookieEncoding): SupportSessionId => FakeRequest[A] = { id =>
+    def withSupport(using cookieEncoding: CookieEncoding): SupportSessionId => FakeRequest[A] = { id =>
       fakeRequest.withCookies(cookieEncoding.createUserCookie(id))
     }
   }

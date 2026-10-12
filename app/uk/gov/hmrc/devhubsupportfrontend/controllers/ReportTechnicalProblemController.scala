@@ -86,11 +86,11 @@ class ReportTechnicalProblemController @Inject() (
     reportTechnicalProblemView: ReportTechnicalProblemView,
     reportTechnicalProblemConfirmationView: ReportTechnicalProblemConfirmationView,
     supportPageConfirmationForHoneyPotFieldView: SupportPageConfirmationForHoneyPotFieldView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
 
-  import ReportTechnicalProblemController._
+  import ReportTechnicalProblemController.*
   val reportTechnicalProblemForm: Form[ReportTechnicalProblemForm] = ReportTechnicalProblemForm.form
 
   def page(service: Option[String], referrer: Option[String]): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>

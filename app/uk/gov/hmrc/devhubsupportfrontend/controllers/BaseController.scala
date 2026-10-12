@@ -28,7 +28,7 @@ import uk.gov.hmrc.devhubsupportfrontend.controllers.security.DevHubAuthorizatio
 abstract class BaseController(mcc: MessagesControllerComponents) extends FrontendController(mcc) with DevHubAuthorization with WithUnsafeDefaultFormBinding {
   val errorHandler: ErrorHandler
 
-  implicit def ec: ExecutionContext
+  given ec: ExecutionContext
 
-  implicit val appConfig: AppConfig
+  given appConfig: AppConfig
 }

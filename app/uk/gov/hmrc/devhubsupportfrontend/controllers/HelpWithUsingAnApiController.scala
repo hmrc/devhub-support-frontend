@@ -66,11 +66,11 @@ class HelpWithUsingAnApiController @Inject() (
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     supportService: SupportService,
     helpWithUsingAnApiView: HelpWithUsingAnApiView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractSupportFlowController[HelpWithUsingAnApiForm, List[ApiSummary]](mcc, supportService) with SupportCookie {
 
-  import HelpWithUsingAnApiController._
+  import HelpWithUsingAnApiController.*
 
   def redirectBack(): Result = Redirect(routes.SupportEnquiryInitialChoiceController.page())
 
@@ -79,7 +79,7 @@ class HelpWithUsingAnApiController @Inject() (
     case _                                                        => false
   }
 
-  def pageContents(flow: SupportFlow, form: Form[HelpWithUsingAnApiForm], extras: List[ApiSummary])(implicit request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable =
+  def pageContents(flow: SupportFlow, form: Form[HelpWithUsingAnApiForm], extras: List[ApiSummary])(using request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable =
     helpWithUsingAnApiView(
       fullyloggedInDeveloper,
       form,
@@ -109,7 +109,7 @@ class HelpWithUsingAnApiController @Inject() (
     }
   }
 
-  def onValidForm(flow: SupportFlow, form: HelpWithUsingAnApiForm)(implicit request: MaybeUserRequest[AnyContent]): Future[Result] = {
+  def onValidForm(flow: SupportFlow, form: HelpWithUsingAnApiForm)(using request: MaybeUserRequest[AnyContent]): Future[Result] = {
     form.choice match {
       case SupportData.MakingAnApiCall.id         => updateFlowAndRedirect(chooseMakingCall(form))(routes.SupportDetailsController.supportDetailsPage())(flow)
       case SupportData.GettingExamples.id         => updateFlowAndRedirect(chooseGettingExamples(form))(routes.SupportDetailsController.supportDetailsPage())(flow)
@@ -122,6 +122,6 @@ class HelpWithUsingAnApiController @Inject() (
 
   def form(): Form[HelpWithUsingAnApiForm] = HelpWithUsingAnApiForm.form
 
-  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[List[ApiSummary]] = supportService.fetchAllApis(request.userSession.map(_.developer.userId))
+  def extraData()(using request: MaybeUserRequest[AnyContent]): Future[List[ApiSummary]] = supportService.fetchAllApis(request.userSession.map(_.developer.userId))
 
 }

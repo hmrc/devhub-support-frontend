@@ -24,7 +24,7 @@ import play.api.data.{Forms, Mapping}
 
 trait FormValidation {
 
-  implicit class FieldNameSyntax(firstFragment: String) {
+  extension (firstFragment: String) {
 
     def ~>[T](fn: (String, String) => Tuple2[String, Mapping[T]]) = {
       fn(firstFragment, firstFragment.toLowerCase())

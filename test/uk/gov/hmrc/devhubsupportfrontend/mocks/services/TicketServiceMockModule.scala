@@ -34,23 +34,23 @@ trait TicketServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
     object FetchTicket {
 
       def succeeds(ticket: Option[DeskproTicket]) =
-        when(aMock.fetchTicket(*)(*)).thenReturn(successful(ticket))
+        when(aMock.fetchTicket(*)(using *)).thenReturn(successful(ticket))
 
       def notFound() =
-        when(aMock.fetchTicket(*)(*)).thenReturn(successful(None))
+        when(aMock.fetchTicket(*)(using *)).thenReturn(successful(None))
 
     }
 
     object CreateResponse {
 
       def succeeds() =
-        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *, *, *)(*)).thenReturn(successful(DeskproTicketResponseSuccess))
+        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *, *, *)(using *)).thenReturn(successful(DeskproTicketResponseSuccess))
 
       def notFound() =
-        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *, *, *)(*)).thenReturn(successful(DeskproTicketResponseNotFound))
+        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *, *, *)(using *)).thenReturn(successful(DeskproTicketResponseNotFound))
 
       def fails() =
-        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *, *, *)(*)).thenReturn(successful(DeskproTicketResponseFailure))
+        when(aMock.createResponse(*, *[LaxEmailAddress], *, *, *, *, *)(using *)).thenReturn(successful(DeskproTicketResponseFailure))
 
       def verifyCalledWith(ticketId: Int, message: String, status: String, newStatus: String, attachments: List[Attachment]) = {
         verify(aMock).createResponse(
@@ -61,14 +61,14 @@ trait TicketServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
           *,
           eqTo(newStatus),
           eqTo(attachments)
-        )(*)
+        )(using *)
       }
     }
 
     object GetTicketsForUser {
 
       def succeeds(tickets: List[DeskproTicket]) =
-        when(aMock.getTicketsForUser(*[LaxEmailAddress], *)(*)).thenReturn(successful(tickets))
+        when(aMock.getTicketsForUser(*[LaxEmailAddress], *)(using *)).thenReturn(successful(tickets))
     }
   }
 

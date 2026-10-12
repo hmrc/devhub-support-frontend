@@ -61,7 +61,7 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
   lazy val uploadRedirectTargetBase = loadConfig("upload-redirect-target-base")
   lazy val callbackEndpointTarget   = loadConfig("upscan.callback-endpoint")
 
-  private def getConfigDefaulted[A](key: String, default: => A)(implicit loader: ConfigLoader[A]): A = config.getOptional[A](key)(loader).getOrElse(default)
+  private def getConfigDefaulted[A](key: String, default: => A)(using loader: ConfigLoader[A]): A = config.getOptional[A](key)(using loader).getOrElse(default)
 
   private def loadConfig(key: String) =
     config.getOptional[String](key).getOrElse(throw new RuntimeException(s"Missing configuration key: $key"))

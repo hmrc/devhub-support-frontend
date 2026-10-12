@@ -45,8 +45,8 @@ class CookieEncodingSpec extends AsyncHmrcSpec with GuiceOneAppPerSuite
       .build()
 
   private val wrapper = new CookieEncoding {
-    override val cookieSigner: CookieSigner    = app.injector.instanceOf[CookieSigner]
-    implicit override val appConfig: AppConfig = mock[AppConfig]
+    override val cookieSigner: CookieSigner = app.injector.instanceOf[CookieSigner]
+    override given appConfig: AppConfig     = mock[AppConfig]
   }
 
   "decode cookie for sessionId" should {

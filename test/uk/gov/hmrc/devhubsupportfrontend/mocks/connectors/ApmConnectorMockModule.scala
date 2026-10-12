@@ -32,10 +32,10 @@ trait ApmConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
     object FetchApiDefinitionsVisibleToUser {
 
       def willReturn(apis: List[ApiDefinition]) =
-        when(aMock.fetchApiDefinitionsVisibleToUser(*)(*)).thenReturn(successful(apis))
+        when(aMock.fetchApiDefinitionsVisibleToUser(*)(using *)).thenReturn(successful(apis))
 
       def willFailWith(exception: Exception) =
-        when(aMock.fetchApiDefinitionsVisibleToUser(*)(*)).thenReturn(failed(exception))
+        when(aMock.fetchApiDefinitionsVisibleToUser(*)(using *)).thenReturn(failed(exception))
     }
   }
 }

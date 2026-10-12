@@ -30,15 +30,15 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.*
 @Singleton
 class TicketService @Inject() (
     deskproConnector: ApiPlatformDeskproConnector
-  )(implicit val ec: ExecutionContext
+  )(using val ec: ExecutionContext
   ) extends ApplicationLogger {
 
-  def getTicketsForUser(email: LaxEmailAddress, getResolvedTickets: Boolean)(implicit hc: HeaderCarrier): Future[List[DeskproTicket]] = {
+  def getTicketsForUser(email: LaxEmailAddress, getResolvedTickets: Boolean)(using hc: HeaderCarrier): Future[List[DeskproTicket]] = {
     val status = if (getResolvedTickets) Some("resolved") else None
     deskproConnector.getTicketsForUser(email, status, hc)
   }
 
-  def fetchTicket(ticketId: Int)(implicit hc: HeaderCarrier): Future[Option[DeskproTicket]] = {
+  def fetchTicket(ticketId: Int)(using hc: HeaderCarrier): Future[Option[DeskproTicket]] = {
     deskproConnector.fetchTicket(ticketId, hc)
   }
 
@@ -50,7 +50,7 @@ class TicketService @Inject() (
       userName: String,
       newStatus: String,
       attachments: List[Attachment] = List.empty
-    )(implicit hc: HeaderCarrier
+    )(using hc: HeaderCarrier
     ): Future[DeskproTicketResponseResult] = {
     def getMessage() = {
       if (status == "resolved") {

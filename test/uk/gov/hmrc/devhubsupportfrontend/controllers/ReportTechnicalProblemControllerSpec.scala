@@ -67,8 +67,8 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
+      .withUser(using underTest)(sessionId)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
   }
@@ -77,7 +77,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withSession(sessionParams: _*)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.fails()
   }
@@ -86,8 +86,8 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
+      .withUser(using underTest)(sessionId)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeedsPartLoggedInEnablingMfa()
   }
@@ -95,7 +95,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
   "ReportTechnicalProblemController" when {
     "invoke page" should {
       "succeed when session exists" in new Setup with IsLoggedIn {
-        val requestWithSupportCookie = request.withSupportSession(underTest)(supportSessionId)
+        val requestWithSupportCookie = request.withSupportSession(using underTest)(supportSessionId)
         SupportServiceMock.GetSupportFlow.succeeds()
 
         val result = addToken(underTest.page(Some("third-party-developer"), Some("referrerUrl")))(requestWithSupportCookie)
@@ -235,7 +235,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
 
     "invoke confirmation page" should {
       "succeed when session exists" in new Setup with IsLoggedIn {
-        val requestWithSupportCookie = request.withSupportSession(underTest)(supportSessionId)
+        val requestWithSupportCookie = request.withSupportSession(using underTest)(supportSessionId)
         SupportServiceMock.GetSupportFlow.succeeds()
 
         val result = addToken(underTest.confirmationPage("ticket-ref"))(requestWithSupportCookie)

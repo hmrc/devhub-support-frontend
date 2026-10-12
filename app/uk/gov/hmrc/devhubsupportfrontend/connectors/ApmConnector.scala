@@ -30,11 +30,11 @@ object ApmConnector {
 }
 
 @Singleton
-class ApmConnector @Inject() (http: HttpClientV2, config: ApmConnector.Config, metrics: ConnectorMetrics)(implicit ec: ExecutionContext) {
+class ApmConnector @Inject() (http: HttpClientV2, config: ApmConnector.Config, metrics: ConnectorMetrics)(using ec: ExecutionContext) {
 
   val api = API("api-platform-microservice")
 
-  def fetchApiDefinitionsVisibleToUser(userId: Option[UserId])(implicit hc: HeaderCarrier): Future[List[ApiDefinition]] = {
+  def fetchApiDefinitionsVisibleToUser(userId: Option[UserId])(using hc: HeaderCarrier): Future[List[ApiDefinition]] = {
     val queryParams: Seq[(String, String)] = userId.fold(Seq.empty[(String, String)])(id => Seq("developerId" -> id.toString()))
 
     http

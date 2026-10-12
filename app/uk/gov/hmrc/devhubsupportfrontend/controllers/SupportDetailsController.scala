@@ -40,7 +40,7 @@ class SupportDetailsController @Inject() (
     supportPageDetailView: SupportPageDetailView,
     supportPageConfirmationView: SupportPageConfirmationView,
     supportPageConfirmationForHoneyPotFieldView: SupportPageConfirmationForHoneyPotFieldView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
 

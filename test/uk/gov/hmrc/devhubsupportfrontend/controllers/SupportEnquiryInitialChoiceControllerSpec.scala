@@ -44,8 +44,8 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
     val apiName          = "Test API definition name"
 
     lazy val request = FakeRequest()
-      .withSupport(underTest)(supportSessionId)
-      .withUser(underTest)(sessionId)
+      .withSupport(using underTest)(supportSessionId)
+      .withUser(using underTest)(sessionId)
 
     val underTest = new SupportEnquiryInitialChoiceController(
       mcc,

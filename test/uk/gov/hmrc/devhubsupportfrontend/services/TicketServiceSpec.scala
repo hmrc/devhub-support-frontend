@@ -29,7 +29,7 @@ import uk.gov.hmrc.devhubsupportfrontend.utils.AsyncHmrcSpec
 
 class TicketServiceSpec extends AsyncHmrcSpec {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  given hc: HeaderCarrier = HeaderCarrier()
 
   trait Setup extends ApiPlatformDeskproConnectorMockModule with FixedClock {
 

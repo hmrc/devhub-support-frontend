@@ -69,11 +69,11 @@ class FeedbackController @Inject() (
     supportService: SupportService,
     feedbackView: FeedbackView,
     feedbackConfirmationView: FeedbackConfirmationView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
 
-  import FeedbackController._
+  import FeedbackController.*
   val feedbackForm: Form[FeedbackForm] = FeedbackForm.form
 
   def page(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>

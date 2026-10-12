@@ -71,8 +71,8 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
+      .withUser(using underTest)(sessionId)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
   }
@@ -81,7 +81,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withSession(sessionParams: _*)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.fails()
   }
@@ -90,8 +90,8 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
+      .withUser(using underTest)(sessionId)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeedsPartLoggedInEnablingMfa()
   }
@@ -99,7 +99,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
   "SupportDetailsController" when {
     "invoke supportConfirmationPage" should {
       "succeed when session exists" in new Setup with IsLoggedIn {
-        val requestWithSupportCookie = request.withSupportSession(underTest)(supportSessionId)
+        val requestWithSupportCookie = request.withSupportSession(using underTest)(supportSessionId)
         SupportServiceMock.GetSupportFlow.succeeds()
 
         val result = addToken(underTest.supportConfirmationPage())(requestWithSupportCookie)

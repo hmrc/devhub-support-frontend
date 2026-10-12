@@ -27,7 +27,7 @@ abstract class AbstractController(
     mcc: MessagesControllerComponents
   ) extends BaseController(mcc) with SupportCookie {
 
-  protected def fullyloggedInDeveloper(implicit request: MaybeUserRequest[AnyContent]): Option[UserSession] =
+  protected def fullyloggedInDeveloper(using request: MaybeUserRequest[AnyContent]): Option[UserSession] =
     request.userSession.filter(_.loggedInState.isLoggedIn)
 
 }

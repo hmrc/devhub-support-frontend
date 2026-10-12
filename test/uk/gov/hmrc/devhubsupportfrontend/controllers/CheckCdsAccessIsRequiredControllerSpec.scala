@@ -41,8 +41,8 @@ class CheckCdsAccessIsRequiredControllerSpec extends BaseControllerSpec with Wit
     val cdsAccessIsNotRequiredView   = app.injector.instanceOf[CdsAccessIsNotRequiredView]
 
     lazy val request = FakeRequest()
-      .withSupport(underTest)(supportSessionId)
-      .withUser(underTest)(sessionId)
+      .withSupport(using underTest)(supportSessionId)
+      .withUser(using underTest)(sessionId)
 
     val underTest = new CheckCdsAccessIsRequiredController(
       mcc,

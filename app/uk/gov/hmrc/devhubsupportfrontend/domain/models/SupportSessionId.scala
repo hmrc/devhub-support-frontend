@@ -28,7 +28,7 @@ case class SupportSessionId(value: ju.UUID) extends AnyVal with SessionId {
 object SupportSessionId {
   import play.api.libs.json.{Format, Json}
 
-  implicit val format: Format[SupportSessionId] = Json.valueFormat[SupportSessionId]
+  given format: Format[SupportSessionId] = Json.valueFormat[SupportSessionId]
 
   def apply(raw: String): Option[SupportSessionId] = allCatch.opt(SupportSessionId(ju.UUID.fromString(raw)))
 

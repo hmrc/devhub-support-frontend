@@ -36,8 +36,8 @@ class GoToSupportFlowControllerSpec extends BaseControllerSpec with WithCSRFAddT
     val supportSessionId = SupportSessionId.random
 
     lazy val request = FakeRequest()
-      .withSupport(underTest)(supportSessionId)
-      .withUser(underTest)(sessionId)
+      .withSupport(using underTest)(supportSessionId)
+      .withUser(using underTest)(sessionId)
 
     val underTest = new GoToSupportFlowController(
       mcc,

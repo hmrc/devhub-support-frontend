@@ -27,15 +27,15 @@ lazy val microservice = Project("devhub-support-frontend", file("."))
   .settings(CodeCoverageSettings.settings: _*)
     .settings(
       routesImport ++= Seq(
-        "uk.gov.hmrc.devhubsupportfrontend.controllers.models._",
-        "uk.gov.hmrc.apiplatform.modules.common.domain.models._",
+        "uk.gov.hmrc.devhubsupportfrontend.controllers.models.*",
+        "uk.gov.hmrc.apiplatform.modules.common.domain.models.*",
     )
   )
   .settings(
     TwirlKeys.templateImports ++= Seq(
-      "uk.gov.hmrc.hmrcfrontend.views.html.components._",
-      "uk.gov.hmrc.hmrcfrontend.views.html.helpers._",
-      "uk.gov.hmrc.apiplatform.modules.common.domain.models._",
+      "uk.gov.hmrc.hmrcfrontend.views.html.components.*",
+      "uk.gov.hmrc.hmrcfrontend.views.html.helpers.*",
+      "uk.gov.hmrc.apiplatform.modules.common.domain.models.*",
       "uk.gov.hmrc.devhubsupportfrontend.config.AppConfig",
       "uk.gov.hmrc.devhubsupportfrontend.controllers"
     )

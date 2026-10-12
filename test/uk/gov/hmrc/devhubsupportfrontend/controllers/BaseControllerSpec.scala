@@ -41,11 +41,11 @@ class BaseControllerSpec
     with ErrorHandlerMock
     with SupportFlowRepositoryMockModule {
 
-  implicit val appConfig: AppConfig = mock[AppConfig]
+  given appConfig: AppConfig = mock[AppConfig]
 
-  implicit val cookieSigner: CookieSigner = app.injector.instanceOf[CookieSigner]
+  given cookieSigner: CookieSigner = app.injector.instanceOf[CookieSigner]
 
-  implicit lazy val materializer: Materializer = app.materializer
+  given materializer: Materializer = app.materializer
 
   lazy val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
 

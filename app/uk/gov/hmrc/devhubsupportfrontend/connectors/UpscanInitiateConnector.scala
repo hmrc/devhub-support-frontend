@@ -38,7 +38,7 @@ case class UpscanInitiateRequest(
   )
 
 object UpscanInitiateRequest {
-  implicit val upscanInitiateRequestFormat: Format[UpscanInitiateRequest] = Json.format[UpscanInitiateRequest]
+  given upscanInitiateRequestFormat: Format[UpscanInitiateRequest] = Json.format[UpscanInitiateRequest]
 }
 
 case class UploadForm(
@@ -49,7 +49,7 @@ case class UploadForm(
 case class Reference(value: String) extends AnyVal
 
 object Reference {
-  implicit val referenceFormat: Reads[Reference] = Reads.StringReads.map(Reference(_))
+  given referenceFormat: Reads[Reference] = Reads.StringReads.map(Reference(_))
 }
 
 case class PreparedUpload(
@@ -58,21 +58,21 @@ case class PreparedUpload(
   )
 
 object PreparedUpload {
-  implicit val UploadFormFormat: Reads[UploadForm]         = Json.reads[UploadForm]
-  implicit val PreparedUploadFormat: Reads[PreparedUpload] = Json.reads[PreparedUpload]
+  given UploadFormFormat: Reads[UploadForm]         = Json.reads[UploadForm]
+  given PreparedUploadFormat: Reads[PreparedUpload] = Json.reads[PreparedUpload]
 }
 
 class UpscanInitiateConnector @Inject() (
     httpClient: HttpClientV2,
     appConfig: AppConfig
-  )(implicit val ec: ExecutionContext
+  )(using val ec: ExecutionContext
   ) {
 
   private val headers = Map(
     HeaderNames.CONTENT_TYPE -> "application/json"
   )
 
-  def initiate()(implicit hc: HeaderCarrier): Future[UpscanInitiateResponse] = {
+  def initiate()(using hc: HeaderCarrier): Future[UpscanInitiateResponse] = {
     val successRedirectUrl = appConfig.devhubSupportFrontendUrl + "/devhub-support/upscan/result"
     val errorRedirectUrl   = appConfig.devhubSupportFrontendUrl + "/devhub-support/upscan/result"
 
@@ -85,7 +85,7 @@ class UpscanInitiateConnector @Inject() (
     for {
       response     <- httpClient.post(url"${appConfig.initiateV2Url}")
                         .withBody(Json.toJson(request))
-                        .setHeader(headers.toSeq: _*)
+                        .setHeader(headers.toSeq*)
                         .execute[PreparedUpload]
       fileReference = UpscanFileReference(response.reference.value)
       postTarget    = response.uploadRequest.href

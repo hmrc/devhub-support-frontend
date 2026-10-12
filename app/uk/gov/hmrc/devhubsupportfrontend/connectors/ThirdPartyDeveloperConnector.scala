@@ -32,14 +32,14 @@ class ThirdPartyDeveloperConnector @Inject() (
     http: HttpClientV2,
     config: AppConfig,
     metrics: ConnectorMetrics
-  )(implicit val ec: ExecutionContext
+  )(using val ec: ExecutionContext
   ) extends Logging {
 
   lazy val serviceBaseUrl: String = config.thirdPartyDeveloperUrl
 
   val api: API = API("third-party-developer")
 
-  def fetchSession(sessionId: UserSessionId)(implicit hc: HeaderCarrier): Future[Option[UserSession]] = metrics.record(api) {
+  def fetchSession(sessionId: UserSessionId)(using hc: HeaderCarrier): Future[Option[UserSession]] = metrics.record(api) {
     http.get(url"$serviceBaseUrl/session/$sessionId")
       .execute[Option[UserSession]]
   }

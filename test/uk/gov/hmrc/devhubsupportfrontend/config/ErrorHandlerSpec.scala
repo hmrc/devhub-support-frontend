@@ -44,7 +44,7 @@ class ErrorHandlerSpec extends AsyncHmrcSpec
 
   "standardErrorTemplate" should {
     "render HTML" in {
-      val html = await(handler.standardErrorTemplate("title", "heading", "message")(fakeRequest))
+      val html = await(handler.standardErrorTemplate("title", "heading", "message")(using fakeRequest))
       html.contentType shouldBe "text/html"
     }
   }

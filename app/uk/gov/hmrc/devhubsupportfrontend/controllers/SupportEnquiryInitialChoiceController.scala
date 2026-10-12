@@ -37,12 +37,12 @@ class SupportEnquiryInitialChoiceController @Inject() (
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     supportService: SupportService,
     supportEnquiryInitialChoiceView: SupportEnquiryInitialChoiceView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
 
   def page(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
-    if (fullyloggedInDeveloper(request).isDefined) {
+    if (fullyloggedInDeveloper(using request).isDefined) {
       // If user is logged on then redirect to the list of tickets for that user
       Future.successful(Redirect(routes.TicketController.ticketListPage()))
     } else {

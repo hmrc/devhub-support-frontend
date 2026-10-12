@@ -73,24 +73,24 @@ object ApiPlatformDeskproConnector {
 
   case class GetTicketsByEmailRequest(email: LaxEmailAddress, status: Option[String] = None)
 
-  implicit val attachmentFormat: Format[Attachment]                              = Json.format[Attachment]
-  implicit val createTicketRequestFormat: Format[CreateTicketRequest]            = Json.format[CreateTicketRequest]
-  implicit val createTicketResponseFormat: Format[CreateTicketResponse]          = Json.format[CreateTicketResponse]
-  implicit val getTicketsByEmailRequest: Format[GetTicketsByEmailRequest]        = Json.format[GetTicketsByEmailRequest]
-  implicit val createTicketResponseRequest: OFormat[CreateTicketResponseRequest] = Json.format[CreateTicketResponseRequest]
+  given attachmentFormat: Format[Attachment]                              = Json.format[Attachment]
+  given createTicketRequestFormat: Format[CreateTicketRequest]            = Json.format[CreateTicketRequest]
+  given createTicketResponseFormat: Format[CreateTicketResponse]          = Json.format[CreateTicketResponse]
+  given getTicketsByEmailRequest: Format[GetTicketsByEmailRequest]        = Json.format[GetTicketsByEmailRequest]
+  given createTicketResponseRequest: OFormat[CreateTicketResponseRequest] = Json.format[CreateTicketResponseRequest]
 }
 
 @Singleton
-class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlatformDeskproConnector.Config, metrics: ConnectorMetrics)(implicit val ec: ExecutionContext)
+class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlatformDeskproConnector.Config, metrics: ConnectorMetrics)(using val ec: ExecutionContext)
     extends ApplicationLogger {
 
-  import ApiPlatformDeskproConnector._
+  import ApiPlatformDeskproConnector.*
 
   val api = API("api-platform-deskpro")
 
   def createTicket(createRequest: CreateTicketRequest, hc: HeaderCarrier): Future[Option[String]] = metrics.record(api) {
-    implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
-    val createRequestJson                     = Json.toJson(createRequest)
+    given headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
+    val createRequestJson              = Json.toJson(createRequest)
     http.post(url"${config.serviceBaseUrl}/ticket")
       .withBody(createRequestJson)
       .execute[CreateTicketResponse]
@@ -98,20 +98,20 @@ class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlat
   }
 
   def getTicketsForUser(email: LaxEmailAddress, status: Option[String], hc: HeaderCarrier): Future[List[DeskproTicket]] = metrics.record(api) {
-    implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
+    given headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
     http.post(url"${config.serviceBaseUrl}/ticket/query")
       .withBody(Json.toJson(GetTicketsByEmailRequest(email, status)))
       .execute[List[DeskproTicket]]
   }
 
   def fetchTicket(ticketId: Int, hc: HeaderCarrier): Future[Option[DeskproTicket]] = metrics.record(api) {
-    implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
+    given headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
     http.get(url"${config.serviceBaseUrl}/ticket/$ticketId")
       .execute[Option[DeskproTicket]]
   }
 
   def closeTicket(ticketId: Int, hc: HeaderCarrier): Future[DeskproTicketCloseResult] = metrics.record(api) {
-    implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
+    given headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
     http.post(url"${config.serviceBaseUrl}/ticket/$ticketId/close")
       .execute[HttpResponse]
       .map(response =>
@@ -131,8 +131,8 @@ class ApiPlatformDeskproConnector @Inject() (http: HttpClientV2, config: ApiPlat
 
   def createResponse(ticketId: Int, userEmail: LaxEmailAddress, message: String, status: String, attachments: List[Attachment], hc: HeaderCarrier)
       : Future[DeskproTicketResponseResult] = metrics.record(api) {
-    implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
-    val ticketResponseJson                    = Json.toJson(CreateTicketResponseRequest(userEmail, message, status, attachments))
+    given headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
+    val ticketResponseJson             = Json.toJson(CreateTicketResponseRequest(userEmail, message, status, attachments))
     http.post(url"${config.serviceBaseUrl}/ticket/$ticketId/response")
       .withBody(ticketResponseJson)
       .execute[HttpResponse]

@@ -42,7 +42,7 @@ class ApplyForPrivateApiAccessController @Inject() (
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     applyForPrivateApiAccessView: ApplyForPrivateApiAccessView,
     supportPageConfirmationForHoneyPotFieldView: SupportPageConfirmationForHoneyPotFieldView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractSupportFlowController[ApplyForPrivateApiAccessForm, Unit](mcc, supportService) with SupportCookie {
 
@@ -56,9 +56,9 @@ class ApplyForPrivateApiAccessController @Inject() (
 
   def form() = ApplyForPrivateApiAccessForm.form
 
-  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
+  def extraData()(using request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
 
-  def pageContents(flow: SupportFlow, form: Form[ApplyForPrivateApiAccessForm], extras: Unit)(implicit request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable = {
+  def pageContents(flow: SupportFlow, form: Form[ApplyForPrivateApiAccessForm], extras: Unit)(using request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable = {
     applyForPrivateApiAccessView(
       fullyloggedInDeveloper,
       flow.privateApi,
@@ -67,7 +67,7 @@ class ApplyForPrivateApiAccessController @Inject() (
     )
   }
 
-  def onValidForm(flow: SupportFlow, form: ApplyForPrivateApiAccessForm)(implicit request: MaybeUserRequest[AnyContent]): Future[Result] = {
+  def onValidForm(flow: SupportFlow, form: ApplyForPrivateApiAccessForm)(using request: MaybeUserRequest[AnyContent]): Future[Result] = {
     if (form.url.isDefined && fullyloggedInDeveloper.map(user => !user.loggedInState.isLoggedIn).getOrElse(true)) {
       logger.warn(s"Honeypot field triggered via 'Apply for access to a private API' support form")
       Future.successful(Ok(supportPageConfirmationForHoneyPotFieldView(fullyloggedInDeveloper)))

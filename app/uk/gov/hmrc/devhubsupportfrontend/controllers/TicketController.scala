@@ -76,11 +76,11 @@ class TicketController @Inject() (
     ticketListView: TicketListView,
     ticketView: TicketView,
     ticketConfirmationView: ClosedTicketConfirmationView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
 
-  import TicketController._
+  import TicketController.*
 
   def ticketListPage(resolved: Boolean): Action[AnyContent] = loggedInAction { implicit request =>
     ticketService.getTicketsForUser(request.userSession.developer.email, resolved)

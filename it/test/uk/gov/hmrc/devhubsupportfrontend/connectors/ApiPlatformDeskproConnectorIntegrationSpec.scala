@@ -56,8 +56,8 @@ class ApiPlatformDeskproConnectorIntegrationSpec
       .build()
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val underTest                  = app.injector.instanceOf[ApiPlatformDeskproConnector]
+    given hc: HeaderCarrier = HeaderCarrier()
+    val underTest           = app.injector.instanceOf[ApiPlatformDeskproConnector]
 
     val fullName      = "Bob"
     val email         = "bob@example.com"

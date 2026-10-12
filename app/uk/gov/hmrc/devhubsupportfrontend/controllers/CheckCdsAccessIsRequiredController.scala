@@ -42,7 +42,7 @@ class CheckCdsAccessIsRequiredController @Inject() (
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     checkCdsAccessIsRequiredView: CheckCdsAccessIsRequiredView,
     cdsAccessIsNotRequiredView: CdsAccessIsNotRequiredView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractSupportFlowController[CheckCdsAccessIsRequiredForm, Unit](mcc, supportService) with SupportCookie {
 
@@ -53,14 +53,14 @@ class CheckCdsAccessIsRequiredController @Inject() (
     case _                                                                                                                                  => false
   }
 
-  def pageContents(flow: SupportFlow, form: Form[CheckCdsAccessIsRequiredForm], extras: Unit)(implicit request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable =
+  def pageContents(flow: SupportFlow, form: Form[CheckCdsAccessIsRequiredForm], extras: Unit)(using request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable =
     checkCdsAccessIsRequiredView(
       fullyloggedInDeveloper,
       form,
       routes.ChooseAPrivateApiController.page().url
     )
 
-  def onValidForm(flow: SupportFlow, form: CheckCdsAccessIsRequiredForm)(implicit request: MaybeUserRequest[AnyContent]): Future[Result] = {
+  def onValidForm(flow: SupportFlow, form: CheckCdsAccessIsRequiredForm)(using request: MaybeUserRequest[AnyContent]): Future[Result] = {
     if (form.confirmCdsIntegration == "yes")
       successful(Redirect(routes.ApplyForPrivateApiAccessController.page()))
     else
@@ -69,7 +69,7 @@ class CheckCdsAccessIsRequiredController @Inject() (
 
   def form() = CheckCdsAccessIsRequiredForm.form
 
-  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
+  def extraData()(using request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
 
   def cdsAccessIsNotRequiredPage(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
     successful(Ok(
