@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.filters.csrf.CSRF.TokenProvider
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
@@ -28,8 +28,8 @@ import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithSupportSession._
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession.*
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithSupportSession.*
 import uk.gov.hmrc.devhubsupportfrontend.views.html.PageNotFoundView
 
 class PageNotFoundControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
@@ -53,8 +53,8 @@ class PageNotFoundControllerSpec extends BaseControllerSpec with WithCSRFAddToke
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
+      .withUser(using underTest)(sessionId)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
   }
@@ -63,25 +63,15 @@ class PageNotFoundControllerSpec extends BaseControllerSpec with WithCSRFAddToke
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withSession(sessionParams: _*)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.fails()
-  }
-
-  trait IsPartLoggedInEnablingMFA {
-    self: Setup =>
-
-    lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
-
-    ThirdPartyDeveloperConnectorMock.FetchSession.succeedsPartLoggedInEnablingMfa()
   }
 
   "PageNotFoundController" when {
     "invoke page" should {
       "succeed when session exists" in new Setup with IsLoggedIn {
-        val requestWithSupportCookie = request.withSupportSession(underTest)(supportSessionId)
+        val requestWithSupportCookie = request.withSupportSession(using underTest)(supportSessionId)
 
         val result = addToken(underTest.page())(requestWithSupportCookie)
 
