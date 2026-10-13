@@ -21,7 +21,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import org.jsoup.Jsoup
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ServiceNameData
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApiContextData
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
@@ -31,7 +31,7 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.{ApiSummary, SupportFlow,
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession.*
 import uk.gov.hmrc.devhubsupportfrontend.views.html.SupportEnquiryInitialChoiceView
 
 class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
@@ -44,8 +44,8 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
     val apiName          = "Test API definition name"
 
     lazy val request = FakeRequest()
-      .withSupport(underTest)(supportSessionId)
-      .withUser(underTest)(sessionId)
+      .withSupport(using underTest)(supportSessionId)
+      .withUser(using underTest)(sessionId)
 
     val underTest = new SupportEnquiryInitialChoiceController(
       mcc,
@@ -131,7 +131,7 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
     "invoking submit" should {
       "redirect to the new help with using an api page when the 'Using an API' option is selected" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody("initialChoice" -> SupportData.UsingAnApi.id)
+          .withMethod("POST").withFormUrlEncodedBody("initialChoice" -> SupportData.UsingAnApi.id)
 
         val result = addToken(underTest.submit())(formRequest)
 
@@ -141,7 +141,7 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
 
       "redirect to the generic support details page when any other option is selected" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody("initialChoice" -> SupportData.FindingAnApi.id)
+          .withMethod("POST").withFormUrlEncodedBody("initialChoice" -> SupportData.FindingAnApi.id)
 
         val result = addToken(underTest.submit())(formRequest)
 
@@ -151,7 +151,7 @@ class SupportEnquiryInitialChoiceControllerSpec extends BaseControllerSpec with 
 
       "submit invalid request returns BAD_REQUEST" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "xyz" -> "blah"
           )
 

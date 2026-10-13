@@ -21,7 +21,7 @@ import scala.concurrent.Future
 
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
@@ -30,7 +30,7 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSess
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession.*
 import uk.gov.hmrc.devhubsupportfrontend.views.html.{ApplyForPrivateApiAccessView, CdsAccessIsNotRequiredView, CheckCdsAccessIsRequiredView}
 
 class CheckCdsAccessIsRequiredControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
@@ -41,8 +41,8 @@ class CheckCdsAccessIsRequiredControllerSpec extends BaseControllerSpec with Wit
     val cdsAccessIsNotRequiredView   = app.injector.instanceOf[CdsAccessIsNotRequiredView]
 
     lazy val request = FakeRequest()
-      .withSupport(underTest)(supportSessionId)
-      .withUser(underTest)(sessionId)
+      .withSupport(using underTest)(supportSessionId)
+      .withUser(using underTest)(sessionId)
 
     val underTest = new CheckCdsAccessIsRequiredController(
       mcc,
@@ -123,7 +123,7 @@ class CheckCdsAccessIsRequiredControllerSpec extends BaseControllerSpec with Wit
     "invoke submit" should {
       "submit new valid request from form with CDS" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "confirmCdsIntegration" -> "yes"
           )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -136,7 +136,7 @@ class CheckCdsAccessIsRequiredControllerSpec extends BaseControllerSpec with Wit
 
       "submit new valid request from form with CDS but choosing No" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "confirmCdsIntegration" -> "no"
           )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -149,7 +149,7 @@ class CheckCdsAccessIsRequiredControllerSpec extends BaseControllerSpec with Wit
 
       "submit invalid request returns BAD_REQUEST" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "xyz" -> "yes"
           )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -162,7 +162,7 @@ class CheckCdsAccessIsRequiredControllerSpec extends BaseControllerSpec with Wit
 
       "submit valid request but no session" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "confirmCdsIntegration" -> "yes"
           )
 

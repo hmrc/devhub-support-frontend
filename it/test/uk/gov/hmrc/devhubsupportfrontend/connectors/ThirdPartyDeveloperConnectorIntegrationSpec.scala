@@ -18,23 +18,27 @@ package uk.gov.hmrc.devhubsupportfrontend.connectors
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application, Configuration, Mode}
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress.StringSyntax
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress.StringSyntax.toLaxEmail
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.{LoggedInState, UserSession, UserSessionId}
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.mongo.play.PlayMongoModule
 
+import uk.gov.hmrc.devhubsupportfrontend.mocks.repositories.SupportFlowRepositoryMockModule
+import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
 import uk.gov.hmrc.devhubsupportfrontend.stubs.ThirdPartyDeveloperStub
 import uk.gov.hmrc.devhubsupportfrontend.utils.WireMockExtensions
 
 class ThirdPartyDeveloperConnectorIntegrationSpec extends BaseConnectorIntegrationSpec
-    with GuiceOneAppPerSuite with UserBuilder with LocalUserIdTracker with WireMockExtensions with FixedClock {
+    with GuiceOneAppPerSuite with UserBuilder with LocalUserIdTracker with WireMockExtensions with FixedClock
+    with SupportFlowRepositoryMockModule {
 
   private val stubConfig = Configuration(
     "microservice.services.third-party-developer.port" -> stubPort,
@@ -43,13 +47,15 @@ class ThirdPartyDeveloperConnectorIntegrationSpec extends BaseConnectorIntegrati
 
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
+      .disable[PlayMongoModule]
+      .overrides(bind[SupportFlowRepository].toInstance(SupportFlowRepositoryMock.aMock))
       .configure(stubConfig)
       .overrides(bind[ConnectorMetrics].to[NoopConnectorMetrics])
       .in(Mode.Test)
       .build()
 
   trait Setup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    given hc: HeaderCarrier = HeaderCarrier()
 
     val userEmail: LaxEmailAddress = "thirdpartydeveloper@example.com".toLaxEmail
     val userId: UserId             = idOf(userEmail)
@@ -64,7 +70,17 @@ class ThirdPartyDeveloperConnectorIntegrationSpec extends BaseConnectorIntegrati
 
       private val result = await(underTest.fetchSession(sessionId))
 
-      result shouldBe Some(UserSession(sessionId, loggedInState = LoggedInState.LOGGED_IN, buildTrackedUser(userEmail)))
+      result shouldBe Some(UserSession(sessionId, loggedInState = LoggedInState.LoggedIn, buildTrackedUser(userEmail)))
+    }
+
+    "return a session that is part logged in enabling MFA" in new Setup {
+      ThirdPartyDeveloperStub.FetchSession.succeeds(sessionId, userId, userEmail, nowAsText, loggedInState = "PART_LOGGED_IN_ENABLING_MFA")
+
+      val result = await(underTest.fetchSession(sessionId))
+
+      result shouldBe Some(UserSession(sessionId, loggedInState = LoggedInState.PartLoggedInEnablingMFA, buildTrackedUser(userEmail)))
+      result.value.loggedInState.isPartLoggedInEnablingMFA shouldBe true
+      result.value.loggedInState.isLoggedIn shouldBe false
     }
 
     "not return a session when a session does not exist" in new Setup {

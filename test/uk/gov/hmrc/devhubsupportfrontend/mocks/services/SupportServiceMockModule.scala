@@ -32,7 +32,7 @@ trait SupportServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
     object FetchAllApis {
 
       def succeeds(apis: List[ApiSummary]) =
-        when(aMock.fetchAllApis(*)(*)).thenReturn(successful(apis))
+        when(aMock.fetchAllApis(*)(using *)).thenReturn(successful(apis))
     }
 
     object GetSupportFlow {
@@ -42,15 +42,15 @@ trait SupportServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
     object SubmitTicket { // TODO - sort two calls
 
       def succeeds(flow: SupportFlow = SupportFlow(SupportSessionId.random, SupportData.UsingAnApi.id)) = {
-        when(aMock.submitTicket(*, *[ApplyForPrivateApiAccessForm])(*)).thenReturn(successful(flow))
-        when(aMock.submitTicket(*, *[SupportDetailsForm])(*)).thenReturn(successful(flow))
+        when(aMock.submitTicket(*, *[ApplyForPrivateApiAccessForm])(using *)).thenReturn(successful(flow))
+        when(aMock.submitTicket(*, *[SupportDetailsForm])(using *)).thenReturn(successful(flow))
       }
 
       def verifyCalledWith(flow: SupportFlow, form: SupportDetailsForm) = {
         verify(aMock).submitTicket(
           eqTo(flow),
           eqTo(form)
-        )(*)
+        )(using *)
       }
     }
 
@@ -63,7 +63,7 @@ trait SupportServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
     }
 
     object ReportTechnicalProblem {
-      def succeeds() = when(aMock.reportTechnicalProblem(*, *, *, *, *, *, *, *)(*)).thenReturn(successful("ticket-ref"))
+      def succeeds() = when(aMock.reportTechnicalProblem(*, *, *, *, *, *, *, *)(using *)).thenReturn(successful("ticket-ref"))
 
       def verifyCalledWith(
           fullName: String,
@@ -84,12 +84,12 @@ trait SupportServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
           eqTo(referrerUrl),
           eqTo(userAgent),
           eqTo(sessionId)
-        )(*)
+        )(using *)
       }
     }
 
     object GiveFeedback {
-      def succeeds() = when(aMock.giveFeedback(*, *, *, *, *, *)(*)).thenReturn(successful("ticket-ref"))
+      def succeeds() = when(aMock.giveFeedback(*, *, *, *, *, *)(using *)).thenReturn(successful("ticket-ref"))
 
       def verifyCalledWith(
           fullName: String,
@@ -106,7 +106,7 @@ trait SupportServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
           eqTo(feedback),
           eqTo(userAgent),
           eqTo(sessionId)
-        )(*)
+        )(using *)
       }
     }
   }

@@ -24,7 +24,7 @@ import org.jsoup.nodes.Document
 
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.ServiceNameData
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApiContextData
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
@@ -35,7 +35,7 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.{ApiSummary, SupportFlow,
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession.*
 import uk.gov.hmrc.devhubsupportfrontend.views.html.HelpWithUsingAnApiView
 
 class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
@@ -46,8 +46,8 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
     val helpWithUsingAnApiView = app.injector.instanceOf[HelpWithUsingAnApiView]
 
     lazy val request = FakeRequest()
-      .withSupport(underTest)(supportSessionId)
-      .withUser(underTest)(sessionId)
+      .withSupport(using underTest)(supportSessionId)
+      .withUser(using underTest)(sessionId)
 
     val underTest = new HelpWithUsingAnApiController(
       mcc,
@@ -63,10 +63,10 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
 
-    def apiListShouldBeHidden(block: String)(implicit dom: Document) =
+    def apiListShouldBeHidden(block: String)(using dom: Document) =
       dom.getElementById("conditional-" + block).classNames should contain("govuk-radios__conditional--hidden")
 
-    def apiListShouldBeVisible(block: String)(implicit dom: Document) =
+    def apiListShouldBeVisible(block: String)(using dom: Document) =
       dom.getElementById("conditional-" + block).classNames should not(contain("govuk-radios__conditional--hidden"))
 
     val apiSummary = ApiSummary(
@@ -130,10 +130,9 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
       }
 
       "work for choosePrivateApi" in {
-        val form = HelpWithUsingAnApiForm("ignored", None, None, None)
         val flow = SupportFlow(supportSessionId, "untouched")
 
-        val result = HelpWithUsingAnApiController.choosePrivateApi(form)(flow)
+        val result = HelpWithUsingAnApiController.choosePrivateApi()(flow)
 
         result.entrySelection shouldBe "untouched"
         result.subSelection.value shouldBe SupportData.PrivateApiDocumentation.id
@@ -148,7 +147,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
         val result = addToken(underTest.page())(request)
 
         status(result) shouldBe OK
-        implicit val dom: Document = Jsoup.parse(contentAsString(result))
+        given dom: Document = Jsoup.parse(contentAsString(result))
         apiListShouldBeHidden(SupportData.MakingAnApiCall.id)
         apiListShouldBeHidden(SupportData.GettingExamples.id)
         apiListShouldBeHidden(SupportData.ReportingDocumentation.id)
@@ -177,7 +176,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
         SupportServiceMock.UpdateWithDelta.succeeds()
 
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "choice"                                            -> SupportData.MakingAnApiCall.id,
             SupportData.MakingAnApiCall.id + "-api-name"        -> apiName,
             SupportData.GettingExamples.id + "-api-name"        -> "ignored",
@@ -194,7 +193,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
         SupportServiceMock.UpdateWithDelta.succeeds()
 
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "choice"                                            -> SupportData.GettingExamples.id,
             SupportData.MakingAnApiCall.id + "-api-name"        -> "ignored",
             SupportData.GettingExamples.id + "-api-name"        -> apiName,
@@ -210,7 +209,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
         SupportServiceMock.UpdateWithDelta.succeeds()
 
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "choice"                                            -> SupportData.ReportingDocumentation.id,
             SupportData.MakingAnApiCall.id + "-api-name"        -> "ignored",
             SupportData.GettingExamples.id + "-api-name"        -> "ignored",
@@ -227,7 +226,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
         SupportServiceMock.UpdateWithDelta.succeeds()
 
         val formRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "choice"                                            -> SupportData.PrivateApiDocumentation.id,
             SupportData.MakingAnApiCall.id + "-api-name"        -> "ignored",
             SupportData.GettingExamples.id + "-api-name"        -> "ignored",
@@ -242,7 +241,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
       "handle bad request" in new Setup {
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
 
-        val formRequest = request.withFormUrlEncodedBody("choice" -> "random stuff")
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody("choice" -> "random stuff")
 
         val result = addToken(underTest.submit())(formRequest)
 
@@ -250,7 +249,7 @@ class HelpWithUsingAnApiControllerSpec extends BaseControllerSpec with WithCSRFA
       }
 
       "submit valid request but no session" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "choice"                                            -> SupportData.ReportingDocumentation.id,
           SupportData.MakingAnApiCall.id + "-api-name"        -> "ignored",
           SupportData.GettingExamples.id + "-api-name"        -> "ignored",

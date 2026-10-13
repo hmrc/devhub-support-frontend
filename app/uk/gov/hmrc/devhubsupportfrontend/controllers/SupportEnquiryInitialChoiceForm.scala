@@ -17,9 +17,9 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 
-import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData._
+import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData.*
 
 final case class SupportEnquiryInitialChoiceForm(initialChoice: String)
 
@@ -28,6 +28,6 @@ object SupportEnquiryInitialChoiceForm extends FormValidation {
   val form: Form[SupportEnquiryInitialChoiceForm] = Form(
     mapping(
       "initialChoice" -> oneOf(FindingAnApi.id, UsingAnApi.id, SigningIn.id, SettingUpApplication.id, NoneOfTheAbove.id)
-    )(SupportEnquiryInitialChoiceForm.apply)(SupportEnquiryInitialChoiceForm.unapply)
+    )(SupportEnquiryInitialChoiceForm.apply)(s => Some(s.initialChoice))
   )
 }

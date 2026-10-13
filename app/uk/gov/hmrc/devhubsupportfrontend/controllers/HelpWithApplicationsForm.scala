@@ -17,7 +17,7 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 
 final case class HelpWithApplicationsForm(choice: String)
 
@@ -26,6 +26,6 @@ object HelpWithApplicationsForm extends FormValidation {
   val form: Form[HelpWithApplicationsForm] = Form(
     mapping(
       "choice" -> oneOf(SupportData.CompletingTermsOfUseAgreement.id, SupportData.GivingTeamMemberAccess.id, SupportData.NoneOfTheAbove.id)
-    )(HelpWithApplicationsForm.apply)(HelpWithApplicationsForm.unapply)
+    )(HelpWithApplicationsForm.apply)(h => Some(h.choice))
   )
 }

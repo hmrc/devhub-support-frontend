@@ -31,9 +31,9 @@ import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.ErrorTemplate
 class ErrorHandler @Inject() (
     errorTemplate: ErrorTemplate,
     override val messagesApi: MessagesApi
-  )(implicit val ec: ExecutionContext
+  )(using val ec: ExecutionContext
   ) extends FrontendErrorHandler {
 
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: RequestHeader): Future[Html] =
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(using request: RequestHeader): Future[Html] =
     successful(errorTemplate(pageTitle, heading, message))
 }

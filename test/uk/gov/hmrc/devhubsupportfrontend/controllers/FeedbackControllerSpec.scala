@@ -19,7 +19,7 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.filters.csrf.CSRF.TokenProvider
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
@@ -29,8 +29,8 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithSupportSession._
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession.*
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithSupportSession.*
 import uk.gov.hmrc.devhubsupportfrontend.views.html.{FeedbackConfirmationView, FeedbackView}
 
 class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
@@ -63,8 +63,8 @@ class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
+      .withUser(using underTest)(sessionId)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
   }
@@ -73,7 +73,7 @@ class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withSession(sessionParams: _*)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.fails()
   }
@@ -82,8 +82,8 @@ class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
+      .withUser(using underTest)(sessionId)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeedsPartLoggedInEnablingMfa()
   }
@@ -91,7 +91,7 @@ class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
   "FeedbackController" when {
     "invoke page" should {
       "succeed when session exists" in new Setup with IsLoggedIn {
-        val requestWithSupportCookie = request.withSupportSession(underTest)(supportSessionId)
+        val requestWithSupportCookie = request.withSupportSession(using underTest)(supportSessionId)
         SupportServiceMock.GetSupportFlow.succeeds()
 
         val result = addToken(underTest.page())(requestWithSupportCookie)
@@ -113,7 +113,7 @@ class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     "invoke action" should {
       "submit new request with comments" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "whatWereYouDoing" -> whatWereYouDoing,
             "feedback"         -> feedback
           )
@@ -136,7 +136,7 @@ class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       "submit new request with no details" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "whatWereYouDoing" -> "",
             "feedback"         -> ""
           )
@@ -151,7 +151,7 @@ class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       "submit new request when honeypot field filled in but logged in" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "whatWereYouDoing" -> whatWereYouDoing,
             "feedback"         -> feedback,
             "url"              -> honeypotUrl
@@ -175,7 +175,7 @@ class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       "show dummy confirmation page when honeypot field filled in but not logged in" in new Setup with NotLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "whatWereYouDoing" -> whatWereYouDoing,
             "feedback"         -> feedback,
             "url"              -> honeypotUrl
@@ -193,7 +193,7 @@ class FeedbackControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
     "invoke confirmation page" should {
       "succeed when session exists" in new Setup with IsLoggedIn {
-        val requestWithSupportCookie = request.withSupportSession(underTest)(supportSessionId)
+        val requestWithSupportCookie = request.withSupportSession(using underTest)(supportSessionId)
         SupportServiceMock.GetSupportFlow.succeeds()
 
         val result = addToken(underTest.confirmationPage())(requestWithSupportCookie)

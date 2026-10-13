@@ -32,10 +32,10 @@ trait XmlServicesConnectorMockModule
     object FetchAllXmlApis {
 
       def willReturn(xmlApis: Seq[XmlApi]) =
-        when(aMock.fetchAllXmlApis()(*)).thenReturn(successful(xmlApis))
+        when(aMock.fetchAllXmlApis()(using *)).thenReturn(successful(xmlApis))
 
       def willFailWith(exception: Exception) =
-        when(aMock.fetchAllXmlApis()(*)).thenReturn(failed(exception))
+        when(aMock.fetchAllXmlApis()(using *)).thenReturn(failed(exception))
     }
   }
 

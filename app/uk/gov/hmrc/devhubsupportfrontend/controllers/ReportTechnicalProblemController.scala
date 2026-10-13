@@ -27,7 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
-import uk.gov.hmrc.devhubsupportfrontend.services._
+import uk.gov.hmrc.devhubsupportfrontend.services.*
 import uk.gov.hmrc.devhubsupportfrontend.views.html.{ReportTechnicalProblemConfirmationView, ReportTechnicalProblemView, SupportPageConfirmationForHoneyPotFieldView}
 
 object ReportTechnicalProblemController {
@@ -71,7 +71,7 @@ object ReportTechnicalProblemController {
         "service"               -> optional(text),
         "referrer"              -> optional(text),
         "url"                   -> optional(text)
-      )(ReportTechnicalProblemForm.apply)(ReportTechnicalProblemForm.unapply)
+      )(ReportTechnicalProblemForm.apply)(r => Some((r.fullName, r.emailAddress, r.whatWereYouDoing, r.whatDoYouNeedHelpWith, r.service, r.referrer, r.url)))
     )
   }
 }
@@ -86,11 +86,11 @@ class ReportTechnicalProblemController @Inject() (
     reportTechnicalProblemView: ReportTechnicalProblemView,
     reportTechnicalProblemConfirmationView: ReportTechnicalProblemConfirmationView,
     supportPageConfirmationForHoneyPotFieldView: SupportPageConfirmationForHoneyPotFieldView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
 
-  import ReportTechnicalProblemController._
+  import ReportTechnicalProblemController.*
   val reportTechnicalProblemForm: Form[ReportTechnicalProblemForm] = ReportTechnicalProblemForm.form
 
   def page(service: Option[String], referrer: Option[String]): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>

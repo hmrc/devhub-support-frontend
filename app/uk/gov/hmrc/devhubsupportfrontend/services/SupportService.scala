@@ -20,14 +20,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
-import uk.gov.hmrc.apiplatform.modules.common.services.{ApplicationLogger, EitherTHelper}
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
+import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApiPlatformDeskproConnector, ApmConnector, XmlServicesConnector}
+import uk.gov.hmrc.devhubsupportfrontend.controllers.*
 import uk.gov.hmrc.devhubsupportfrontend.controllers.SupportData.SupportDataChoice
-import uk.gov.hmrc.devhubsupportfrontend.controllers._
-import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, _}
+import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, *}
 import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
 
 @Singleton
@@ -36,13 +35,9 @@ class SupportService @Inject() (
     deskproConnector: ApiPlatformDeskproConnector,
     xmlServicesConnector: XmlServicesConnector,
     flowRepository: SupportFlowRepository,
-    config: AppConfig,
     auditService: AuditService
-  )(implicit val ec: ExecutionContext
+  )(using val ec: ExecutionContext
   ) extends ApplicationLogger {
-
-  val ET = EitherTHelper.make[Throwable]
-  val ES = EitherTHelper.make[UpstreamErrorResponse]
 
   private def fetchSupportFlow(sessionId: SupportSessionId): Future[SupportFlow] = {
     flowRepository.fetchBySessionId(sessionId) map {
@@ -66,7 +61,7 @@ class SupportService @Inject() (
     flowRepository.saveFlow(SupportFlow(sessionId, entrypoint, None))
   }
 
-  def fetchAllApis(userId: Option[UserId])(implicit hc: HeaderCarrier): Future[List[ApiSummary]] = {
+  def fetchAllApis(userId: Option[UserId])(using hc: HeaderCarrier): Future[List[ApiSummary]] = {
     for {
       restfulApiDefs     <- apmConnector.fetchApiDefinitionsVisibleToUser(userId)
       restfulApiSummaries = restfulApiDefs.map(api => ApiSummary.fromApiDefinition(api))
@@ -75,7 +70,7 @@ class SupportService @Inject() (
     } yield restfulApiSummaries ++ xmlApiSummaries
   }
 
-  def submitTicket(supportFlow: SupportFlow, form: SupportDetailsForm)(implicit hc: HeaderCarrier): Future[SupportFlow] = {
+  def submitTicket(supportFlow: SupportFlow, form: SupportDetailsForm)(using hc: HeaderCarrier): Future[SupportFlow] = {
     val baseDeskproTicket = buildTicket(
       supportFlow,
       form.fullName,
@@ -93,7 +88,7 @@ class SupportService @Inject() (
     )
   }
 
-  def submitTicket(supportFlow: SupportFlow, form: ApplyForPrivateApiAccessForm)(implicit hc: HeaderCarrier): Future[SupportFlow] = {
+  def submitTicket(supportFlow: SupportFlow, form: ApplyForPrivateApiAccessForm)(using hc: HeaderCarrier): Future[SupportFlow] = {
     val baseDeskproTicket = buildTicket(
       supportFlow,
       form.fullName,
@@ -143,7 +138,7 @@ class SupportService @Inject() (
     )
   }
 
-  private def submitTicket(supportFlow: SupportFlow, ticket: ApiPlatformDeskproConnector.CreateTicketRequest)(implicit hc: HeaderCarrier): Future[SupportFlow] = {
+  private def submitTicket(supportFlow: SupportFlow, ticket: ApiPlatformDeskproConnector.CreateTicketRequest)(using hc: HeaderCarrier): Future[SupportFlow] = {
     for {
       ticketReference <- deskproConnector.createTicket(ticket, hc)
       _                = auditService.explicitAudit(CreateTicketAuditAction(ticket))
@@ -160,7 +155,7 @@ class SupportService @Inject() (
       referrer: Option[String],
       userAgent: Option[String],
       sessionId: Option[String]
-    )(implicit hc: HeaderCarrier
+    )(using hc: HeaderCarrier
     ): Future[String] = {
     val message = s"<strong>What were you doing?</strong><br>${whatWereYouDoing}<br><br><strong>What do you need help with?</strong><br>${whatDoYouNeedHelpWith}"
     val ticket  = ApiPlatformDeskproConnector.CreateTicketRequest(
@@ -189,7 +184,7 @@ class SupportService @Inject() (
       feedback: String,
       userAgent: Option[String],
       sessionId: Option[String]
-    )(implicit hc: HeaderCarrier
+    )(using hc: HeaderCarrier
     ): Future[String] = {
     val message = s"<strong>What were you doing?</strong><br>${whatWereYouDoing}<br><br><strong>How do you feel about your experience today?</strong><br>${feedback}"
     val ticket  = ApiPlatformDeskproConnector.CreateTicketRequest(

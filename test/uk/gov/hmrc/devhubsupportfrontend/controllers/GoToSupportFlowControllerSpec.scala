@@ -19,7 +19,7 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
@@ -27,7 +27,7 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession.*
 
 class GoToSupportFlowControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
@@ -36,8 +36,8 @@ class GoToSupportFlowControllerSpec extends BaseControllerSpec with WithCSRFAddT
     val supportSessionId = SupportSessionId.random
 
     lazy val request = FakeRequest()
-      .withSupport(underTest)(supportSessionId)
-      .withUser(underTest)(sessionId)
+      .withSupport(using underTest)(supportSessionId)
+      .withUser(using underTest)(sessionId)
 
     val underTest = new GoToSupportFlowController(
       mcc,

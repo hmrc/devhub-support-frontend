@@ -27,7 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
-import uk.gov.hmrc.devhubsupportfrontend.services._
+import uk.gov.hmrc.devhubsupportfrontend.services.*
 import uk.gov.hmrc.devhubsupportfrontend.views.html.{FeedbackConfirmationView, FeedbackView}
 
 object FeedbackController {
@@ -55,7 +55,7 @@ object FeedbackController {
           )
           .verifying("feedback.feedback.error.length", feedback => feedback.length <= 1000),
         "url"              -> optional(text)
-      )(FeedbackForm.apply)(FeedbackForm.unapply)
+      )(FeedbackForm.apply)(f => Some((f.whatWereYouDoing, f.feedback, f.url)))
     )
   }
 }
@@ -69,11 +69,11 @@ class FeedbackController @Inject() (
     supportService: SupportService,
     feedbackView: FeedbackView,
     feedbackConfirmationView: FeedbackConfirmationView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
 
-  import FeedbackController._
+  import FeedbackController.*
   val feedbackForm: Form[FeedbackForm] = FeedbackForm.form
 
   def page(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
@@ -107,7 +107,7 @@ class FeedbackController @Inject() (
             data.feedback,
             userAgent,
             sessionId
-          ).map(ref =>
+          ).map(_ =>
             Redirect(routes.FeedbackController.confirmationPage())
           )
         }

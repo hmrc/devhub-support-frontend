@@ -50,7 +50,7 @@ private[services] object CreateTicketDetails {
     teamMemberEmail = createTicketRequest.teamMemberEmail
   )
 
-  implicit val format: OFormat[CreateTicketDetails] = Json.format[CreateTicketDetails]
+  given format: OFormat[CreateTicketDetails] = Json.format[CreateTicketDetails]
 }
 
 case class CreateTicketAuditAction(createTicketRequest: ApiPlatformDeskproConnector.CreateTicketRequest) extends AuditAction {

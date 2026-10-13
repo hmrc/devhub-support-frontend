@@ -19,7 +19,7 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.filters.csrf.CSRF.TokenProvider
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
@@ -29,8 +29,8 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithSupportSession._
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession.*
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithSupportSession.*
 import uk.gov.hmrc.devhubsupportfrontend.views.html.{ReportTechnicalProblemConfirmationView, ReportTechnicalProblemView, SupportPageConfirmationForHoneyPotFieldView}
 
 class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
@@ -67,8 +67,8 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
+      .withUser(using underTest)(sessionId)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
   }
@@ -77,7 +77,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withSession(sessionParams: _*)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.fails()
   }
@@ -86,8 +86,8 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
+      .withUser(using underTest)(sessionId)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeedsPartLoggedInEnablingMfa()
   }
@@ -95,7 +95,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
   "ReportTechnicalProblemController" when {
     "invoke page" should {
       "succeed when session exists" in new Setup with IsLoggedIn {
-        val requestWithSupportCookie = request.withSupportSession(underTest)(supportSessionId)
+        val requestWithSupportCookie = request.withSupportSession(using underTest)(supportSessionId)
         SupportServiceMock.GetSupportFlow.succeeds()
 
         val result = addToken(underTest.page(Some("third-party-developer"), Some("referrerUrl")))(requestWithSupportCookie)
@@ -117,7 +117,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
     "invoke action" should {
       "submit new request with name, email, comments" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"              -> fullName,
             "emailAddress"          -> emailAddress,
             "whatWereYouDoing"      -> whatWereYouDoing,
@@ -146,7 +146,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
 
       "submit new request with no name, email or details" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"              -> "",
             "emailAddress"          -> "",
             "whatWereYouDoing"      -> "",
@@ -165,7 +165,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
 
       "submit new request with invalid name and email" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"              -> "12345678901234567890123456789012345678901234567890123456789012345678901",
             "emailAddress"          -> "invalidemailaddress",
             "whatWereYouDoing"      -> whatWereYouDoing,
@@ -182,7 +182,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
 
       "submit new request when honeypot field filled in but logged in" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"              -> fullName,
             "emailAddress"          -> emailAddress,
             "whatWereYouDoing"      -> whatWereYouDoing,
@@ -212,7 +212,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
 
       "show dummy confirmation page when honeypot field filled in but not logged in" in new Setup with NotLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"              -> fullName,
             "emailAddress"          -> emailAddress,
             "whatWereYouDoing"      -> whatWereYouDoing,
@@ -235,7 +235,7 @@ class ReportTechnicalProblemControllerSpec extends BaseControllerSpec with WithC
 
     "invoke confirmation page" should {
       "succeed when session exists" in new Setup with IsLoggedIn {
-        val requestWithSupportCookie = request.withSupportSession(underTest)(supportSessionId)
+        val requestWithSupportCookie = request.withSupportSession(using underTest)(supportSessionId)
         SupportServiceMock.GetSupportFlow.succeeds()
 
         val result = addToken(underTest.confirmationPage("ticket-ref"))(requestWithSupportCookie)

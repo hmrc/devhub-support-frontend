@@ -21,7 +21,7 @@ import scala.concurrent.Future
 
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
@@ -30,7 +30,7 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSess
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession.*
 import uk.gov.hmrc.devhubsupportfrontend.views.html.{ApplyForPrivateApiAccessView, SupportPageConfirmationForHoneyPotFieldView}
 
 class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
@@ -68,8 +68,8 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withSupport(underTest)(supportSessionId)
-      .withUser(underTest)(sessionId)
+      .withSupport(using underTest)(supportSessionId)
+      .withUser(using underTest)(sessionId)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
   }
@@ -117,7 +117,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
 
     "invoke submit" should {
       "submit new valid request from form" in new Setup with IsLoggedIn {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "fullName"      -> "Bob",
           "emailAddress"  -> "bob@example.com",
           "organisation"  -> "org",
@@ -133,7 +133,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
       }
 
       "create new support ticket when valid request with url (honeypot field) on form and user is logged in" in new Setup with IsLoggedIn {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "fullName"      -> "Bob",
           "emailAddress"  -> "bob@example.com",
           "organisation"  -> "org",
@@ -151,7 +151,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
 
       "not create new ticket but show dummy confirmation page when url (honeypot field) on form and user not logged in" in new Setup with NotLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"      -> "Bob",
             "emailAddress"  -> "bob@example.com",
             "organisation"  -> "org",
@@ -170,7 +170,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
       }
 
       "submit invalid request returns BAD_REQUEST" in new Setup with IsLoggedIn {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "fullName"      -> "Bob",
           "emailAddress"  -> "bob@example.com",
           "applicationId" -> "123456"
@@ -183,7 +183,7 @@ class ApplyForPrivateApiAccessControllerSpec extends BaseControllerSpec with Wit
       }
 
       "submit valid request but no session" in new Setup with IsLoggedIn {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "fullName"      -> "Bob",
           "emailAddress"  -> "bob@example.com",
           "organisation"  -> "org",

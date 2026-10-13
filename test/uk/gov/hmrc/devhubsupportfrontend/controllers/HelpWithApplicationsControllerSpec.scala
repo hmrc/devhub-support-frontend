@@ -21,7 +21,7 @@ import scala.concurrent.Future
 
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
@@ -30,7 +30,7 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSess
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession.*
 import uk.gov.hmrc.devhubsupportfrontend.views.html.{GivingTeamMemberAccessView, HelpWithApplicationsView}
 
 class HelpWithApplicationsControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
@@ -40,8 +40,8 @@ class HelpWithApplicationsControllerSpec extends BaseControllerSpec with WithCSR
     val givingTeamMembersAccessView = app.injector.instanceOf[GivingTeamMemberAccessView]
 
     lazy val request = FakeRequest()
-      .withSupport(underTest)(supportSessionId)
-      .withUser(underTest)(sessionId)
+      .withSupport(using underTest)(supportSessionId)
+      .withUser(using underTest)(sessionId)
 
     val underTest        = new HelpWithApplicationsController(
       mcc,
@@ -113,7 +113,7 @@ class HelpWithApplicationsControllerSpec extends BaseControllerSpec with WithCSR
     "invoke submit" should {
       "redirect to the generic support details page when Completing Terms Of Use Agreement is selected" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody("choice" -> SupportData.CompletingTermsOfUseAgreement.id)
+          .withMethod("POST").withFormUrlEncodedBody("choice" -> SupportData.CompletingTermsOfUseAgreement.id)
 
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
         SupportServiceMock.UpdateWithDelta.succeeds()
@@ -126,7 +126,7 @@ class HelpWithApplicationsControllerSpec extends BaseControllerSpec with WithCSR
 
       "redirect to the giving team member access page when Giving a Team Member Access  is selected" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody("choice" -> SupportData.GivingTeamMemberAccess.id)
+          .withMethod("POST").withFormUrlEncodedBody("choice" -> SupportData.GivingTeamMemberAccess.id)
 
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
         SupportServiceMock.UpdateWithDelta.succeeds()
@@ -139,7 +139,7 @@ class HelpWithApplicationsControllerSpec extends BaseControllerSpec with WithCSR
 
       "redirect to the generic support details page when None of these is selected" in new Setup {
         val formRequest = request
-          .withFormUrlEncodedBody("choice" -> SupportData.NoneOfTheAbove.id)
+          .withMethod("POST").withFormUrlEncodedBody("choice" -> SupportData.NoneOfTheAbove.id)
 
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
         SupportServiceMock.UpdateWithDelta.succeeds()

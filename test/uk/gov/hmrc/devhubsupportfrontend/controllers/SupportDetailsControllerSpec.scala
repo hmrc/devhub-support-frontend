@@ -19,7 +19,7 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.filters.csrf.CSRF.TokenProvider
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
@@ -30,8 +30,8 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSess
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ThirdPartyDeveloperConnectorMockModule, UpscanInitiateConnectorMockModule}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithSupportSession._
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession.*
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithSupportSession.*
 import uk.gov.hmrc.devhubsupportfrontend.views.html.{SupportPageConfirmationForHoneyPotFieldView, SupportPageConfirmationView, SupportPageDetailView}
 
 class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
@@ -71,8 +71,8 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
+      .withUser(using underTest)(sessionId)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
   }
@@ -81,7 +81,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withSession(sessionParams: _*)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.fails()
   }
@@ -90,8 +90,8 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
+      .withUser(using underTest)(sessionId)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeedsPartLoggedInEnablingMfa()
   }
@@ -99,7 +99,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
   "SupportDetailsController" when {
     "invoke supportConfirmationPage" should {
       "succeed when session exists" in new Setup with IsLoggedIn {
-        val requestWithSupportCookie = request.withSupportSession(underTest)(supportSessionId)
+        val requestWithSupportCookie = request.withSupportSession(using underTest)(supportSessionId)
         SupportServiceMock.GetSupportFlow.succeeds()
 
         val result = addToken(underTest.supportConfirmationPage())(requestWithSupportCookie)
@@ -181,7 +181,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
       "redirect to login when not logged in" in new Setup with NotLoggedIn {
         val supportFlow = SupportFlow(SupportSessionId.random, SupportData.UsingAnApi.id)
         val newRequest  = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
             "details"                          -> details,
@@ -200,7 +200,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
       "submit new request with name, email, comments and attachments from form when logged in" in new Setup with IsLoggedIn {
         val supportFlow = SupportFlow(SupportSessionId.random, SupportData.UsingAnApi.id)
         val newRequest  = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
             "details"                          -> details,
@@ -231,7 +231,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
 
       "create support ticket when request with attachments and url (honeypot field) on form and user is logged in" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
             "details"                          -> details,
@@ -250,7 +250,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
 
       "not create support ticket but show dummy confirmation page when url (honeypot field) on form and user is not logged in" in new Setup with NotLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"     -> fullName,
             "emailAddress" -> emailAddress,
             "details"      -> details,
@@ -268,7 +268,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
 
       "submit request with attachments and 3000 characters including \r\n details returns success" in new Setup with IsLoggedIn {
         val newRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
             "details"                          -> "A\r\n" * 1500,
@@ -286,7 +286,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
 
       "submit request with attachments and invalid details returns BAD_REQUEST" in new Setup with IsPartLoggedInEnablingMFA {
         request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
             "details"                          -> "A+++, good como  puedo iniciar, would buy again",
@@ -303,7 +303,7 @@ class SupportDetailsControllerSpec extends BaseControllerSpec with WithCSRFAddTo
 
       "submit request with attachments, details and invalid team member email returns BAD_REQUEST" in new Setup with IsPartLoggedInEnablingMFA {
         request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "fullName"                         -> fullName,
             "emailAddress"                     -> emailAddress,
             "details"                          -> validDetails,

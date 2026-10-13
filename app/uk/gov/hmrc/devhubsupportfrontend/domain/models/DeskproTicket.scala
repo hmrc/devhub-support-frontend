@@ -24,7 +24,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 case class DeskproAttachment(filename: String, url: String)
 
 object DeskproAttachment {
-  implicit val format: OFormat[DeskproAttachment] = Json.format[DeskproAttachment]
+  given format: OFormat[DeskproAttachment] = Json.format[DeskproAttachment]
 }
 
 case class DeskproMessage(
@@ -38,7 +38,7 @@ case class DeskproMessage(
   )
 
 object DeskproMessage {
-  implicit val format: OFormat[DeskproMessage] = Json.format[DeskproMessage]
+  given format: OFormat[DeskproMessage] = Json.format[DeskproMessage]
 }
 
 case class DeskproTicket(
@@ -55,5 +55,5 @@ case class DeskproTicket(
   )
 
 object DeskproTicket {
-  implicit val format: OFormat[DeskproTicket] = Json.format[DeskproTicket]
+  given format: OFormat[DeskproTicket] = Json.format[DeskproTicket]
 }

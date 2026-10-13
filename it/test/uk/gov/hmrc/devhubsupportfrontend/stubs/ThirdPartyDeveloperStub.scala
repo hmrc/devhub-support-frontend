@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 
-import play.api.http.Status._
+import play.api.http.Status.*
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSessionId
 
@@ -27,7 +27,7 @@ object ThirdPartyDeveloperStub {
 
   object FetchSession {
 
-    def succeeds(sessionId: UserSessionId, userId: UserId, userEmail: LaxEmailAddress, nowAsText: String): StubMapping = {
+    def succeeds(sessionId: UserSessionId, userId: UserId, userEmail: LaxEmailAddress, nowAsText: String, loggedInState: String = "LOGGED_IN"): StubMapping = {
       stubFor(
         get(urlPathEqualTo(s"/session/$sessionId"))
           .willReturn(
@@ -36,7 +36,7 @@ object ThirdPartyDeveloperStub {
               .withHeader("Content-Type", "application/json")
               .withBody(s"""{
                            |  "sessionId": "$sessionId",
-                           |  "loggedInState": "LOGGED_IN",
+                           |  "loggedInState": "$loggedInState",
                            |    "developer": {
                            |      "userId":"$userId",
                            |      "email":"${userEmail.text}",

@@ -25,7 +25,7 @@ object WithSupportSession {
 
   implicit class SupportSessionFakeRequest[A](fakeRequest: FakeRequest[A]) {
 
-    def withSupportSession(implicit cookieEncoding: CookieEncoding): SupportSessionId => FakeRequest[A] = { id =>
+    def withSupportSession(using cookieEncoding: CookieEncoding): SupportSessionId => FakeRequest[A] = { id =>
       fakeRequest.withCookies(cookieEncoding.createSupportCookie(id))
     }
   }

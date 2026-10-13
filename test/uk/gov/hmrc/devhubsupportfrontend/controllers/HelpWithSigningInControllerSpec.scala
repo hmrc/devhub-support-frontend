@@ -21,7 +21,7 @@ import scala.concurrent.Future
 
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 
@@ -30,7 +30,7 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSess
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.ThirdPartyDeveloperConnectorMockModule
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.SupportServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession.*
 import uk.gov.hmrc.devhubsupportfrontend.views.html.{HelpWithSigningInView, RemoveAccessCodesView}
 
 class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
@@ -40,8 +40,8 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
     val removeAccessCodesView  = app.injector.instanceOf[RemoveAccessCodesView]
 
     lazy val request = FakeRequest()
-      .withSupport(underTest)(supportSessionId)
-      .withUser(underTest)(sessionId)
+      .withSupport(using underTest)(supportSessionId)
+      .withUser(using underTest)(sessionId)
 
     val underTest        = new HelpWithSigningInController(
       mcc,
@@ -118,7 +118,7 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
 
     "invoke submit" should {
       "submit new valid request from form for 'Forgotten Password' choice" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "choice" -> SupportData.ForgottenPassword.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -130,7 +130,7 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
       }
 
       "submit new valid request from form for 'Access Codes' choice" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "choice" -> SupportData.AccessCodes.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -142,7 +142,7 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
       }
 
       "submit new valid request from form for 'None of these' choice" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "choice" -> SupportData.NoneOfTheAbove.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -154,7 +154,7 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
       }
 
       "submit invalid request returns BAD_REQUEST" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "bobbins" -> SupportData.AccessCodes.id
         )
         SupportServiceMock.GetSupportFlow.succeeds(appropriateFlow)
@@ -165,7 +165,7 @@ class HelpWithSigningInControllerSpec extends BaseControllerSpec with WithCSRFAd
       }
 
       "submit valid request but no session" in new Setup {
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = request.withMethod("POST").withFormUrlEncodedBody(
           "choice" -> SupportData.AccessCodes.id
         )
         SupportServiceMock.GetSupportFlow.succeeds()

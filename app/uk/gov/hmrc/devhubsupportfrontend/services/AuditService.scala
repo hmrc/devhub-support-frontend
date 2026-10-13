@@ -24,9 +24,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 @Singleton
-class AuditService @Inject() (val auditConnector: AuditConnector)(implicit ec: ExecutionContext) {
+class AuditService @Inject() (val auditConnector: AuditConnector)(using ec: ExecutionContext) {
 
-  def explicitAudit(auditAction: AuditAction)(implicit hc: HeaderCarrier): Unit = {
+  def explicitAudit(auditAction: AuditAction)(using hc: HeaderCarrier): Unit = {
     val details = auditAction match {
       case action: CreateTicketAuditAction => Json.toJson(CreateTicketDetails(action.createTicketRequest))
     }

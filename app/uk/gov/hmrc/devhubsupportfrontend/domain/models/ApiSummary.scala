@@ -46,5 +46,5 @@ object ApiSummary {
     )
   }
 
-  implicit val format: OFormat[ApiSummary] = Json.format[ApiSummary]
+  given format: OFormat[ApiSummary] = Json.format[ApiSummary]
 }

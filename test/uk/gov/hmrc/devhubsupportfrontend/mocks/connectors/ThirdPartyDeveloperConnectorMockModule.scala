@@ -39,13 +39,13 @@ trait ThirdPartyDeveloperConnectorMockModule
     object FetchSession {
 
       def succeeds() =
-        when(aMock.fetchSession(eqTo(sessionId))(*)).thenReturn(successful(Some(userSession)))
+        when(aMock.fetchSession(eqTo(sessionId))(using *)).thenReturn(successful(Some(userSession)))
 
       def succeedsPartLoggedInEnablingMfa() =
-        when(aMock.fetchSession(eqTo(sessionId))(*)).thenReturn(successful(Some(partLoggedInSession)))
+        when(aMock.fetchSession(eqTo(sessionId))(using *)).thenReturn(successful(Some(partLoggedInSession)))
 
       def fails() =
-        when(aMock.fetchSession(eqTo(sessionId))(*)).thenReturn(successful(None))
+        when(aMock.fetchSession(eqTo(sessionId))(using *)).thenReturn(successful(None))
     }
   }
 

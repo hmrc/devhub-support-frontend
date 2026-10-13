@@ -20,30 +20,27 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import cats.data.OptionT
 
-import play.api.mvc._
+import play.api.mvc.*
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.{LoggedInState, UserSession, UserSessionId}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
 
-import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.controllers.models.{MaybeUserRequest, UserRequest}
-import uk.gov.hmrc.devhubsupportfrontend.controllers.{BaseController, _}
+import uk.gov.hmrc.devhubsupportfrontend.controllers.{BaseController, *}
 
 trait DevHubAuthorization extends FrontendHeaderCarrierProvider with CookieEncoding {
   self: BaseController =>
 
   val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector
 
-  implicit val appConfig: AppConfig
-
   object DeveloperSessionFilter {
     type Type = UserSession => Boolean
 
-    val onlyTrueIfLoggedInFilter: DeveloperSessionFilter.Type = _.loggedInState == LoggedInState.LOGGED_IN
+    val onlyTrueIfLoggedInFilter: DeveloperSessionFilter.Type = _.loggedInState == LoggedInState.LoggedIn
   }
 
-  def maybeAtLeastPartLoggedInEnablingMfa(body: MaybeUserRequest[AnyContent] => Future[Result])(implicit ec: ExecutionContext): Action[AnyContent] =
+  def maybeAtLeastPartLoggedInEnablingMfa(body: MaybeUserRequest[AnyContent] => Future[Result])(using ec: ExecutionContext): Action[AnyContent] =
     Action.async { implicit request: MessagesRequest[AnyContent] =>
       def getMaybeUserRequest(maybeUserSession: Option[UserSession]): Future[Result] = {
         if (appConfig.enforceLogin && maybeUserSession.isEmpty) {
@@ -62,7 +59,7 @@ trait DevHubAuthorization extends FrontendHeaderCarrierProvider with CookieEncod
       def refine[A](msgRequest: MessagesRequest[A]): Future[Either[Result, UserRequest[A]]] = {
         lazy val loginRedirect = Redirect(s"${appConfig.thirdPartyDeveloperFrontendUrl}/developer/login")
 
-        implicit val request = msgRequest
+        given request: MessagesRequest[A] = msgRequest
 
         OptionT(loadSession)
           .filter(filter)
@@ -77,14 +74,14 @@ trait DevHubAuthorization extends FrontendHeaderCarrierProvider with CookieEncod
       loggedInActionRefiner().invokeBlock(request, block)
     }
 
-  private[security] def loadSession[A](implicit request: Request[A]): Future[Option[UserSession]] = {
+  private[security] def loadSession[A](using request: Request[A]): Future[Option[UserSession]] = {
     (for {
       sessionId <- extractUserSessionIdFromCookie(request)
     } yield fetchDeveloperSession(sessionId))
       .getOrElse(Future.successful(None))
   }
 
-  private def fetchDeveloperSession[A](sessionId: UserSessionId)(implicit hc: HeaderCarrier): Future[Option[UserSession]] = {
+  private def fetchDeveloperSession[A](sessionId: UserSessionId)(using hc: HeaderCarrier): Future[Option[UserSession]] = {
     thirdPartyDeveloperConnector.fetchSession(sessionId)
   }
 }

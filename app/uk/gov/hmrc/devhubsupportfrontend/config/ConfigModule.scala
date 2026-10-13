@@ -25,7 +25,7 @@ import uk.gov.hmrc.devhubsupportfrontend.connectors.{ApiPlatformDeskproConnector
 
 class ConfigModule extends Module {
 
-  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = Seq(
+  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[?]] = Seq(
     bind[AppConfig].toSelf.eagerly(),
     bind[ConnectorMetrics].to[ConnectorMetricsImpl],
     bind[ApmConnector.Config].toProvider[LiveApmConnectorConfigProvider],
