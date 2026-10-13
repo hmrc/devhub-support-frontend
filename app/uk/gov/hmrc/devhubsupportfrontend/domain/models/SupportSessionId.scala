@@ -16,19 +16,19 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.domain.models
 
-import java.{util => ju}
-import scala.util.control.Exception._
+import java.util as ju
+import scala.util.control.Exception.*
 
 import uk.gov.hmrc.apiplatform.modules.tpd.core.domain.models.SessionId
 
-case class SupportSessionId(value: ju.UUID) extends SessionId {
+case class SupportSessionId(value: ju.UUID) extends AnyVal with SessionId {
   override def toString(): String = value.toString
 }
 
 object SupportSessionId {
   import play.api.libs.json.{Format, Json}
 
-  implicit val format: Format[SupportSessionId] = Json.valueFormat[SupportSessionId]
+  given format: Format[SupportSessionId] = Json.valueFormat[SupportSessionId]
 
   def apply(raw: String): Option[SupportSessionId] = allCatch.opt(SupportSessionId(ju.UUID.fromString(raw)))
 

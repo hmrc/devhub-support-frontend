@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
 
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.controllers.routes
@@ -25,12 +25,9 @@
 @this(
   layout: Layout,
   govukRadios: GovukRadios,
-  govukButton : GovukButton,
-  govukInput : GovukInput,
-  govukSelect : GovukSelect
-)
+  govukButton : GovukButton)
 
-@(loggedInSession: Option[UserSession], form: Form[HelpWithApplicationsForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[HelpWithApplicationsForm], backUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages)
 
 @layout(
   pageTitle = "Which option best describes the help you need?",

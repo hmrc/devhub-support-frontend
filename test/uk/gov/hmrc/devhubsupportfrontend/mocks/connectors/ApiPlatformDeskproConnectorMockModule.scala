@@ -23,7 +23,7 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector
-import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector._
+import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.*
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.DeskproTicket
 
 trait ApiPlatformDeskproConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {

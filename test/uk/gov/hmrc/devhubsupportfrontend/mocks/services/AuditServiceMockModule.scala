@@ -28,10 +28,10 @@ trait AuditServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
     object ExplicitAudit {
 
       def succeeds() =
-        doNothing.when(aMock).explicitAudit(*)(*)
+        doNothing.when(aMock).explicitAudit(*)(using *)
 
       def verifyCalledWith(auditAction: AuditAction) =
-        verify(aMock).explicitAudit(eqTo(auditAction))(*)
+        verify(aMock).explicitAudit(eqTo(auditAction))(using *)
     }
   }
 

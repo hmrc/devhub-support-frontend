@@ -41,7 +41,7 @@ class ChooseAPrivateApiController @Inject() (
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     supportService: SupportService,
     chooseAPrivateApiView: ChooseAPrivateApiView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractSupportFlowController[ChooseAPrivateApiForm, Unit](mcc, supportService) with SupportCookie {
 
@@ -52,7 +52,7 @@ class ChooseAPrivateApiController @Inject() (
     case _                                                                                                   => false
   }
 
-  def pageContents(flow: SupportFlow, form: Form[ChooseAPrivateApiForm], extras: Unit)(implicit request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable =
+  def pageContents(flow: SupportFlow, form: Form[ChooseAPrivateApiForm], extras: Unit)(using request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable =
     chooseAPrivateApiView(
       fullyloggedInDeveloper,
       form,
@@ -63,7 +63,7 @@ class ChooseAPrivateApiController @Inject() (
     flow.copy(privateApi = choice)
 
   def updateFlowAndRedirect(flowFn: SupportFlow => SupportFlow)(redirectTo: Call)(flow: SupportFlow) = {
-    supportService.updateWithDelta(flowFn)(flow).map { newFlow =>
+    supportService.updateWithDelta(flowFn)(flow).map { _ =>
       Redirect(redirectTo)
     }
   }
@@ -71,14 +71,14 @@ class ChooseAPrivateApiController @Inject() (
   def chooseADifferentAPI(flow: SupportFlow) = choose(None)(flow)
   def chooseCDS(flow: SupportFlow)           = choose(Some(SupportData.ChooseCDS.text))(flow)
 
-  def onValidForm(flow: SupportFlow, form: ChooseAPrivateApiForm)(implicit request: MaybeUserRequest[AnyContent]): Future[Result] =
+  def onValidForm(flow: SupportFlow, form: ChooseAPrivateApiForm)(using request: MaybeUserRequest[AnyContent]): Future[Result] =
     form.chosenApiName match {
-      case c @ SupportData.ChooseADifferentAPI.id => updateFlowAndRedirect(chooseADifferentAPI)(routes.ApplyForPrivateApiAccessController.page())(flow)
-      case c @ SupportData.ChooseCDS.id           => updateFlowAndRedirect(chooseCDS)(routes.CheckCdsAccessIsRequiredController.page())(flow)
-      case _                                      => throw new RuntimeException("Validation failed to eliminate bad data during Form processing")
+      case SupportData.ChooseADifferentAPI.id => updateFlowAndRedirect(chooseADifferentAPI)(routes.ApplyForPrivateApiAccessController.page())(flow)
+      case SupportData.ChooseCDS.id           => updateFlowAndRedirect(chooseCDS)(routes.CheckCdsAccessIsRequiredController.page())(flow)
+      case _                                  => throw new RuntimeException("Validation failed to eliminate bad data during Form processing")
     }
 
   def form(): Form[ChooseAPrivateApiForm] = ChooseAPrivateApiForm.form
 
-  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
+  def extraData()(using request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
 }

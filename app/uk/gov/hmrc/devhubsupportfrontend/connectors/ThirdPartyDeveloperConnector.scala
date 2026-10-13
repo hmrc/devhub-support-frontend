@@ -21,10 +21,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.Logging
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.{UserSession, UserSessionId}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{SessionId => _, StringContextOps, _}
-import uk.gov.hmrc.play.http.metrics.common.API
+import uk.gov.hmrc.http.{SessionId as _, StringContextOps, *}
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 
@@ -33,14 +32,14 @@ class ThirdPartyDeveloperConnector @Inject() (
     http: HttpClientV2,
     config: AppConfig,
     metrics: ConnectorMetrics
-  )(implicit val ec: ExecutionContext
+  )(using val ec: ExecutionContext
   ) extends Logging {
 
   lazy val serviceBaseUrl: String = config.thirdPartyDeveloperUrl
 
   val api: API = API("third-party-developer")
 
-  def fetchSession(sessionId: UserSessionId)(implicit hc: HeaderCarrier): Future[Option[UserSession]] = metrics.record(api) {
+  def fetchSession(sessionId: UserSessionId)(using hc: HeaderCarrier): Future[Option[UserSession]] = metrics.record(api) {
     http.get(url"$serviceBaseUrl/session/$sessionId")
       .execute[Option[UserSession]]
   }

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.data.{Form, Mapping}
 
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ApiPlatformDeskproConnector.Attachment
@@ -55,7 +55,7 @@ object SupportDetailsForm extends FormValidation {
       "fileAttachments" -> list(mapping(
         "fileReference" -> text,
         "fileName"      -> text
-      )(Attachment.apply)(Attachment.unapply)).transform[List[Attachment]](_.filter(_.fileReference.nonEmpty), identity)
-    )(SupportDetailsForm.apply)(SupportDetailsForm.unapply)
+      )(Attachment.apply)(a => Some((a.fileReference, a.fileName)))).transform[List[Attachment]](_.filter(_.fileReference.nonEmpty), identity)
+    )(SupportDetailsForm.apply)(s => Some((s.details, s.fullName, s.emailAddress, s.organisation, s.teamMemberEmailAddress, s.url, s.fileAttachments)))
   )
 }

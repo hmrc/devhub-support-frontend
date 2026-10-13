@@ -17,7 +17,7 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 
 final case class ChooseAPrivateApiForm(chosenApiName: String)
 
@@ -26,6 +26,6 @@ object ChooseAPrivateApiForm extends FormValidation {
   val form: Form[ChooseAPrivateApiForm] = Form(
     mapping(
       "apiName" -> oneOf(SupportData.ChooseADifferentAPI.id, SupportData.ChooseCDS.id)
-    )(ChooseAPrivateApiForm.apply)(ChooseAPrivateApiForm.unapply)
+    )(ChooseAPrivateApiForm.apply)(c => Some(c.chosenApiName))
   )
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
 
 @import uk.gov.hmrc.devhubsupportfrontend.domain.models.ApiSummary
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
@@ -28,11 +28,9 @@
   layout: Layout,
   govukRadios: GovukRadios,
   govukButton : GovukButton,
-  govukInput : GovukInput,
-  govukSelect : GovukSelect
-)
+  govukSelect : GovukSelect)
 
-@(loggedInSession: Option[UserSession], form: Form[HelpWithUsingAnApiForm], backUri: String, apis: List[ApiSummary])(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
+@(loggedInSession: Option[UserSession], form: Form[HelpWithUsingAnApiForm], backUri: String, apis: List[ApiSummary])(implicit request: play.api.mvc.RequestHeader, messages: Messages)
 
 @selectItems = @{
   Seq(SelectItem(value = None, text = "")).concat(

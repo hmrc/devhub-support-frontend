@@ -19,6 +19,7 @@ package uk.gov.hmrc.devhubsupportfrontend.repositories
 import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import org.mongodb.scala.SingleObservableFuture
 import org.mongodb.scala.bson.{BsonValue, Document}
 import org.mongodb.scala.model.Aggregates.{filter, project}
 import org.mongodb.scala.model.Projections.fields
@@ -151,8 +152,8 @@ case class ResultSet(lastUpdated: Instant)
 
 object ResultSet {
   import play.api.libs.json.Json
-  implicit val dateFormat: Format[Instant]         = MongoJavatimeFormats.instantFormat
-  implicit val resultSetFormat: OFormat[ResultSet] = Json.format[ResultSet]
+  given dateFormat: Format[Instant]         = MongoJavatimeFormats.instantFormat
+  given resultSetFormat: OFormat[ResultSet] = Json.format[ResultSet]
 
   def apply(lastUpdated: Instant) = new ResultSet(lastUpdated)
 }

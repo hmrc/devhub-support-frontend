@@ -17,7 +17,7 @@
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 
 final case class CheckCdsAccessIsRequiredForm(confirmCdsIntegration: String)
 
@@ -26,6 +26,6 @@ object CheckCdsAccessIsRequiredForm extends FormValidation {
   val form: Form[CheckCdsAccessIsRequiredForm] = Form(
     mapping(
       "confirmCdsIntegration" -> oneOf("yes", "no")
-    )(CheckCdsAccessIsRequiredForm.apply)(CheckCdsAccessIsRequiredForm.unapply)
+    )(CheckCdsAccessIsRequiredForm.apply)(c => Some(c.confirmCdsIntegration))
   )
 }

@@ -22,21 +22,29 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 
 import play.api.Application
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
+import uk.gov.hmrc.mongo.play.PlayMongoModule
+
+import uk.gov.hmrc.devhubsupportfrontend.mocks.repositories.SupportFlowRepositoryMockModule
+import uk.gov.hmrc.devhubsupportfrontend.repositories.SupportFlowRepository
 
 class HealthEndpointIntegrationSpec
     extends AnyWordSpec
     with Matchers
     with ScalaFutures
     with IntegrationPatience
-    with GuiceOneServerPerSuite {
+    with GuiceOneServerPerSuite
+    with SupportFlowRepositoryMockModule {
 
   private val wsClient = app.injector.instanceOf[WSClient]
   private val baseUrl  = s"http://localhost:$port"
 
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
+      .disable[PlayMongoModule]
+      .overrides(bind[SupportFlowRepository].toInstance(SupportFlowRepositoryMock.aMock))
       .build()
 
   "service health endpoint" should {

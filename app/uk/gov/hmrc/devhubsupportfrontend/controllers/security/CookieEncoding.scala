@@ -27,7 +27,7 @@ import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
 
 trait CookieEncoding {
-  implicit val appConfig: AppConfig
+  given appConfig: AppConfig
 
   private[security] lazy val cookieName                         = "PLAY2AUTH_SESS_ID"
   private[security] lazy val cookieSecureOption: Boolean        = appConfig.securedCookie

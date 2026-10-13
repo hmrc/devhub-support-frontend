@@ -19,12 +19,12 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 import cats.data.NonEmptyList
 import org.apache.commons.validator.routines.EmailValidator
 
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.data.{Forms, Mapping}
 
 trait FormValidation {
 
-  implicit class FieldNameSyntax(firstFragment: String) {
+  extension (firstFragment: String) {
 
     def ~>[T](fn: (String, String) => Tuple2[String, Mapping[T]]) = {
       fn(firstFragment, firstFragment.toLowerCase())
@@ -41,8 +41,6 @@ trait FormValidation {
 
     def ~>[T](nextFragment: String) = new FormAndFieldSyntax(nextFragment :: fragments)
   }
-
-  def textValidator: (String, String) => Tuple2[String, Mapping[String]] = requiredLimitedTextValidator(30)
 
   def requiredLimitedTextValidator(maxLength: Int)(fieldName: String, messagePrefix: String): Tuple2[String, Mapping[String]] =
     (

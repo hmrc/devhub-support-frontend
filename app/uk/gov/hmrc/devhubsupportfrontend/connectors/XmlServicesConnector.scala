@@ -23,17 +23,16 @@ import play.api.Logging
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.apiplatform.modules.apis.domain.models.{ApiCategory, ServiceName}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApiContext
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
-import uk.gov.hmrc.play.http.metrics.common._
 
 import uk.gov.hmrc.devhubsupportfrontend.config.AppConfig
 
 case class XmlApi(name: String, serviceName: ServiceName, context: ApiContext, description: String, categories: Option[Seq[ApiCategory]] = None)
 
 object XmlApi {
-  implicit val formatXmlApi: OFormat[XmlApi] = Json.format[XmlApi]
+  given formatXmlApi: OFormat[XmlApi] = Json.format[XmlApi]
 }
 
 @Singleton
@@ -41,14 +40,14 @@ class XmlServicesConnector @Inject() (
     http: HttpClientV2,
     config: AppConfig,
     metrics: ConnectorMetrics
-  )(implicit val ec: ExecutionContext
+  )(using val ec: ExecutionContext
   ) extends Logging {
 
   lazy val serviceBaseUrl: String = config.xmlServicesUrl
 
   val api = API("api-platform-xml-services")
 
-  def fetchAllXmlApis()(implicit hc: HeaderCarrier): Future[Seq[XmlApi]] = metrics.record(api) {
+  def fetchAllXmlApis()(using hc: HeaderCarrier): Future[Seq[XmlApi]] = metrics.record(api) {
     http.get(url"$serviceBaseUrl/api-platform-xml-services/xml/apis").execute[Seq[XmlApi]]
   }
 }

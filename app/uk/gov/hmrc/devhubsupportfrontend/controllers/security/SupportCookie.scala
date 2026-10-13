@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.controllers.security
 
-import play.api.mvc._
+import play.api.mvc.*
 import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
 

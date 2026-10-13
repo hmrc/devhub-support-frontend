@@ -19,7 +19,7 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.filters.csrf.CSRF.TokenProvider
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
@@ -31,8 +31,8 @@ import uk.gov.hmrc.devhubsupportfrontend.domain.models.{DeskproAttachment, Deskp
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ThirdPartyDeveloperConnectorMockModule, UpscanInitiateConnectorMockModule}
 import uk.gov.hmrc.devhubsupportfrontend.mocks.services.TicketServiceMockModule
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
-import uk.gov.hmrc.devhubsupportfrontend.views.html._
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession.*
+import uk.gov.hmrc.devhubsupportfrontend.views.html.*
 
 class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
@@ -100,8 +100,8 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
+      .withUser(using underTest)(sessionId)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
   }
@@ -110,7 +110,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withSession(sessionParams: _*)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.fails()
   }
@@ -234,7 +234,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     "invoke submitTicketResponse" should {
       "return to the tickets list when response submitted successfully" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "status"   -> statusOpen,
             "action"   -> actionSend,
             "response" -> response
@@ -269,7 +269,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       "pass the fileReference to the ticket service" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "status"                           -> statusOpen,
             "action"                           -> actionSend,
             "response"                         -> response,
@@ -295,7 +295,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       "return 500 if ticket not found" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "status"   -> statusOpen,
             "action"   -> actionSend,
             "response" -> response
@@ -317,7 +317,7 @@ class TicketControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
       "return 500 if submit response failed" in new Setup with IsLoggedIn {
         val ticketResponseRequest = request
-          .withFormUrlEncodedBody(
+          .withMethod("POST").withFormUrlEncodedBody(
             "status"   -> statusOpen,
             "action"   -> actionSend,
             "response" -> response

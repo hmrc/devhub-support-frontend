@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.devhubsupportfrontend.controllers
 
+import scala.annotation.unused
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
 
@@ -24,7 +25,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 
-import uk.gov.hmrc.devhubsupportfrontend.controllers._
+import uk.gov.hmrc.devhubsupportfrontend.controllers.*
 import uk.gov.hmrc.devhubsupportfrontend.controllers.models.MaybeUserRequest
 import uk.gov.hmrc.devhubsupportfrontend.controllers.security.SupportCookie
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.{SupportFlow, SupportSessionId}
@@ -35,21 +36,21 @@ abstract class AbstractSupportFlowController[F, E](
     supportService: SupportService
   ) extends BaseController(mcc) with SupportCookie {
 
-  protected def fullyloggedInDeveloper(implicit request: MaybeUserRequest[AnyContent]): Option[UserSession] =
+  protected def fullyloggedInDeveloper(using request: MaybeUserRequest[AnyContent]): Option[UserSession] =
     request.userSession.filter(_.loggedInState.isLoggedIn)
 
   def redirectBack(): Result
 
   def filterValidFlow(flow: SupportFlow): Boolean
 
-  def pageContents(flow: SupportFlow, form: Form[F], extras: E)(implicit request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable
+  def pageContents(flow: SupportFlow, form: Form[F], extras: E)(using request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable
 
-  def onValidForm(flow: SupportFlow, form: F)(implicit request: MaybeUserRequest[AnyContent]): Future[Result]
+  def onValidForm(flow: SupportFlow, form: F)(using request: MaybeUserRequest[AnyContent]): Future[Result]
 
   def form(): Form[F]
 
   // Typically can be successful(Unit) if nothing is needed (see HelpWithUsingAnApiController for use to get api list)
-  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[E]
+  def extraData()(using request: MaybeUserRequest[AnyContent]): Future[E]
 
   private final def performActionIfFlowValid(flow: SupportFlow)(action: SupportFlow => Result): Future[Result] = {
     Some(flow).filter(filterValidFlow).fold(successful(redirectBack()))(f => successful(action(f)))
@@ -59,12 +60,12 @@ abstract class AbstractSupportFlowController[F, E](
     Some(flow).filter(filterValidFlow).fold(successful(redirectBack()))(action)
   }
 
-  private final def lookupFlow(implicit request: MaybeUserRequest[AnyContent]): Future[SupportFlow] = {
+  private final def lookupFlow(using request: MaybeUserRequest[AnyContent]): Future[SupportFlow] = {
     val sessionId = extractSupportSessionIdFromCookie(request).getOrElse(SupportSessionId.random)
     supportService.getSupportFlow(sessionId)
   }
 
-  private final def renderPageWhenFlowIsValid(render: (SupportFlow, E) => Result)(implicit request: MaybeUserRequest[AnyContent]): Future[Result] = {
+  private final def renderPageWhenFlowIsValid(render: (SupportFlow, E) => Result)(using request: MaybeUserRequest[AnyContent]): Future[Result] = {
     lookupFlow.flatMap { flow =>
       extraData().flatMap { extras =>
         performActionIfFlowValid(flow) { validFlow =>
@@ -80,7 +81,7 @@ abstract class AbstractSupportFlowController[F, E](
     }
   }
 
-  def otherValidation(flow: SupportFlow, extraData: E, form: Form[F]): Form[F] = {
+  def otherValidation(@unused extraData: E, form: Form[F]): Form[F] = {
     form
   }
 
@@ -89,7 +90,7 @@ abstract class AbstractSupportFlowController[F, E](
       extraData().flatMap { extras =>
         performAsyncActionIfFlowValid(flow) { validFlow =>
           def handleInvalidForm(formWithErrors: Form[F]) = successful(BadRequest(pageContents(validFlow, formWithErrors, extras)))
-          otherValidation(flow, extras, form().bindFromRequest()).fold(handleInvalidForm, form => onValidForm(validFlow, form)(request))
+          otherValidation(extras, form().bindFromRequest()).fold(handleInvalidForm, form => onValidForm(validFlow, form)(using request))
         }
       }
     }

@@ -50,11 +50,11 @@ class HelpWithApplicationsController @Inject() (
     supportService: SupportService,
     helpWithApplicationsView: HelpWithApplicationsView,
     givingTeamMemberAccessView: GivingTeamMemberAccessView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractSupportFlowController[HelpWithApplicationsForm, Unit](mcc, supportService) with SupportCookie {
 
-  import HelpWithApplicationsController._
+  import HelpWithApplicationsController.*
 
   def redirectBack(): Result = Redirect(routes.SupportEnquiryInitialChoiceController.page())
 
@@ -63,14 +63,14 @@ class HelpWithApplicationsController @Inject() (
     case _                                                                  => false
   }
 
-  def pageContents(flow: SupportFlow, form: Form[HelpWithApplicationsForm], extras: Unit)(implicit request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable =
+  def pageContents(flow: SupportFlow, form: Form[HelpWithApplicationsForm], extras: Unit)(using request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable =
     helpWithApplicationsView(
       fullyloggedInDeveloper,
       form,
       routes.SupportEnquiryInitialChoiceController.page().url
     )
 
-  def onValidForm(flow: SupportFlow, form: HelpWithApplicationsForm)(implicit request: MaybeUserRequest[AnyContent]): Future[Result] = {
+  def onValidForm(flow: SupportFlow, form: HelpWithApplicationsForm)(using request: MaybeUserRequest[AnyContent]): Future[Result] = {
     form.choice match {
       case SupportData.GivingTeamMemberAccess.id                                        => successful(Redirect(routes.HelpWithApplicationsController.givingTeamMembersAccess()))
       case SupportData.CompletingTermsOfUseAgreement.id | SupportData.NoneOfTheAbove.id =>
@@ -84,7 +84,7 @@ class HelpWithApplicationsController @Inject() (
   def form(): Form[HelpWithApplicationsForm] = HelpWithApplicationsForm.form
 
   // Typically can be successful(Unit) if nothing is needed (see HelpWithUsingAnApiController for use to get api list)
-  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
+  def extraData()(using request: MaybeUserRequest[AnyContent]): Future[Unit] = successful(())
 
   def givingTeamMembersAccess(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
     successful(Ok(

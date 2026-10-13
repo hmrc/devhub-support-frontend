@@ -19,7 +19,7 @@ package uk.gov.hmrc.devhubsupportfrontend.controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.filters.csrf.CSRF.TokenProvider
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
@@ -27,7 +27,7 @@ import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 import uk.gov.hmrc.devhubsupportfrontend.config.ErrorHandler
 import uk.gov.hmrc.devhubsupportfrontend.mocks.connectors.{ThirdPartyDeveloperConnectorMockModule, UpscanInitiateConnectorMockModule}
 import uk.gov.hmrc.devhubsupportfrontend.utils.WithCSRFAddToken
-import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession._
+import uk.gov.hmrc.devhubsupportfrontend.utils.WithLoggedInSession.*
 
 class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
 
@@ -53,8 +53,8 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withUser(underTest)(sessionId)
-      .withSession(sessionParams: _*)
+      .withUser(using underTest)(sessionId)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.succeeds()
   }
@@ -63,7 +63,7 @@ class UpscanControllerSpec extends BaseControllerSpec with WithCSRFAddToken {
     self: Setup =>
 
     lazy val request = FakeRequest()
-      .withSession(sessionParams: _*)
+      .withSession(sessionParams*)
 
     ThirdPartyDeveloperConnectorMock.FetchSession.fails()
   }

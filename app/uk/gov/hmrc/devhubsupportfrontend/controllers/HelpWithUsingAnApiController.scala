@@ -54,7 +54,7 @@ object HelpWithUsingAnApiController {
 
   def chooseNone()(flow: SupportFlow) = flow.copy(subSelection = Some(SupportData.NoneOfTheAbove.id))
 
-  def choosePrivateApi(form: HelpWithUsingAnApiForm)(flow: SupportFlow) =
+  def choosePrivateApi()(flow: SupportFlow) =
     flow.copy(subSelection = Some(SupportData.PrivateApiDocumentation.id))
 }
 
@@ -66,11 +66,11 @@ class HelpWithUsingAnApiController @Inject() (
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     supportService: SupportService,
     helpWithUsingAnApiView: HelpWithUsingAnApiView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractSupportFlowController[HelpWithUsingAnApiForm, List[ApiSummary]](mcc, supportService) with SupportCookie {
 
-  import HelpWithUsingAnApiController._
+  import HelpWithUsingAnApiController.*
 
   def redirectBack(): Result = Redirect(routes.SupportEnquiryInitialChoiceController.page())
 
@@ -79,7 +79,7 @@ class HelpWithUsingAnApiController @Inject() (
     case _                                                        => false
   }
 
-  def pageContents(flow: SupportFlow, form: Form[HelpWithUsingAnApiForm], extras: List[ApiSummary])(implicit request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable =
+  def pageContents(flow: SupportFlow, form: Form[HelpWithUsingAnApiForm], extras: List[ApiSummary])(using request: MaybeUserRequest[AnyContent]): HtmlFormat.Appendable =
     helpWithUsingAnApiView(
       fullyloggedInDeveloper,
       form,
@@ -88,12 +88,12 @@ class HelpWithUsingAnApiController @Inject() (
     )
 
   def updateFlowAndRedirect(flowFn: SupportFlow => SupportFlow)(redirectTo: Call)(flow: SupportFlow) = {
-    supportService.updateWithDelta(flowFn)(flow).map { newFlow =>
+    supportService.updateWithDelta(flowFn)(flow).map { _ =>
       Redirect(redirectTo)
     }
   }
 
-  override def otherValidation(flow: SupportFlow, extraData: List[ApiSummary], form: Form[HelpWithUsingAnApiForm]): Form[HelpWithUsingAnApiForm] = {
+  override def otherValidation(extraData: List[ApiSummary], form: Form[HelpWithUsingAnApiForm]): Form[HelpWithUsingAnApiForm] = {
     def validate(fieldName: String) = {
       val matchesApiName = form(fieldName).value
         .filter(_.nonEmpty)
@@ -109,12 +109,12 @@ class HelpWithUsingAnApiController @Inject() (
     }
   }
 
-  def onValidForm(flow: SupportFlow, form: HelpWithUsingAnApiForm)(implicit request: MaybeUserRequest[AnyContent]): Future[Result] = {
+  def onValidForm(flow: SupportFlow, form: HelpWithUsingAnApiForm)(using request: MaybeUserRequest[AnyContent]): Future[Result] = {
     form.choice match {
       case SupportData.MakingAnApiCall.id         => updateFlowAndRedirect(chooseMakingCall(form))(routes.SupportDetailsController.supportDetailsPage())(flow)
       case SupportData.GettingExamples.id         => updateFlowAndRedirect(chooseGettingExamples(form))(routes.SupportDetailsController.supportDetailsPage())(flow)
       case SupportData.ReportingDocumentation.id  => updateFlowAndRedirect(chooseReporting(form))(routes.SupportDetailsController.supportDetailsPage())(flow)
-      case SupportData.PrivateApiDocumentation.id => updateFlowAndRedirect(choosePrivateApi(form))(routes.ChooseAPrivateApiController.page())(flow)
+      case SupportData.PrivateApiDocumentation.id => updateFlowAndRedirect(choosePrivateApi())(routes.ChooseAPrivateApiController.page())(flow)
       case SupportData.NoneOfTheAbove.id          => updateFlowAndRedirect(chooseNone())(routes.SupportDetailsController.supportDetailsPage())(flow)
       case _                                      => throw new RuntimeException("Validation failed to eliminate bad data during Form processing")
     }
@@ -122,6 +122,6 @@ class HelpWithUsingAnApiController @Inject() (
 
   def form(): Form[HelpWithUsingAnApiForm] = HelpWithUsingAnApiForm.form
 
-  def extraData()(implicit request: MaybeUserRequest[AnyContent]): Future[List[ApiSummary]] = supportService.fetchAllApis(request.userSession.map(_.developer.userId))
+  def extraData()(using request: MaybeUserRequest[AnyContent]): Future[List[ApiSummary]] = supportService.fetchAllApis(request.userSession.map(_.developer.userId))
 
 }

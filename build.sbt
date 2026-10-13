@@ -6,7 +6,7 @@ Global / bloopAggregateSourceDependencies := true
 Global / bloopExportJarClassifiers := Some(Set("sources"))
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.18"
+ThisBuild / scalaVersion := "3.7.4"
 
 ThisBuild / semanticdbEnabled := true
 ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
@@ -25,28 +25,26 @@ lazy val microservice = Project("devhub-support-frontend", file("."))
     Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-eT")
   )
   .settings(CodeCoverageSettings.settings: _*)
-    .settings(
-      routesImport ++= Seq(
-        "uk.gov.hmrc.devhubsupportfrontend.controllers.models._",
-        "uk.gov.hmrc.apiplatform.modules.common.domain.models._",
-    )
-  )
   .settings(
     TwirlKeys.templateImports ++= Seq(
-      "uk.gov.hmrc.hmrcfrontend.views.html.components._",
-      "uk.gov.hmrc.hmrcfrontend.views.html.helpers._",
-      "uk.gov.hmrc.apiplatform.modules.common.domain.models._",
+      "uk.gov.hmrc.hmrcfrontend.views.html.components.*",
+      "uk.gov.hmrc.hmrcfrontend.views.html.helpers.*",
+      "uk.gov.hmrc.apiplatform.modules.common.domain.models.*",
       "uk.gov.hmrc.devhubsupportfrontend.config.AppConfig",
       "uk.gov.hmrc.devhubsupportfrontend.controllers"
     )
   )
   .settings(
     scalacOptions ++= Seq(
-      "-Wconf:cat=unused&src=views/.*\\.scala:s",
+      "-Wconf:msg=unused import&src=views/.*:s",
+      "-Wconf:msg=unused implicit parameter&src=views/.*:s",
+      "-Wconf:msg=unused explicit parameter&src=views/.*:s",
       // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
       // suppress warnings in generated routes files
-      "-Wconf:src=routes/.*:s",
-      "-Wconf:cat=unused-imports&src=html/.*:s"
+      "-Wconf:msg=unused import&src=routes/.*:s",
+      "-Wconf:msg=unused pattern variable&src=routes/.*:s",
+      "-Wconf:msg=unused private member&src=routes/.*:s",
+      "-Wconf:msg=unused import&src=html/.*:s"
     )
   )
 

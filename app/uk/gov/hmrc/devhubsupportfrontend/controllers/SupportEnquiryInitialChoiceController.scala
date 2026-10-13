@@ -26,7 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.devhubsupportfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.devhubsupportfrontend.connectors.ThirdPartyDeveloperConnector
 import uk.gov.hmrc.devhubsupportfrontend.domain.models.SupportSessionId
-import uk.gov.hmrc.devhubsupportfrontend.services._
+import uk.gov.hmrc.devhubsupportfrontend.services.*
 import uk.gov.hmrc.devhubsupportfrontend.views.html.SupportEnquiryInitialChoiceView
 
 @Singleton
@@ -37,12 +37,12 @@ class SupportEnquiryInitialChoiceController @Inject() (
     val thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     supportService: SupportService,
     supportEnquiryInitialChoiceView: SupportEnquiryInitialChoiceView
-  )(implicit val ec: ExecutionContext,
+  )(using val ec: ExecutionContext,
     val appConfig: AppConfig
   ) extends AbstractController(mcc) {
 
   def page(): Action[AnyContent] = maybeAtLeastPartLoggedInEnablingMfa { implicit request =>
-    if (fullyloggedInDeveloper(request).isDefined) {
+    if (fullyloggedInDeveloper(using request).isDefined) {
       // If user is logged on then redirect to the list of tickets for that user
       Future.successful(Redirect(routes.TicketController.ticketListPage()))
     } else {

@@ -14,18 +14,12 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
 
 @import uk.gov.hmrc.apiplatform.modules.tpd.session.domain.models.UserSession
 @import uk.gov.hmrc.devhubsupportfrontend.views.html.templates.Layout
 
-@this(
-  layout: Layout,
-  govukRadios: GovukRadios,
-  govukButton : GovukButton,
-  govukInput : GovukInput,
-  govukSelect : GovukSelect
-)
+@this(layout: Layout)
 
 @(loggedInSession: Option[UserSession], backUri: String, signInUri: String)(implicit request: play.api.mvc.RequestHeader, messages: Messages, appConfig: AppConfig)
 
