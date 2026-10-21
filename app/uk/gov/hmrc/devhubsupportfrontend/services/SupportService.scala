@@ -42,7 +42,7 @@ class SupportService @Inject() (
   private def fetchSupportFlow(sessionId: SupportSessionId): Future[SupportFlow] = {
     flowRepository.fetchBySessionId(sessionId) map {
       case Some(flow) => flow
-      case None       => SupportFlow(sessionId, "unknown", None)
+      case None       => SupportFlow(sessionId, "unknown")
     }
   }
 
@@ -58,7 +58,7 @@ class SupportService @Inject() (
   }
 
   def createFlow(sessionId: SupportSessionId, entrypoint: String): Future[SupportFlow] = {
-    flowRepository.saveFlow(SupportFlow(sessionId, entrypoint, None))
+    flowRepository.saveFlow(SupportFlow(sessionId, entrypoint))
   }
 
   def fetchAllApis(userId: Option[UserId])(using hc: HeaderCarrier): Future[List[ApiSummary]] = {
