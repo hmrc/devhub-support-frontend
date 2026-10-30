@@ -61,7 +61,11 @@ class SupportServiceSpec extends AsyncHmrcSpec {
 
   given hc: HeaderCarrier = HeaderCarrier()
 
-  trait Setup extends ApmConnectorMockModule with SupportFlowRepositoryMockModule with ApiPlatformDeskproConnectorMockModule with AuditServiceMockModule
+  trait Setup
+      extends ApmConnectorMockModule 
+      with SupportFlowRepositoryMockModule 
+      with ApiPlatformDeskproConnectorMockModule 
+      with AuditServiceMockModule
       with XmlServicesConnectorMockModule {
 
     val underTest = new SupportService(
@@ -78,7 +82,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
     "default to a fixed SupportFlow if not found" in new Setup {
       SupportFlowRepositoryMock.FetchBySessionId.thenReturnNothing
 
-      underTest.getSupportFlow(sessionId)
+      await(underTest.getSupportFlow(sessionId))
       SupportFlowRepositoryMock.SaveFlow.verifyCalledWith(defaultFlow)
     }
 
@@ -92,7 +96,7 @@ class SupportServiceSpec extends AsyncHmrcSpec {
 
   "createFlow" should {
     "save a newly created flow in the flow repository" in new Setup {
-      underTest.createFlow(sessionId, entryPoint)
+      await(underTest.createFlow(sessionId, entryPoint))
       SupportFlowRepositoryMock.SaveFlow.verifyCalledWith(savedFlow)
     }
   }
