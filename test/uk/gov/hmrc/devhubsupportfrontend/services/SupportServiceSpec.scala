@@ -62,9 +62,9 @@ class SupportServiceSpec extends AsyncHmrcSpec {
   given hc: HeaderCarrier = HeaderCarrier()
 
   trait Setup
-      extends ApmConnectorMockModule 
-      with SupportFlowRepositoryMockModule 
-      with ApiPlatformDeskproConnectorMockModule 
+      extends ApmConnectorMockModule
+      with SupportFlowRepositoryMockModule
+      with ApiPlatformDeskproConnectorMockModule
       with AuditServiceMockModule
       with XmlServicesConnectorMockModule {
 
