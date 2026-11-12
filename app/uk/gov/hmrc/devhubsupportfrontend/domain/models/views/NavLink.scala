@@ -34,8 +34,7 @@ case object StaticNavLinks {
       NavLink("Getting started", s"$apiDocumentationFrontendUrl/api-documentation/docs/using-the-hub"),
       NavLink("API documentation", s"$apiDocumentationFrontendUrl/api-documentation/docs/api"),
       NavLink("Applications", s"$thirdPartyDeveloperFrontendUrl/developer/applications"),
-      NavLink("Support", routes.SupportEnquiryInitialChoiceController.page().url, active = true),
-      NavLink("Service availability", "https://api-platform-status.production.tax.service.gov.uk/", openInNewWindow = true)
+      NavLink("Support", routes.SupportEnquiryInitialChoiceController.page().url, active = true)
     )
   }
 }
