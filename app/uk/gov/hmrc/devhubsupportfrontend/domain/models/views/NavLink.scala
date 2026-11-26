@@ -33,6 +33,7 @@ case object StaticNavLinks {
     Seq(
       NavLink("Getting started", s"$apiDocumentationFrontendUrl/api-documentation/docs/using-the-hub"),
       NavLink("API documentation", s"$apiDocumentationFrontendUrl/api-documentation/docs/api"),
+      NavLink("Guides and tutorials", s"$apiDocumentationFrontendUrl/api-documentation/docs/guides-and-tutorials"),
       NavLink("Applications", s"$thirdPartyDeveloperFrontendUrl/developer/applications"),
       NavLink("Support", routes.SupportEnquiryInitialChoiceController.page().url, active = true)
     )
